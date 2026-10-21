@@ -1,6 +1,8 @@
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { Platform, StatusBar, View } from "react-native";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import Toast from "react-native-toast-message";
 import ConvexClientProvider from "../../ConvexClientProvider";
 
 const statusBarHeight =
@@ -23,16 +25,19 @@ export default function RootLayout() {
 
   return (
     <ConvexClientProvider>
-      <View style={{ flex: 1 }}>
-        <View style={{ height: statusBarHeight, backgroundColor: "#0D87E1" }}>
+      <BottomSheetModalProvider>
+        <View style={{ flex: 1 }}>
+        <View style={{ height: statusBarHeight, backgroundColor: "#087A3D" }}>
           <StatusBar
             translucent
-            backgroundColor="#0D87E1"
+            backgroundColor="#087A3D"
             barStyle="light-content"
           />
         </View>
         <Stack screenOptions={{ headerShown: false }} />
-      </View>
+        <Toast />
+        </View>
+      </BottomSheetModalProvider>
     </ConvexClientProvider>
   );
 }

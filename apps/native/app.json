@@ -1,9 +1,9 @@
 {
   "expo": {
     "newArchEnabled": true,
-    "name": "NotesContract",
-    "slug": "NotesContract",
-    "scheme": "notescontract",
+    "name": "Trinity Health Solution",
+    "slug": "trinity-health-solution",
+    "scheme": "trinityhealth",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -11,7 +11,7 @@
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0D87E1"
+      "backgroundColor": "#087A3D"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
