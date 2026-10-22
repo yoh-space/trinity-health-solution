@@ -64,6 +64,7 @@ Create `.env.local` files in `apps/web` and `apps/native` from the provided `.ex
 - Use `CONVEX_URL` from `packages/backend/.env.local` for both `NEXT_PUBLIC_CONVEX_URL` and `EXPO_PUBLIC_CONVEX_URL`
 - Use your Clerk publishable key for both app env files
 - Use your Clerk secret key in `apps/web/.env.local`
+- In the web app, name these variables `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`. Both keys must come from the same Clerk instance.
 
 ### 5. Run the apps
 
