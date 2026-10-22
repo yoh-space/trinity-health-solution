@@ -1,22 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
 
 interface Props {
   isMobile?: boolean;
+  className?: string;
 }
 
-const Logo = ({ isMobile }: Props) => {
+const Logo = ({ isMobile, className }: Props) => {
   return (
-    <Link href={"/"}>
-      <div className="flex gap-2 items-center">
-        <Image src={"/images/logo.png"} width={26} height={26} alt="logo" />
-        {!isMobile ? (
-          <h1 className="font-montserrat text-black text-3xl sm:text-[35px] not-italic font-normal leading-[90.3%] tracking-[-0.875px]">
-            UseNotes
-          </h1>
-        ) : null}
-      </div>
+    <Link href="/" aria-label="Trinity Health Solution home">
+      <Image
+        src="/images/logo-trinity-web.png"
+        width={192}
+        height={128}
+        alt="Trinity Health Solution"
+        className={`w-auto object-contain ${className ?? (isMobile ? "h-14" : "h-16")}`}
+      />
     </Link>
   );
 };

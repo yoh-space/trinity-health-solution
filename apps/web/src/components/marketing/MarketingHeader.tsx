@@ -13,7 +13,7 @@ export function MarketingHeader() {
     <header className="relative z-20 border-b border-[#183b2d]/[0.08] bg-[#fbfaf6]/90 backdrop-blur">
       <nav
         aria-label="Main navigation"
-        className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-12"
+        className="mx-auto flex h-[88px] max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-12"
       >
         <Wordmark />
         <div className="hidden items-center gap-9 md:flex">
