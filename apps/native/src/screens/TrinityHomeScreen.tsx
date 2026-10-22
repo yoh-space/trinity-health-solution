@@ -34,12 +34,7 @@ export default function TrinityHomeScreen() {
 
   const showSavedLessons = () => router.push("/public/saved" as Href);
 
-  const showOpalInfo = () => {
-    Alert.alert(copy.opalTitle, copy.opalMessage, [
-      { text: copy.cancel, style: "cancel" },
-      { text: copy.openLearn, onPress: openLearn },
-    ]);
-  };
+  const openOpal = () => router.push("/public/opal" as Href);
 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
@@ -109,7 +104,7 @@ export default function TrinityHomeScreen() {
 
         <Pressable
           accessibilityRole="button"
-          onPress={showOpalInfo}
+          onPress={openOpal}
           style={({ pressed }) => [
             styles.opalCard,
             pressed && styles.opalPressed,

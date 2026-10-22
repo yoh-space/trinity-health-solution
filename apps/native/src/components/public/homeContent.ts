@@ -30,9 +30,6 @@ export const homeCopy = {
     english: "English",
     amharic: "አማርኛ",
     cancel: "ዝጋ",
-    opalTitle: "ኦፓልን ጠይቅ",
-    opalMessage: "የተዘጋጁ መልሶችን በትምህርት ገጹ ውስጥ ያግኙ። ይህ ስሪት ገና የቀጥታ ውይይት አያቀርብም።",
-    openLearn: "ትምህርቶችን ክፈት",
   },
   en: {
     eyebrow: "CARE FOR EVERY DAY",
@@ -65,10 +62,6 @@ export const homeCopy = {
     english: "English",
     amharic: "አማርኛ",
     cancel: "Cancel",
-    opalTitle: "Ask Opal",
-    opalMessage:
-      "Find prepared answers in the Learn section. Live chat is not available in this version.",
-    openLearn: "Open learning",
   },
 } satisfies Record<
   PublicLanguage,
@@ -101,8 +94,5 @@ export const homeCopy = {
     english: string;
     amharic: string;
     cancel: string;
-    opalTitle: string;
-    opalMessage: string;
-    openLearn: string;
   }
 >;

@@ -1,11 +1,11 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
-import { useRouter } from "expo-router";
+import { useRouter, type Href } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
-  starterContent,
+  getEducationContent,
   type EducationItem,
 } from "../../components/public/educationContent";
 import { useTrinityStore } from "../../store/useTrinityStore";
@@ -18,7 +18,7 @@ export default function SavedLessonsScreen() {
   const published = useQuery(anyApi.education.listPublished) as
     | EducationItem[]
     | undefined;
-  const content = published?.length ? published : starterContent;
+  const content = getEducationContent(published);
   const savedItems = content.filter((item) => savedIds.includes(item._id));
 
   return (
@@ -42,7 +42,16 @@ export default function SavedLessonsScreen() {
 
         {savedItems.length ? (
           savedItems.map((item) => (
-            <View key={item._id} style={styles.card}>
+            <Pressable
+              accessibilityRole="button"
+              key={item._id}
+              onPress={() =>
+                router.push(
+                  `/public/article/${encodeURIComponent(item._id)}` as Href,
+                )
+              }
+              style={styles.card}
+            >
               <Text style={styles.category}>{item.category}</Text>
               <Text style={styles.cardTitle}>
                 {am ? item.titleAm : item.title}
@@ -55,7 +64,7 @@ export default function SavedLessonsScreen() {
                   ? `${item.readMinutes} ደቂቃ ንባብ`
                   : `${item.readMinutes} min read`}
               </Text>
-            </View>
+            </Pressable>
           ))
         ) : (
           <View style={styles.empty}>

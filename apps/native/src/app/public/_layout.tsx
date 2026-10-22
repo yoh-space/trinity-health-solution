@@ -15,6 +15,7 @@ export default function PublicTabs() {
           food: "restaurant-outline",
           care: "heart-outline",
           saved: "bookmark-outline",
+          opal: "chatbubble-ellipses-outline",
         };
         const titles: Record<string, string> = am
           ? {
@@ -38,9 +39,13 @@ export default function PublicTabs() {
           },
           tabBarLabelStyle: { fontFamily: "Medium", fontSize: 10 },
           tabBarIcon: ({ color, size }) => (
-            <Ionicons color={color} name={icons[route.name]} size={size} />
+            <Ionicons
+              color={color}
+              name={icons[route.name] ?? "ellipse-outline"}
+              size={size}
+            />
           ),
-          title: titles[route.name],
+          title: titles[route.name] ?? "",
         };
       }}
     >
@@ -49,6 +54,14 @@ export default function PublicTabs() {
       <Tabs.Screen name="food" />
       <Tabs.Screen name="care" />
       <Tabs.Screen name="saved" options={{ href: null }} />
+      <Tabs.Screen
+        name="opal"
+        options={{ href: null, tabBarStyle: { display: "none" } }}
+      />
+      <Tabs.Screen
+        name="article/[articleId]"
+        options={{ href: null, tabBarStyle: { display: "none" } }}
+      />
     </Tabs>
   );
 }
