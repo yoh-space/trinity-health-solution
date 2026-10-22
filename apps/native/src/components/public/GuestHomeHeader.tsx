@@ -1,0 +1,68 @@
+import { Ionicons } from "@expo/vector-icons";
+import { Pressable, StyleSheet, Text, View } from "react-native";
+
+type GuestHomeHeaderProps = {
+  language: "am" | "en";
+  onSavedPress: () => void;
+  onSettingsPress: () => void;
+};
+
+export function GuestHomeHeader({
+  language,
+  onSavedPress,
+  onSettingsPress,
+}: GuestHomeHeaderProps) {
+  const am = language === "am";
+
+  return (
+    <View style={styles.header}>
+      <View style={styles.brand}>
+        <Text style={styles.brandName}>Trinity Health Solution</Text>
+        <Text style={styles.tagline}>
+          {am ? "ትንሽ እውቀት፣ ብዙ እንክብካቤ" : "A little learning. A lot of care."}
+        </Text>
+      </View>
+      <View style={styles.actions}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={am ? "የተቀመጡ ትምህርቶች" : "Saved lessons"}
+          onPress={onSavedPress}
+          style={styles.iconButton}
+        >
+          <Ionicons name="bookmark-outline" size={19} color="#365B41" />
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={am ? "ቅንብሮች" : "Settings"}
+          onPress={onSettingsPress}
+          style={styles.iconButton}
+        >
+          <Ionicons name="settings-outline" size={19} color="#365B41" />
+        </Pressable>
+      </View>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  header: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 21,
+  },
+  brand: { flex: 1, gap: 3 },
+  brandName: { color: "#23472E", fontFamily: "MBold", fontSize: 12 },
+  tagline: { color: "#77867A", fontFamily: "Regular", fontSize: 9 },
+  actions: { flexDirection: "row", gap: 8 },
+  iconButton: {
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderColor: "#E2EAE3",
+    borderRadius: 13,
+    borderWidth: 1,
+    height: 36,
+    justifyContent: "center",
+    width: 36,
+  },
+});

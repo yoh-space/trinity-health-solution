@@ -1,1 +1,1 @@
-export { default } from "../../../screens/TrinityHomeScreen";
+export { default } from "../../../screens/LearningScreen";

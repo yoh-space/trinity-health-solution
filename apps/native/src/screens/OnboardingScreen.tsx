@@ -83,7 +83,7 @@ export default function OnboardingScreen() {
   ) => setAnswers((current) => ({ ...current, [key]: value }));
 
   const openLearning = () => {
-    router.replace("/explore" as Href);
+    router.replace("/public/home" as Href);
   };
 
   const goBack = () => {

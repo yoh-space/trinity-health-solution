@@ -46,7 +46,7 @@ export default function WelcomeScreen() {
   };
 
   const explore = () => {
-    router.push("/explore" as Href);
+    router.push("/public/home" as Href);
   };
 
   const phoneContent = (
