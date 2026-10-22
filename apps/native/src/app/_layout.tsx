@@ -27,11 +27,11 @@ export default function RootLayout() {
     <ConvexClientProvider>
       <BottomSheetModalProvider>
         <View style={{ flex: 1 }}>
-        <View style={{ height: statusBarHeight, backgroundColor: "#087A3D" }}>
+        <View style={{ height: statusBarHeight, backgroundColor: "#E6F1E8" }}>
           <StatusBar
             translucent
-            backgroundColor="#087A3D"
-            barStyle="light-content"
+            backgroundColor="#E6F1E8"
+            barStyle="dark-content"
           />
         </View>
         <Stack screenOptions={{ headerShown: false }} />

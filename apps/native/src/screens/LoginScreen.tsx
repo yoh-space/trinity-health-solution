@@ -17,7 +17,7 @@ const LoginScreen = () => {
       if (!createdSessionId || !setActive) return;
 
       await setActive({ session: createdSessionId });
-      router.replace("/");
+      router.replace("/(app)");
     } catch (err) {
       const message = String(err);
       if (message.includes("already signed in")) {
