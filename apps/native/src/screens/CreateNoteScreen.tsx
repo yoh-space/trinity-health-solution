@@ -101,7 +101,7 @@ export default function CreateNoteScreen() {
         content: noteContent,
         isSummary: isAdvancedSummarizationEnabled,
       });
-      router.replace("/");
+      router.replace("/(app)");
     } catch (error) {
       Alert.alert("Failed to create note", String(error));
     }

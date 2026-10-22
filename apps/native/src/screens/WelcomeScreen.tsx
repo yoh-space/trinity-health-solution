@@ -1,5 +1,4 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useAuth } from "@clerk/clerk-expo";
 import { useRouter, type Href } from "expo-router";
 import { useState } from "react";
 import {
@@ -16,17 +15,24 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { WelcomeLanguagePicker } from "../components/welcome/WelcomeLanguagePicker";
 import { WelcomeStoryPanel } from "../components/welcome/WelcomeStoryPanel";
-import { type WelcomeLanguage, welcomeCopy } from "../components/welcome/welcomeCopy";
+import {
+  type WelcomeLanguage,
+  welcomeCopy,
+} from "../components/welcome/welcomeCopy";
 import { useTrinityStore } from "../store/useTrinityStore";
 
-const categoryIcons = ["book-outline", "medkit-outline", "heart-outline"] as const;
+const categoryIcons = [
+  "book-outline",
+  "medkit-outline",
+  "heart-outline",
+] as const;
 
 export default function WelcomeScreen() {
   const router = useRouter();
-  const { isSignedIn } = useAuth();
   const { width } = useWindowDimensions();
   const { language: savedLanguage, setLanguage } = useTrinityStore();
-  const [language, setWelcomeLanguage] = useState<WelcomeLanguage>(savedLanguage);
+  const [language, setWelcomeLanguage] =
+    useState<WelcomeLanguage>(savedLanguage);
   const copy = welcomeCopy[language];
   const isTablet = width >= 900;
 
@@ -36,7 +42,7 @@ export default function WelcomeScreen() {
   };
 
   const begin = () => {
-    router.push(isSignedIn ? "/(app)" : "/(auth)/sign-in");
+    router.push("/onboarding" as Href);
   };
 
   const explore = () => {
@@ -55,10 +61,7 @@ export default function WelcomeScreen() {
       </View>
 
       <View
-        style={[
-          styles.heroImageFrame,
-          isTablet && styles.tabletHeroImageFrame,
-        ]}
+        style={[styles.heroImageFrame, isTablet && styles.tabletHeroImageFrame]}
       >
         <Image
           source={require("../assets/images/health-worker-consultation.jpg")}
