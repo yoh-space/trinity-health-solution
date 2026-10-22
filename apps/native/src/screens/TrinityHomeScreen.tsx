@@ -18,7 +18,7 @@ import { useTrinityStore } from "../store/useTrinityStore";
 
 export default function TrinityHomeScreen() {
   const router = useRouter();
-  const { language, setLanguage, savedIds } = useTrinityStore();
+  const { language, setLanguage } = useTrinityStore();
   const copy = homeCopy[language];
   const am = language === "am";
 

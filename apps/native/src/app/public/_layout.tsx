@@ -14,6 +14,7 @@ export default function PublicTabs() {
           learn: "book-outline",
           food: "restaurant-outline",
           care: "heart-outline",
+          saved: "bookmark-outline",
         };
         const titles: Record<string, string> = am
           ? {

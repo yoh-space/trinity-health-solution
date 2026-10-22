@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 
 type GuestHomeHeaderProps = {
   language: "am" | "en";
@@ -17,10 +17,17 @@ export function GuestHomeHeader({
   return (
     <View style={styles.header}>
       <View style={styles.brand}>
-        <Text style={styles.brandName}>Trinity Health Solution</Text>
-        <Text style={styles.tagline}>
-          {am ? "ትንሽ እውቀት፣ ብዙ እንክብካቤ" : "A little learning. A lot of care."}
-        </Text>
+        <Image
+          source={require("../../assets/images/trinity-symbol.png")}
+          resizeMode="contain"
+          style={styles.symbol}
+        />
+        <View style={styles.brandCopy}>
+          <Text style={styles.brandName}>Trinity Health Solution</Text>
+          <Text style={styles.tagline}>
+            {am ? "ትንሽ እውቀት፣ ብዙ እንክብካቤ" : "A little learning. A lot of care."}
+          </Text>
+        </View>
       </View>
       <View style={styles.actions}>
         <Pressable
@@ -51,7 +58,9 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 21,
   },
-  brand: { flex: 1, gap: 3 },
+  brand: { alignItems: "center", flex: 1, flexDirection: "row", gap: 8 },
+  symbol: { height: 34, width: 34 },
+  brandCopy: { flex: 1, gap: 3 },
   brandName: { color: "#23472E", fontFamily: "MBold", fontSize: 12 },
   tagline: { color: "#77867A", fontFamily: "Regular", fontSize: 9 },
   actions: { flexDirection: "row", gap: 8 },

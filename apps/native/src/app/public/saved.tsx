@@ -4,17 +4,11 @@ import { anyApi } from "convex/server";
 import { useRouter } from "expo-router";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import {
+  starterContent,
+  type EducationItem,
+} from "../../components/public/educationContent";
 import { useTrinityStore } from "../../store/useTrinityStore";
-
-type SavedEducationItem = {
-  _id: string;
-  category: string;
-  readMinutes: number;
-  title: string;
-  titleAm: string;
-  summary: string;
-  summaryAm: string;
-};
 
 export default function SavedLessonsScreen() {
   const router = useRouter();
@@ -22,11 +16,10 @@ export default function SavedLessonsScreen() {
   const savedIds = useTrinityStore((state) => state.savedIds);
   const am = language === "am";
   const published = useQuery(anyApi.education.listPublished) as
-    | SavedEducationItem[]
+    | EducationItem[]
     | undefined;
-  const savedItems = (published ?? []).filter((item) =>
-    savedIds.includes(item._id),
-  );
+  const content = published?.length ? published : starterContent;
+  const savedItems = content.filter((item) => savedIds.includes(item._id));
 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>

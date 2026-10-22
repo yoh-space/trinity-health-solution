@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter, type Href } from "expo-router";
 import { useState } from "react";
 import {
   Alert,
@@ -13,6 +14,7 @@ import { GuestChoiceChip } from "../components/public/GuestChoiceChip";
 import { useTrinityStore } from "../store/useTrinityStore";
 
 export default function CareRequestScreen() {
+  const router = useRouter();
   const language = useTrinityStore((state) => state.language);
   const am = language === "am";
   const [supportType, setSupportType] = useState("family");
@@ -166,6 +168,43 @@ export default function CareRequestScreen() {
               : "We do not ask for names, phone numbers, addresses, or health details. For urgent help, contact a local health service directly."}
           </Text>
         </View>
+        <Pressable
+          accessibilityRole="button"
+          onPress={() =>
+            Alert.alert(
+              am ? "ኦፓልን ይጠይቁ" : "Ask Opal",
+              am
+                ? "በዚህ ስሪት የቀጥታ ውይይት አይገኝም። በትምህርት ገጹ ላይ የተዘጋጁ መረጃዎችን ያግኙ።"
+                : "Live chat is not available in this version. Browse the Learn section for prepared educational content.",
+              [
+                {
+                  text: am ? "ዝጋ" : "Close",
+                  style: "cancel",
+                },
+                {
+                  text: am ? "ትምህርቶችን ክፈት" : "Open learning",
+                  onPress: () => router.push("/public/learn" as Href),
+                },
+              ],
+            )
+          }
+          style={styles.questionsCard}
+        >
+          <Ionicons
+            name="chatbubble-ellipses-outline"
+            size={20}
+            color="#317A48"
+          />
+          <View style={styles.questionsCopy}>
+            <Text style={styles.questionsTitle}>
+              {am ? "አጠቃላይ ጥያቄ አለዎት?" : "Have a general question?"}
+            </Text>
+            <Text style={styles.questionsSubtitle}>
+              {am ? "ኦፓልን ይጠይቁ · የተዘጋጁ መልሶች" : "Ask Opal · prepared answers"}
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={16} color="#748579" />
+        </Pressable>
       </ScrollView>
     </SafeAreaView>
   );
@@ -270,4 +309,18 @@ const styles = StyleSheet.create({
     fontSize: 9,
     lineHeight: 14,
   },
+  questionsCard: {
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderColor: "#E3EBE4",
+    borderRadius: 14,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 10,
+    marginTop: 18,
+    padding: 12,
+  },
+  questionsCopy: { flex: 1, gap: 4 },
+  questionsTitle: { color: "#314738", fontFamily: "SemiBold", fontSize: 10 },
+  questionsSubtitle: { color: "#748378", fontFamily: "Regular", fontSize: 9 },
 });
