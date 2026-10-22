@@ -16,7 +16,7 @@
     "@gorhom/bottom-sheet": "^5.2.14",
     "@packages/backend": "workspace:*",
     "expo": "~54.0.38",
-    "expo-asset": "~12.0.14",
+    "expo-asset": "12.0.13",
     "expo-auth-session": "~7.0.11",
     "expo-constants": "~18.0.14",
     "expo-font": "~14.0.12",
