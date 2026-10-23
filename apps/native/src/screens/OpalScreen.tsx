@@ -18,6 +18,10 @@ import {
   getEducationContent,
   type EducationItem,
 } from "../components/public/educationContent";
+import {
+  classifyOpalQuestion,
+  getOpalSafetyResponse,
+} from "../lib/opal/safety";
 import { useTrinityStore } from "../store/useTrinityStore";
 
 type Question = {
@@ -34,6 +38,7 @@ type Message = {
   role: "user" | "opal";
   text: string;
   sourceId?: string;
+  safety?: boolean;
 };
 
 const questions: Question[] = [
@@ -95,34 +100,40 @@ export default function OpalScreen() {
     router.push(`/public/article/${encodeURIComponent(id)}` as Href);
 
   const answerQuestion = (text: string, preferredId?: string) => {
+    const safetyIntent = classifyOpalQuestion(text);
     const normalized = text.toLocaleLowerCase();
     const matched =
-      questions.find((question) => question.id === preferredId) ??
-      questions
-        .map((question) => ({
-          question,
-          score: question.keywords.filter((keyword) =>
-            normalized.includes(keyword.toLocaleLowerCase()),
-          ).length,
-        }))
-        .filter(({ score }) => score > 0)
-        .sort((left, right) => right.score - left.score)[0]?.question;
+      safetyIntent === "safe"
+        ? (questions.find((question) => question.id === preferredId) ??
+          questions
+            .map((question) => ({
+              question,
+              score: question.keywords.filter((keyword) =>
+                normalized.includes(keyword.toLocaleLowerCase()),
+              ).length,
+            }))
+            .filter(({ score }) => score > 0)
+            .sort((left, right) => right.score - left.score)[0]?.question)
+        : undefined;
     const lesson = matched
       ? content.find((item) => item._id === matched.lessonId)
       : undefined;
     const sourceSection =
       lesson?.sections?.[matched?.sectionIndex ?? -1] ?? lesson?.sections?.[0];
-    const response = lesson
-      ? sourceSection
-        ? am
-          ? sourceSection.bodyAm
-          : sourceSection.body
-        : am
-          ? lesson.contentAm
-          : lesson.content
-      : am
-        ? "በአሁኑ ጊዜ በተዘጋጁ የትምህርት ማስታወሻዎች ውስጥ ለዚህ ጥያቄ መልስ የለኝም። ከብቁ የጤና ባለሙያ ጋር ይነጋገሩ።"
-        : "I can only help with questions covered by the prepared learning notes. I don’t have a source-backed answer for this one; please ask a qualified health professional.";
+    const response =
+      safetyIntent !== "safe"
+        ? getOpalSafetyResponse(safetyIntent, language)
+        : lesson
+          ? sourceSection
+            ? am
+              ? sourceSection.bodyAm
+              : sourceSection.body
+            : am
+              ? lesson.contentAm
+              : lesson.content
+          : am
+            ? "በአሁኑ ጊዜ በተዘጋጁ የትምህርት ማስታወሻዎች ውስጥ ለዚህ ጥያቄ መልስ የለኝም። ከብቁ የጤና ባለሙያ ጋር ይነጋገሩ።"
+            : "I can only help with questions covered by the prepared learning notes. I don’t have a source-backed answer for this one; please ask a qualified health professional.";
     const questionMessage: Message = {
       id: nextMessageId.current++,
       role: "user",
@@ -132,6 +143,7 @@ export default function OpalScreen() {
       id: nextMessageId.current++,
       role: "opal",
       text: response,
+      ...(safetyIntent !== "safe" ? { safety: true } : {}),
       ...(lesson ? { sourceId: lesson._id } : {}),
     };
     setMessages((previous) => [...previous, questionMessage, answerMessage]);
@@ -251,7 +263,11 @@ export default function OpalScreen() {
                 <View
                   style={[
                     styles.messageBubble,
-                    isOpal ? styles.opalBubble : styles.userBubble,
+                    isOpal
+                      ? message.safety
+                        ? styles.safetyBubble
+                        : styles.opalBubble
+                      : styles.userBubble,
                   ]}
                 >
                   <Text
@@ -472,6 +488,12 @@ const styles = StyleSheet.create({
   opalBubble: {
     backgroundColor: "#FFFFFF",
     borderColor: "#E3EBE4",
+    borderWidth: 1,
+    borderBottomLeftRadius: 4,
+  },
+  safetyBubble: {
+    backgroundColor: "#FFF7E8",
+    borderColor: "#E6C982",
     borderWidth: 1,
     borderBottomLeftRadius: 4,
   },

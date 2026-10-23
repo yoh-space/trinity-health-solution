@@ -20,8 +20,10 @@ export default function CareRequestScreen() {
   const [supportType, setSupportType] = useState("family");
   const [format, setFormat] = useState<"online" | "inPerson">("online");
   const [acknowledged, setAcknowledged] = useState(false);
+  const [previewCreated, setPreviewCreated] = useState(false);
 
   const submitDemo = () => {
+    setPreviewCreated(true);
     Alert.alert(
       am ? "የሙከራ ቅጽ" : "Demo request",
       am
@@ -160,6 +162,26 @@ export default function CareRequestScreen() {
           <Ionicons name="arrow-forward" size={17} color="#FFFFFF" />
         </Pressable>
 
+        {previewCreated && (
+          <View style={styles.previewResult} accessibilityRole="alert">
+            <Ionicons
+              name="checkmark-circle-outline"
+              size={20}
+              color="#8A641A"
+            />
+            <View style={styles.previewResultCopy}>
+              <Text style={styles.previewResultTitle}>
+                {am ? "የሙከራ ጥያቄ ተፈጥሯል" : "Preview created — not sent"}
+              </Text>
+              <Text style={styles.previewResultText}>
+                {am
+                  ? "ይህ በመሣሪያዎ ላይ የሚታይ ማሳያ ብቻ ነው። ለባለሙያ አልተላከም፣ ቀጠሮም አልተያዘም።"
+                  : "This is a local preview only. Nothing was sent to a professional and no appointment was booked."}
+              </Text>
+            </View>
+          </View>
+        )}
+
         <View style={styles.safetyNotice}>
           <Ionicons name="shield-checkmark-outline" size={16} color="#558262" />
           <Text style={styles.safetyText}>
@@ -296,6 +318,25 @@ const styles = StyleSheet.create({
   submitDisabled: { backgroundColor: "#A9BBAE" },
   submitPressed: { opacity: 0.82 },
   submitText: { color: "#FFFFFF", fontFamily: "Bold", fontSize: 12 },
+  previewResult: {
+    alignItems: "flex-start",
+    backgroundColor: "#FFF7E8",
+    borderColor: "#E6C982",
+    borderRadius: 14,
+    borderWidth: 1,
+    flexDirection: "row",
+    gap: 9,
+    marginTop: 12,
+    padding: 12,
+  },
+  previewResultCopy: { flex: 1, gap: 4 },
+  previewResultTitle: { color: "#6B4E14", fontFamily: "Bold", fontSize: 11 },
+  previewResultText: {
+    color: "#755F2D",
+    fontFamily: "Regular",
+    fontSize: 10,
+    lineHeight: 15,
+  },
   safetyNotice: {
     alignItems: "flex-start",
     flexDirection: "row",
