@@ -1,42 +1,355 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter, type Href } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import {
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-
-const roles = ["Counselor / Nutrition & education", "Clinician / NCD & therapy", "Admin / Queue & team"];
+import {
+  getStaffRole,
+  staffDashboardPath,
+  staffRoles,
+  type StaffRoleId,
+} from "../lib/staffRoles";
 
 export default function StaffPortalScreen() {
   const router = useRouter();
-  const [role, setRole] = useState(0);
+  const [roleId, setRoleId] = useState<StaffRoleId>("counselor");
   const [staffId, setStaffId] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
+  const role = getStaffRole(roleId);
+
+  const openDesk = () => {
+    if (!staffId.trim() || !password.trim()) {
+      setMessage(
+        "Enter your Staff ID and password, or continue with demo access.",
+      );
+      return;
+    }
+    router.push(staffDashboardPath(roleId));
+  };
+
+  const openDemo = () => {
+    setMessage("");
+    router.push(staffDashboardPath(roleId));
+  };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <View style={styles.brandRow}><View style={styles.mark}><Ionicons name="leaf-outline" size={24} color="#237B42" /></View><View><Text style={styles.brand}>Trinity Health Solution</Text><Text style={styles.tagline}>WELLNESS WITHOUT BORDERS</Text></View></View>
-        <View style={styles.eyebrowRow}><Ionicons name="shield-checkmark-outline" size={14} color="#4A8B5B" /><Text style={styles.eyebrow}>STAFF PORTAL</Text></View>
-        <Text style={styles.title}>Welcome back to care.</Text>
-        <Text style={styles.subtitle}>A calm desk for the people helping families feel well.</Text>
-        <View style={styles.roleTabs}>{roles.map((item, index) => <Pressable key={item} onPress={() => setRole(index)} style={[styles.roleTab, role === index && styles.roleTabActive]}><Text style={[styles.roleText, role === index && styles.roleTextActive]}>{item}</Text></Pressable>)}</View>
-        <View style={styles.formCard}>
-          <Text style={styles.fieldLabel}>Staff ID</Text>
-          <TextInput autoCapitalize="characters" onChangeText={setStaffId} placeholder="e.g. THS-0000" placeholderTextColor="#94A39A" style={styles.input} value={staffId} />
-          <Text style={styles.fieldLabel}>Password</Text>
-          <TextInput onChangeText={setPassword} placeholder="Enter your password" placeholderTextColor="#94A39A" secureTextEntry style={styles.input} value={password} />
-          <Pressable onPress={() => setMessage("Prototype sign-in is not connected. Use demo access to explore the desk.")} style={styles.signInButton}><Text style={styles.signInText}>Sign in</Text><Ionicons name="arrow-forward" size={16} color="#FFFFFF" /></Pressable>
-          <Pressable onPress={() => router.push("/staff-dashboard" as Href)} style={styles.demoButton}><Ionicons name="sparkles-outline" size={16} color="#287343" /><Text style={styles.demoText}>Continue with demo access</Text></Pressable>
-          {message ? <Text style={styles.message}>{message}</Text> : null}
-        </View>
-        <Text style={styles.disclaimer}>This is a prototype workspace. Demo access does not store or send credentials.</Text>
-        <Pressable onPress={() => router.replace("/" as Href)} style={styles.backButton}><Ionicons name="arrow-back" size={16} color="#386248" /><Text style={styles.backText}>Back to the family app</Text></Pressable>
-      </ScrollView>
+    <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={styles.keyboardView}
+      >
+        <ScrollView
+          contentContainerStyle={styles.content}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.brandRow}>
+            <View style={styles.logoMark}>
+              <Ionicons name="leaf-outline" size={25} color="#218243" />
+              <View style={styles.logoHeart} />
+            </View>
+            <View>
+              <Text style={styles.brandTitle}>Staff Portal</Text>
+              <Text style={styles.brandCaption}>TRINITY HEALTH SOLUTION</Text>
+            </View>
+          </View>
+
+          <View style={styles.eyebrowRow}>
+            <Ionicons
+              name="shield-checkmark-outline"
+              size={12}
+              color="#4B8A5A"
+            />
+            <Text style={styles.eyebrow}>TEAM ACCESS</Text>
+          </View>
+          <Text style={styles.title}>Welcome back to care.</Text>
+          <Text style={styles.subtitle}>
+            Review consultations, assign the right colleague, and keep families
+            informed.
+          </Text>
+
+          <View accessibilityRole="radiogroup" style={styles.roleGrid}>
+            {staffRoles.map((item) => {
+              const selected = item.id === roleId;
+              return (
+                <Pressable
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected }}
+                  key={item.id}
+                  onPress={() => {
+                    setRoleId(item.id);
+                    setMessage("");
+                  }}
+                  style={[styles.roleCard, selected && styles.roleCardSelected]}
+                >
+                  <Text
+                    style={[
+                      styles.roleName,
+                      selected && styles.roleNameSelected,
+                    ]}
+                  >
+                    {item.shortLabel}
+                  </Text>
+                  <Text
+                    style={[
+                      styles.roleDescription,
+                      selected && styles.roleDescriptionSelected,
+                    ]}
+                  >
+                    {item.description}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+
+          <View style={styles.form}>
+            <Text style={styles.fieldLabel}>Staff ID</Text>
+            <TextInput
+              autoCapitalize="characters"
+              autoCorrect={false}
+              onChangeText={(value) => {
+                setStaffId(value);
+                setMessage("");
+              }}
+              placeholder="e.g. THS-0000"
+              placeholderTextColor="#9AA89E"
+              style={styles.input}
+              value={staffId}
+            />
+            <Text style={styles.fieldLabel}>Password</Text>
+            <TextInput
+              onChangeText={(value) => {
+                setPassword(value);
+                setMessage("");
+              }}
+              placeholder="••••••••"
+              placeholderTextColor="#9AA89E"
+              secureTextEntry
+              style={styles.input}
+              value={password}
+            />
+            <Pressable
+              accessibilityRole="button"
+              onPress={openDesk}
+              style={({ pressed }) => [
+                styles.signInButton,
+                pressed && styles.pressed,
+              ]}
+            >
+              <Text style={styles.signInText}>Sign in</Text>
+              <Ionicons name="arrow-forward" size={14} color="#FFFFFF" />
+            </Pressable>
+            <Pressable
+              accessibilityRole="button"
+              onPress={openDemo}
+              style={({ pressed }) => [
+                styles.demoButton,
+                pressed && styles.demoPressed,
+              ]}
+            >
+              <Text style={styles.demoText}>Continue with demo access</Text>
+            </Pressable>
+            {message ? <Text style={styles.message}>{message}</Text> : null}
+          </View>
+
+          <View style={styles.privacyRow}>
+            <Ionicons name="lock-closed-outline" size={11} color="#66806D" />
+            <Text style={styles.privacyText}>
+              Prototype sign-in; nothing is checked, stored, or sent. Sample
+              requests are fictional and hold no personal details.
+            </Text>
+          </View>
+
+          <Pressable
+            accessibilityRole="button"
+            onPress={() => router.replace("/" as Href)}
+            style={styles.backButton}
+          >
+            <Ionicons name="arrow-back" size={13} color="#386248" />
+            <Text style={styles.backText}>Back to the family app</Text>
+          </Pressable>
+          <Text style={styles.selectedDesk}>
+            Opening {role.label.toLowerCase()} desk
+          </Text>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { backgroundColor: "#E8F3E9", flex: 1 }, content: { flexGrow: 1, padding: 24, paddingBottom: 32 }, brandRow: { alignItems: "center", flexDirection: "row", gap: 10, marginBottom: 48 }, mark: { alignItems: "center", backgroundColor: "#D6EED9", borderRadius: 18, height: 42, justifyContent: "center", width: 42 }, brand: { color: "#1E4E2E", fontFamily: "MBold", fontSize: 16 }, tagline: { color: "#64906D", fontFamily: "Bold", fontSize: 8, letterSpacing: 1, marginTop: 3 }, eyebrowRow: { alignItems: "center", flexDirection: "row", gap: 6 }, eyebrow: { color: "#4A8B5B", fontFamily: "Bold", fontSize: 9, letterSpacing: 1.4 }, title: { color: "#182C20", fontFamily: "MBold", fontSize: 30, lineHeight: 36, marginTop: 10 }, subtitle: { color: "#68796D", fontFamily: "Regular", fontSize: 12, lineHeight: 18, marginTop: 8, maxWidth: 320 }, roleTabs: { gap: 7, marginTop: 24 }, roleTab: { backgroundColor: "#F7FBF7", borderColor: "#D6E7D8", borderRadius: 12, borderWidth: 1, padding: 11 }, roleTabActive: { backgroundColor: "#287343", borderColor: "#287343" }, roleText: { color: "#4E6755", fontFamily: "SemiBold", fontSize: 10 }, roleTextActive: { color: "#FFFFFF" }, formCard: { backgroundColor: "#FFFFFF", borderColor: "#DCE9DE", borderRadius: 20, borderWidth: 1, marginTop: 18, padding: 17 }, fieldLabel: { color: "#385442", fontFamily: "SemiBold", fontSize: 10, marginBottom: 6, marginTop: 8 }, input: { borderColor: "#DCE7DE", borderRadius: 10, borderWidth: 1, color: "#263C2C", fontFamily: "Regular", fontSize: 12, minHeight: 45, paddingHorizontal: 12 }, signInButton: { alignItems: "center", backgroundColor: "#287343", borderRadius: 11, flexDirection: "row", gap: 7, justifyContent: "center", marginTop: 18, minHeight: 46 }, signInText: { color: "#FFFFFF", fontFamily: "Bold", fontSize: 11 }, demoButton: { alignItems: "center", backgroundColor: "#EEF7EF", borderRadius: 11, flexDirection: "row", gap: 7, justifyContent: "center", marginTop: 9, minHeight: 46 }, demoText: { color: "#287343", fontFamily: "SemiBold", fontSize: 11 }, message: { color: "#8A5C2B", fontFamily: "Regular", fontSize: 10, lineHeight: 15, marginTop: 12 }, disclaimer: { color: "#718075", fontFamily: "Regular", fontSize: 10, lineHeight: 15, marginTop: 15, textAlign: "center" }, backButton: { alignItems: "center", alignSelf: "center", flexDirection: "row", gap: 6, marginTop: 22, padding: 8 }, backText: { color: "#386248", fontFamily: "SemiBold", fontSize: 11 },
+  safeArea: { backgroundColor: "#F0F9F1", flex: 1 },
+  keyboardView: { flex: 1 },
+  content: {
+    flexGrow: 1,
+    paddingHorizontal: 13,
+    paddingTop: 10,
+    paddingBottom: 22,
+  },
+  brandRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 7,
+    marginBottom: 21,
+  },
+  logoMark: {
+    alignItems: "center",
+    height: 39,
+    justifyContent: "center",
+    width: 39,
+  },
+  logoHeart: {
+    borderColor: "#218243",
+    borderRadius: 8,
+    borderWidth: 1.5,
+    height: 13,
+    position: "absolute",
+    right: 1,
+    top: 14,
+    transform: [{ rotate: "-28deg" }],
+    width: 20,
+  },
+  brandTitle: { color: "#24733B", fontFamily: "MBold", fontSize: 11 },
+  brandCaption: {
+    color: "#65906D",
+    fontFamily: "Bold",
+    fontSize: 6,
+    letterSpacing: 1,
+    marginTop: 2,
+  },
+  eyebrowRow: { alignItems: "center", flexDirection: "row", gap: 4 },
+  eyebrow: {
+    color: "#4B8A5A",
+    fontFamily: "Bold",
+    fontSize: 7,
+    letterSpacing: 1.1,
+  },
+  title: {
+    color: "#1E4D2D",
+    fontFamily: "MBold",
+    fontSize: 21,
+    lineHeight: 25,
+    marginTop: 5,
+  },
+  subtitle: {
+    color: "#6D7E72",
+    fontFamily: "Regular",
+    fontSize: 8,
+    lineHeight: 12,
+    marginTop: 4,
+    maxWidth: 265,
+  },
+  roleGrid: { flexDirection: "row", gap: 5, marginTop: 14 },
+  roleCard: {
+    backgroundColor: "#F8FCF8",
+    borderColor: "#D5E7D7",
+    borderRadius: 8,
+    borderWidth: 1,
+    flex: 1,
+    minHeight: 42,
+    paddingHorizontal: 6,
+    paddingVertical: 7,
+  },
+  roleCardSelected: { backgroundColor: "#E0F1E3", borderColor: "#6FAA7A" },
+  roleName: { color: "#476151", fontFamily: "Bold", fontSize: 8 },
+  roleNameSelected: { color: "#276B3A" },
+  roleDescription: {
+    color: "#7C8A81",
+    fontFamily: "Regular",
+    fontSize: 6,
+    lineHeight: 8,
+    marginTop: 3,
+  },
+  roleDescriptionSelected: { color: "#587962" },
+  form: { marginTop: 13 },
+  fieldLabel: {
+    color: "#5B6F60",
+    fontFamily: "SemiBold",
+    fontSize: 7,
+    marginBottom: 4,
+    marginTop: 7,
+  },
+  input: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#D5E4D7",
+    borderRadius: 7,
+    borderWidth: 1,
+    color: "#284331",
+    fontFamily: "Regular",
+    fontSize: 9,
+    height: 31,
+    paddingHorizontal: 9,
+  },
+  signInButton: {
+    alignItems: "center",
+    backgroundColor: "#93C9A4",
+    borderRadius: 7,
+    flexDirection: "row",
+    gap: 5,
+    justifyContent: "center",
+    marginTop: 12,
+    minHeight: 31,
+  },
+  pressed: { opacity: 0.78 },
+  signInText: { color: "#FFFFFF", fontFamily: "Bold", fontSize: 8 },
+  demoButton: {
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderColor: "#CFE1D2",
+    borderRadius: 7,
+    borderWidth: 1,
+    justifyContent: "center",
+    marginTop: 6,
+    minHeight: 31,
+  },
+  demoPressed: { backgroundColor: "#F1F8F2" },
+  demoText: { color: "#315C3D", fontFamily: "SemiBold", fontSize: 8 },
+  message: {
+    color: "#956636",
+    fontFamily: "Regular",
+    fontSize: 7,
+    lineHeight: 10,
+    marginTop: 7,
+  },
+  privacyRow: {
+    alignItems: "flex-start",
+    flexDirection: "row",
+    gap: 4,
+    marginTop: 10,
+    paddingHorizontal: 2,
+  },
+  privacyText: {
+    color: "#78877C",
+    flex: 1,
+    fontFamily: "Regular",
+    fontSize: 6,
+    lineHeight: 8,
+  },
+  backButton: {
+    alignItems: "center",
+    alignSelf: "center",
+    flexDirection: "row",
+    gap: 4,
+    marginTop: 14,
+    padding: 5,
+  },
+  backText: { color: "#386248", fontFamily: "SemiBold", fontSize: 7 },
+  selectedDesk: {
+    color: "#9AA99D",
+    fontFamily: "Regular",
+    fontSize: 6,
+    marginTop: 3,
+    textAlign: "center",
+  },
 });
