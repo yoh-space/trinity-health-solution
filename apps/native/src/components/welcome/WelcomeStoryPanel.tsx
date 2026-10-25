@@ -1,11 +1,14 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Image, Linking, Pressable, StyleSheet, Text, View } from "react-native";
+import { useRouter, type Href } from "expo-router";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { PatternDivider } from "./PatternDivider";
 import { storyCopy } from "./welcomeCopy";
 
 const commitmentIcons = ["leaf-outline", "book-outline", "shield-checkmark-outline"] as const;
 
 export function WelcomeStoryPanel() {
+  const router = useRouter();
+
   return (
     <View style={styles.panel}>
       <View>
@@ -49,7 +52,7 @@ export function WelcomeStoryPanel() {
       <View style={styles.footer}>
         <Pressable
           accessibilityRole="link"
-          onPress={() => Linking.openURL("https://trinity-health-solution.vercel.app/admin")}
+          onPress={() => router.push("/staff-portal" as Href)}
           style={styles.portalButton}
         >
           <Ionicons name="shield-checkmark-outline" size={15} color="#275D37" />
