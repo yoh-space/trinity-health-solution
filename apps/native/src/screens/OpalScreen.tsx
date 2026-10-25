@@ -4,6 +4,7 @@ import { anyApi } from "convex/server";
 import { useRouter, type Href } from "expo-router";
 import { useRef, useState } from "react";
 import {
+  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -14,6 +15,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { GuestHomeHeader } from "../components/public/GuestHomeHeader";
 import {
   getEducationContent,
   type EducationItem,
@@ -32,7 +34,6 @@ type Question = {
   questionAm: string;
   keywords: string[];
 };
-
 type Message = {
   id: number;
   role: "user" | "opal";
@@ -84,6 +85,53 @@ const questions: Question[] = [
   },
 ];
 
+function BottomNav({
+  language,
+  onNavigate,
+}: {
+  language: "am" | "en";
+  onNavigate: (path: Href) => void;
+}) {
+  const am = language === "am";
+  const items = [
+    ["Home", "መነሻ", "home-outline", "/public/home"],
+    ["Learn", "ትምህርት", "book-outline", "/public/learn"],
+    ["Meals", "ምግብ", "restaurant-outline", "/public/food"],
+    ["Care", "እንክብካቤ", "heart-outline", "/public/care"],
+  ] as const;
+  return (
+    <View style={styles.bottomNav}>
+      {items.map(([label, labelAm, icon, path], index) => {
+        const active = index === 3;
+        return (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel={am ? labelAm : label}
+            key={label}
+            onPress={() => onNavigate(path)}
+            style={styles.bottomNavItem}
+          >
+            <View
+              style={[styles.bottomIcon, active && styles.bottomIconActive]}
+            >
+              <Ionicons
+                color={active ? "#2D7D49" : "#77857B"}
+                name={icon}
+                size={17}
+              />
+            </View>
+            <Text
+              style={[styles.bottomLabel, active && styles.bottomLabelActive]}
+            >
+              {am ? labelAm : label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
 export default function OpalScreen() {
   const router = useRouter();
   const language = useTrinityStore((state) => state.language);
@@ -96,58 +144,57 @@ export default function OpalScreen() {
   const nextMessageId = useRef(0);
   const am = language === "am";
 
-  const openLesson = (id: string) =>
-    router.push(`/public/article/${encodeURIComponent(id)}` as Href);
-
   const answerQuestion = (text: string, preferredId?: string) => {
-    const safetyIntent = classifyOpalQuestion(text);
+    const intent = classifyOpalQuestion(text);
     const normalized = text.toLocaleLowerCase();
     const matched =
-      safetyIntent === "safe"
-        ? (questions.find((question) => question.id === preferredId) ??
+      intent === "safe"
+        ? (questions.find((q) => q.id === preferredId) ??
           questions
-            .map((question) => ({
-              question,
-              score: question.keywords.filter((keyword) =>
-                normalized.includes(keyword.toLocaleLowerCase()),
+            .map((q) => ({
+              q,
+              score: q.keywords.filter((k) =>
+                normalized.includes(k.toLocaleLowerCase()),
               ).length,
             }))
             .filter(({ score }) => score > 0)
-            .sort((left, right) => right.score - left.score)[0]?.question)
+            .sort((a, b) => b.score - a.score)[0]?.q)
         : undefined;
     const lesson = matched
       ? content.find((item) => item._id === matched.lessonId)
       : undefined;
-    const sourceSection =
+    const section =
       lesson?.sections?.[matched?.sectionIndex ?? -1] ?? lesson?.sections?.[0];
     const response =
-      safetyIntent !== "safe"
-        ? getOpalSafetyResponse(safetyIntent, language)
+      intent !== "safe"
+        ? getOpalSafetyResponse(intent, language)
         : lesson
-          ? sourceSection
+          ? section
             ? am
-              ? sourceSection.bodyAm
-              : sourceSection.body
+              ? section.bodyAm
+              : section.body
             : am
               ? lesson.contentAm
               : lesson.content
           : am
             ? "በአሁኑ ጊዜ በተዘጋጁ የትምህርት ማስታወሻዎች ውስጥ ለዚህ ጥያቄ መልስ የለኝም። ከብቁ የጤና ባለሙያ ጋር ይነጋገሩ።"
             : "I can only help with questions covered by the prepared learning notes. I don’t have a source-backed answer for this one; please ask a qualified health professional.";
-    const questionMessage: Message = {
-      id: nextMessageId.current++,
-      role: "user",
-      text,
-    };
-    const answerMessage: Message = {
-      id: nextMessageId.current++,
-      role: "opal",
-      text: response,
-      ...(safetyIntent !== "safe" ? { safety: true } : {}),
-      ...(lesson ? { sourceId: lesson._id } : {}),
-    };
-    setMessages((previous) => [...previous, questionMessage, answerMessage]);
+    setMessages((previous) => [
+      ...previous,
+      { id: nextMessageId.current++, role: "user", text },
+      {
+        id: nextMessageId.current++,
+        role: "opal",
+        text: response,
+        ...(intent !== "safe" ? { safety: true } : {}),
+        ...(lesson ? { sourceId: lesson._id } : {}),
+      },
+    ]);
     setDraft("");
+  };
+  const submitDraft = () => {
+    const text = draft.trim();
+    if (text) answerQuestion(text);
   };
 
   return (
@@ -156,421 +203,403 @@ export default function OpalScreen() {
         behavior={Platform.OS === "ios" ? "padding" : undefined}
         style={styles.keyboardView}
       >
-        <View style={styles.header}>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={am ? "ተመለስ" : "Go back"}
-            onPress={() => router.back()}
-            style={styles.backButton}
-          >
-            <Ionicons name="arrow-back" size={19} color="#345B40" />
-          </Pressable>
-          <View style={styles.headerCenter}>
-            <View style={styles.opalAvatar}>
-              <Ionicons
-                name="chatbubble-ellipses-outline"
-                size={18}
-                color="#FFFFFF"
-              />
-            </View>
-            <View>
-              <Text style={styles.headerTitle}>Opal</Text>
-              <Text style={styles.headerSubtitle}>
-                {am ? "የትምህርት ረዳት" : "Learning companion"}
-              </Text>
-            </View>
-          </View>
-          <View style={styles.onlineBadge} />
+        <View style={styles.pageHeader}>
+          <GuestHomeHeader
+            language={language}
+            onHomePress={() => router.replace("/public/home" as Href)}
+            onSavedPress={() => router.push("/public/saved" as Href)}
+            onSettingsPress={() =>
+              Alert.alert(
+                am ? "ቅንብሮች" : "Settings",
+                am
+                  ? "የቋንቋ ቅንብሮችን ከመነሻ ገጽ ይክፈቱ።"
+                  : "Open the language settings from the Home screen.",
+              )
+            }
+          />
         </View>
-
         <ScrollView
           contentContainerStyle={styles.conversation}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View style={styles.privacyNote}>
-            <Ionicons
-              name="shield-checkmark-outline"
-              size={17}
-              color="#52735A"
-            />
-            <Text style={styles.privacyText}>
-              {am
-                ? "ይህ የተዘጋጁ የትምህርት ማስታወሻዎች ብቻ የሚጠቀም የሙከራ ረዳት ነው። የግል ወይም የጤና መረጃ አያስገቡ።"
-                : "Opal uses prepared learning notes only. Don’t share personal or health details."}
-            </Text>
-          </View>
-
-          <View style={styles.welcomeCard}>
-            <Text style={styles.welcomeTitle}>
-              {am ? "ሰላም፣ እኔ ኦፓል ነኝ።" : "Hi, I’m Opal."}
-            </Text>
-            <Text style={styles.welcomeBody}>
-              {am
-                ? "ከእነዚህ የተዘጋጁ ጥያቄዎች ይምረጡ ወይም በታች ይጻፉ። መልሶቼ ከትምህርት ማስታወሻዎች ይመጣሉ።"
-                : "Choose a suggested question or type below. Answers come from the learning notes."}
-            </Text>
-          </View>
-
+          <Text style={styles.eyebrow}>
+            {am ? "ትንሽ መመሪያ" : "A LITTLE GUIDANCE"}
+          </Text>
+          <Text style={styles.title}>{am ? "ኦፓልን ይጠይቁ" : "Ask Opal"}</Text>
+          <Text style={styles.subtitle}>
+            {am
+              ? "መልሶች ከዚህ ማሳያ ውስጥ ከተካተቱ ማስታወሻዎች ይመጣሉ።"
+              : "Answers matched from notes bundled inside this prototype."}
+          </Text>
           {!messages.length && (
-            <View style={styles.suggestions}>
-              <Text style={styles.suggestionsTitle}>
-                {am ? "ሊጠይቁ የሚችሉት" : "SUGGESTED QUESTIONS"}
-              </Text>
-              {questions.map((question) => (
-                <Pressable
-                  accessibilityRole="button"
-                  key={question.id}
-                  onPress={() =>
-                    answerQuestion(
-                      am ? question.questionAm : question.question,
-                      question.id,
-                    )
-                  }
-                  style={({ pressed }) => [
-                    styles.suggestion,
-                    pressed && styles.suggestionPressed,
-                  ]}
-                >
-                  <Text style={styles.suggestionText}>
-                    {am ? question.questionAm : question.question}
-                  </Text>
-                  <Ionicons name="arrow-up-outline" size={16} color="#438451" />
-                </Pressable>
-              ))}
+            <View style={styles.welcomeRow}>
+              <View style={styles.leafBadge}>
+                <Ionicons name="leaf" size={18} color="#2E8A4D" />
+              </View>
+              <View style={styles.welcomeBubble}>
+                <Text style={styles.welcomeTitle}>
+                  {am ? "ሰላም! ምን እንመርምር?" : "Selam! What shall we explore?"}
+                </Text>
+                <Text style={styles.welcomeText}>
+                  {am
+                    ? "ከታች ያለውን ጥያቄ ይምረጡ ወይም የራስዎን ይጻፉ።"
+                    : "Pick a question below or type your own. I can share notes on food safety, water, pregnancy, breastfeeding, and feeding young children."}
+                </Text>
+              </View>
             </View>
           )}
-
-          {messages.map((message) => {
-            const isOpal = message.role === "opal";
-            const source = message.sourceId
-              ? content.find((item) => item._id === message.sourceId)
-              : undefined;
-            return (
-              <View
-                key={message.id}
-                style={[styles.messageRow, !isOpal && styles.userMessageRow]}
-              >
-                {isOpal && (
-                  <View style={styles.messageAvatar}>
-                    <Ionicons
-                      name="chatbubble-ellipses-outline"
-                      size={14}
-                      color="#FFFFFF"
-                    />
-                  </View>
-                )}
-                <View
-                  style={[
-                    styles.messageBubble,
-                    isOpal
-                      ? message.safety
-                        ? styles.safetyBubble
-                        : styles.opalBubble
-                      : styles.userBubble,
-                  ]}
-                >
-                  <Text
+          {!!messages.length && (
+            <View style={styles.messageList}>
+              {messages.map((message) => {
+                const isOpal = message.role === "opal";
+                const source = message.sourceId
+                  ? content.find((item) => item._id === message.sourceId)
+                  : undefined;
+                return (
+                  <View
+                    key={message.id}
                     style={[
-                      styles.messageText,
-                      !isOpal && styles.userMessageText,
+                      styles.messageRow,
+                      !isOpal && styles.userMessageRow,
                     ]}
                   >
-                    {message.text}
-                  </Text>
-                  {source && (
-                    <Pressable
-                      accessibilityRole="link"
-                      onPress={() => openLesson(source._id)}
-                      style={styles.sourceLink}
+                    {isOpal && (
+                      <View style={styles.messageLeaf}>
+                        <Ionicons name="leaf" size={13} color="#2E8A4D" />
+                      </View>
+                    )}
+                    <View
+                      style={[
+                        styles.messageBubble,
+                        isOpal
+                          ? message.safety
+                            ? styles.safetyBubble
+                            : styles.opalBubble
+                          : styles.userBubble,
+                      ]}
                     >
-                      <Ionicons name="book-outline" size={14} color="#087A3D" />
-                      <Text style={styles.sourceLinkText}>
-                        {am ? "ምንጭ" : "Read source"}:{" "}
-                        {am ? source.titleAm : source.title}
+                      <Text
+                        style={[
+                          styles.messageText,
+                          !isOpal && styles.userMessageText,
+                        ]}
+                      >
+                        {message.text}
                       </Text>
-                      <Ionicons
-                        name="arrow-forward"
-                        size={12}
-                        color="#087A3D"
-                      />
-                    </Pressable>
-                  )}
-                  {isOpal && !source && (
-                    <Text style={styles.unsourcedNote}>
-                      {am
-                        ? "ምንጭ ያለው መልስ አልተገኘም።"
-                        : "No matching source note found."}
-                    </Text>
-                  )}
-                </View>
-              </View>
-            );
-          })}
-
-          {!!messages.length && (
+                      {source && (
+                        <Pressable
+                          accessibilityRole="link"
+                          onPress={() =>
+                            router.push(
+                              `/public/article/${encodeURIComponent(source._id)}` as Href,
+                            )
+                          }
+                          style={styles.sourceLink}
+                        >
+                          <Ionicons
+                            name="book-outline"
+                            size={13}
+                            color="#087A3D"
+                          />
+                          <Text style={styles.sourceLinkText}>
+                            {am ? "ምንጭ" : "Read source"}:{" "}
+                            {am ? source.titleAm : source.title}
+                          </Text>
+                        </Pressable>
+                      )}
+                    </View>
+                  </View>
+                );
+              })}
+              <Pressable
+                onPress={() => setMessages([])}
+                style={styles.resetButton}
+              >
+                <Ionicons name="refresh-outline" size={14} color="#438451" />
+                <Text style={styles.resetText}>
+                  {am ? "አዲስ ውይይት ጀምር" : "Start a new conversation"}
+                </Text>
+              </Pressable>
+            </View>
+          )}
+          <View style={styles.quickQuestions}>
+            {[questions[0], questions[4]].map((question) => (
+              <Pressable
+                accessibilityRole="button"
+                key={question.id}
+                onPress={() =>
+                  answerQuestion(
+                    am ? question.questionAm : question.question,
+                    question.id,
+                  )
+                }
+                style={({ pressed }) => [
+                  styles.quickQuestion,
+                  pressed && styles.quickQuestionPressed,
+                ]}
+              >
+                <Text numberOfLines={1} style={styles.quickQuestionText}>
+                  {am
+                    ? question.id === "food-hands"
+                      ? "የምግብ ደህንነት ትምህርት አሳየኝ"
+                      : "የመጠጥ ውሃን ደህንነት እንዴት እጠብቅ?"
+                    : question.id === "food-hands"
+                      ? "Show me a food-safety lesson"
+                      : "How do I keep drinking water safe?"}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
+        </ScrollView>
+        <View style={styles.composerSection}>
+          <View style={styles.composer}>
+            <TextInput
+              accessibilityLabel={am ? "ጥያቄዎን ይጻፉ" : "Ask Opal a question"}
+              onChangeText={setDraft}
+              onSubmitEditing={submitDraft}
+              placeholder={
+                am
+                  ? "ስለ ምግብ፣ ውሃ ወይም ንጽህና ይጠይቁ..."
+                  : "Ask about food, water or hygiene..."
+              }
+              placeholderTextColor="#9AA79D"
+              returnKeyType="send"
+              style={styles.input}
+              value={draft}
+            />
             <Pressable
               accessibilityRole="button"
-              onPress={() => setMessages([])}
-              style={styles.resetButton}
+              accessibilityLabel={am ? "ጥያቄ ላክ" : "Send question"}
+              disabled={!draft.trim()}
+              onPress={submitDraft}
+              style={[styles.sendButton, !draft.trim() && styles.sendDisabled]}
             >
-              <Ionicons name="refresh-outline" size={15} color="#438451" />
-              <Text style={styles.resetText}>
-                {am ? "አዲስ ውይይት ጀምር" : "Start a new conversation"}
-              </Text>
+              <Ionicons name="arrow-up" size={18} color="#FFFFFF" />
             </Pressable>
-          )}
-        </ScrollView>
-
-        <View style={styles.composer}>
-          <TextInput
-            accessibilityLabel={am ? "ጥያቄዎን ይጻፉ" : "Type your question"}
-            multiline
-            onChangeText={setDraft}
-            onSubmitEditing={() => {
-              if (draft.trim()) answerQuestion(draft.trim());
-            }}
-            placeholder={
-              am ? "የጤና ወይም የግል መረጃ አያስገቡ..." : "Ask a general question..."
-            }
-            placeholderTextColor="#89958C"
-            returnKeyType="send"
-            style={styles.input}
-            value={draft}
-          />
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={am ? "ጥያቄ ላክ" : "Send question"}
-            disabled={!draft.trim()}
-            onPress={() => answerQuestion(draft.trim())}
-            style={[styles.sendButton, !draft.trim() && styles.sendDisabled]}
-          >
-            <Ionicons name="arrow-up" size={20} color="#FFFFFF" />
-          </Pressable>
+          </View>
+          <Text style={styles.disclaimer}>
+            {am
+              ? "ስም፣ ስልክ ቁጥር ወይም የጤና ዝርዝር አይጻፉ። መልዕክቶች ለዚህ ክፍለ ጊዜ ብቻ ናቸው።"
+              : "Please don't type names, phone numbers, or health details. Messages stay on this screen for this session only."}
+          </Text>
         </View>
+        <BottomNav
+          language={language}
+          onNavigate={(path) => router.replace(path)}
+        />
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { backgroundColor: "#F7FAF6", flex: 1 },
+  safeArea: { backgroundColor: "#F8FBF8", flex: 1 },
   keyboardView: { flex: 1 },
-  header: {
-    alignItems: "center",
+  pageHeader: {
     backgroundColor: "#FFFFFF",
-    borderBottomColor: "#E5ECE5",
+    borderBottomColor: "#E2EAE3",
     borderBottomWidth: 1,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 17,
-    paddingVertical: 11,
+    paddingHorizontal: 14,
+    paddingTop: 5,
   },
-  backButton: {
-    alignItems: "center",
-    backgroundColor: "#F6F9F6",
-    borderRadius: 13,
-    height: 38,
-    justifyContent: "center",
-    width: 38,
+  conversation: { paddingBottom: 10, paddingHorizontal: 15, paddingTop: 13 },
+  eyebrow: {
+    color: "#438451",
+    fontFamily: "Bold",
+    fontSize: 8,
+    letterSpacing: 1.2,
   },
-  headerCenter: {
-    alignItems: "center",
-    flexDirection: "row",
-    flex: 1,
-    gap: 10,
-    marginLeft: 12,
+  title: {
+    color: "#203A28",
+    fontFamily: "MBold",
+    fontSize: 24,
+    lineHeight: 29,
+    marginTop: 4,
   },
-  opalAvatar: {
-    alignItems: "center",
-    backgroundColor: "#347346",
-    borderRadius: 15,
-    height: 38,
-    justifyContent: "center",
-    width: 38,
-  },
-  headerTitle: { color: "#203A28", fontFamily: "Bold", fontSize: 14 },
-  headerSubtitle: {
-    color: "#7A887D",
-    fontFamily: "Regular",
-    fontSize: 10,
-    marginTop: 2,
-  },
-  onlineBadge: {
-    backgroundColor: "#79B681",
-    borderColor: "#FFFFFF",
-    borderRadius: 6,
-    borderWidth: 2,
-    height: 12,
-    width: 12,
-  },
-  conversation: { padding: 17, paddingBottom: 25 },
-  privacyNote: {
-    alignItems: "flex-start",
-    backgroundColor: "#EAF4EB",
-    borderRadius: 13,
-    flexDirection: "row",
-    gap: 8,
-    padding: 11,
-  },
-  privacyText: {
-    color: "#49634E",
-    flex: 1,
+  subtitle: {
+    color: "#718075",
     fontFamily: "Regular",
     fontSize: 10,
     lineHeight: 15,
+    marginTop: 2,
   },
-  welcomeCard: {
-    backgroundColor: "#FFFFFF",
-    borderColor: "#E4EBE4",
-    borderRadius: 17,
-    borderWidth: 1,
-    marginTop: 18,
-    padding: 15,
-  },
-  welcomeTitle: { color: "#203A28", fontFamily: "Bold", fontSize: 16 },
-  welcomeBody: {
-    color: "#68766B",
-    fontFamily: "Regular",
-    fontSize: 12,
-    lineHeight: 18,
-    marginTop: 6,
-  },
-  suggestions: { marginTop: 22 },
-  suggestionsTitle: {
-    color: "#7A887D",
-    fontFamily: "Bold",
-    fontSize: 9,
-    letterSpacing: 1,
-    marginBottom: 9,
-  },
-  suggestion: {
-    alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    borderColor: "#E3EBE4",
-    borderRadius: 13,
-    borderWidth: 1,
+  welcomeRow: {
+    alignItems: "flex-start",
     flexDirection: "row",
-    gap: 10,
-    justifyContent: "space-between",
-    marginBottom: 8,
-    paddingHorizontal: 13,
-    paddingVertical: 12,
+    gap: 7,
+    marginTop: 18,
   },
-  suggestionPressed: { backgroundColor: "#EFF6F0" },
-  suggestionText: {
-    color: "#35543C",
+  leafBadge: {
+    alignItems: "center",
+    backgroundColor: "#E5F2E7",
+    borderRadius: 14,
+    height: 28,
+    justifyContent: "center",
+    marginTop: 3,
+    width: 28,
+  },
+  welcomeBubble: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#DDE8DF",
+    borderRadius: 14,
+    borderTopLeftRadius: 4,
+    borderWidth: 1,
     flex: 1,
-    fontFamily: "Medium",
-    fontSize: 11,
-    lineHeight: 16,
+    paddingHorizontal: 12,
+    paddingVertical: 10,
   },
+  welcomeTitle: { color: "#203A28", fontFamily: "Bold", fontSize: 11 },
+  welcomeText: {
+    color: "#657568",
+    fontFamily: "Regular",
+    fontSize: 9,
+    lineHeight: 13,
+    marginTop: 5,
+  },
+  messageList: { marginTop: 17 },
   messageRow: {
     alignItems: "flex-end",
     flexDirection: "row",
-    gap: 7,
-    marginTop: 14,
+    gap: 6,
+    marginBottom: 10,
   },
   userMessageRow: { justifyContent: "flex-end" },
-  messageAvatar: {
+  messageLeaf: {
     alignItems: "center",
-    backgroundColor: "#347346",
-    borderRadius: 12,
-    height: 25,
+    backgroundColor: "#E5F2E7",
+    borderRadius: 11,
+    height: 22,
     justifyContent: "center",
-    width: 25,
+    width: 22,
   },
-  messageBubble: {
-    borderRadius: 15,
-    maxWidth: "84%",
-    padding: 12,
-  },
+  messageBubble: { borderRadius: 13, maxWidth: "86%", padding: 10 },
   opalBubble: {
     backgroundColor: "#FFFFFF",
-    borderColor: "#E3EBE4",
+    borderColor: "#DDE8DF",
     borderWidth: 1,
     borderBottomLeftRadius: 4,
   },
   safetyBubble: {
-    backgroundColor: "#FFF7E8",
+    backgroundColor: "#FFF8E8",
     borderColor: "#E6C982",
     borderWidth: 1,
     borderBottomLeftRadius: 4,
   },
-  userBubble: {
-    backgroundColor: "#347346",
-    borderBottomRightRadius: 4,
-  },
+  userBubble: { backgroundColor: "#347346", borderBottomRightRadius: 4 },
   messageText: {
     color: "#435649",
     fontFamily: "Regular",
-    fontSize: 12,
-    lineHeight: 18,
+    fontSize: 11,
+    lineHeight: 16,
   },
   userMessageText: { color: "#FFFFFF" },
   sourceLink: {
     alignItems: "center",
     backgroundColor: "#EEF6EF",
-    borderRadius: 9,
+    borderRadius: 8,
     flexDirection: "row",
-    gap: 5,
-    marginTop: 10,
-    paddingHorizontal: 8,
-    paddingVertical: 7,
+    gap: 4,
+    marginTop: 8,
+    paddingHorizontal: 7,
+    paddingVertical: 6,
   },
   sourceLinkText: {
     color: "#087A3D",
     flex: 1,
     fontFamily: "SemiBold",
-    fontSize: 9,
-    lineHeight: 13,
-  },
-  unsourcedNote: {
-    color: "#89958C",
-    fontFamily: "Regular",
-    fontSize: 9,
-    marginTop: 7,
+    fontSize: 8,
+    lineHeight: 11,
   },
   resetButton: {
     alignItems: "center",
     alignSelf: "center",
     flexDirection: "row",
     gap: 5,
-    marginTop: 18,
-    padding: 8,
+    marginTop: 2,
+    padding: 7,
   },
-  resetText: { color: "#438451", fontFamily: "SemiBold", fontSize: 10 },
-  composer: {
-    alignItems: "center",
+  resetText: { color: "#438451", fontFamily: "SemiBold", fontSize: 9 },
+  quickQuestions: { flexDirection: "row", gap: 7, marginTop: 15 },
+  quickQuestion: {
     backgroundColor: "#FFFFFF",
-    borderTopColor: "#E5ECE5",
-    borderTopWidth: 1,
-    flexDirection: "row",
-    gap: 9,
-    paddingHorizontal: 13,
-    paddingVertical: 10,
-  },
-  input: {
-    backgroundColor: "#F5F8F5",
-    borderColor: "#E3EBE4",
-    borderRadius: 15,
+    borderColor: "#DEE8DF",
+    borderRadius: 12,
     borderWidth: 1,
-    color: "#283E2E",
+    flex: 1,
+    minHeight: 32,
+    justifyContent: "center",
+    paddingHorizontal: 8,
+  },
+  quickQuestionPressed: { backgroundColor: "#EEF7EF" },
+  quickQuestionText: {
+    color: "#4B6751",
+    fontFamily: "Medium",
+    fontSize: 8,
+    textAlign: "center",
+  },
+  composerSection: {
+    backgroundColor: "#FFFFFF",
+    borderTopColor: "#E2EAE3",
+    borderTopWidth: 1,
+    paddingHorizontal: 13,
+    paddingTop: 8,
+  },
+  composer: { alignItems: "center", flexDirection: "row", gap: 7 },
+  input: {
+    backgroundColor: "#F4F8F4",
+    borderColor: "#CFE0D2",
+    borderRadius: 18,
+    borderWidth: 1,
+    color: "#2A4431",
     flex: 1,
     fontFamily: "Regular",
-    fontSize: 12,
-    maxHeight: 88,
-    minHeight: 42,
-    paddingHorizontal: 13,
-    paddingVertical: 10,
+    fontSize: 10,
+    height: 38,
+    paddingHorizontal: 12,
   },
   sendButton: {
     alignItems: "center",
-    backgroundColor: "#087A3D",
-    borderRadius: 15,
-    height: 42,
+    backgroundColor: "#73B589",
+    borderRadius: 17,
+    height: 34,
     justifyContent: "center",
-    width: 42,
+    width: 34,
   },
-  sendDisabled: { backgroundColor: "#A6B5A9" },
+  sendDisabled: { backgroundColor: "#AFC7B4" },
+  disclaimer: {
+    color: "#829087",
+    fontFamily: "Regular",
+    fontSize: 7,
+    lineHeight: 10,
+    marginHorizontal: 4,
+    marginTop: 5,
+    textAlign: "center",
+  },
+  bottomNav: {
+    alignItems: "flex-start",
+    backgroundColor: "#FFFFFF",
+    borderTopColor: "#E2EAE3",
+    borderTopWidth: 1,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    minHeight: 61,
+    paddingTop: 5,
+  },
+  bottomNavItem: { alignItems: "center", flex: 1 },
+  bottomIcon: {
+    alignItems: "center",
+    borderRadius: 12,
+    height: 27,
+    justifyContent: "center",
+    width: 34,
+  },
+  bottomIconActive: { backgroundColor: "#E5F2E7" },
+  bottomLabel: {
+    color: "#77857B",
+    fontFamily: "Medium",
+    fontSize: 8,
+    marginTop: 1,
+  },
+  bottomLabelActive: { color: "#2D7D49", fontFamily: "Bold" },
 });
