@@ -24,7 +24,7 @@ export default function PublicTabs() {
               food: "ምግብ",
               care: "እንክብካቤ",
             }
-          : { home: "Home", learn: "Learn", food: "Food", care: "Care" };
+          : { home: "Home", learn: "Learn", food: "Meals", care: "Care" };
 
         return {
           headerShown: false,
