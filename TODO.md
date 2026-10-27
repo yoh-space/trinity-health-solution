@@ -12,5 +12,7 @@
 - [x] Add staff shell with role-aware navigation and staff overview.
 - [x] Add staff request queue, assigned-client directory, client summary, and appointment views.
 - [x] Add admin team-access entry point and preserve the education publisher CMS.
+- [x] Add admin content search, draft/live filters, bilingual editing, article preview, and explicit publish/unpublish/delete confirmations.
+- [x] Add an authenticated education-content update mutation while preserving the existing publisher authorization guard.
 - [ ] Connect client requests, profiles, appointments, notes, and saved content to Convex tables with ownership and staff-role authorization.
 - [ ] Replace prototype request actions and demo records with persisted mutations and audit logs.

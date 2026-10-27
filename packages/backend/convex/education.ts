@@ -13,10 +13,16 @@ const contentArgs = {
 };
 
 async function requirePublisher(ctx: {
-  auth: { getUserIdentity: () => Promise<{ subject: string; tokenIdentifier: string } | null> };
+  auth: {
+    getUserIdentity: () => Promise<{
+      subject: string;
+      tokenIdentifier: string;
+    } | null>;
+  };
 }) {
   const identity = await ctx.auth.getUserIdentity();
-  if (!identity) throw new Error("Sign in is required to manage education content.");
+  if (!identity)
+    throw new Error("Sign in is required to manage education content.");
 
   const allowedUsers = (process.env.ADMIN_CLERK_USER_IDS ?? "")
     .split(",")
@@ -54,7 +60,11 @@ function validateContent(args: {
     throw new Error("Complete each English and Amharic field before saving.");
   }
 
-  if (!Number.isInteger(args.readMinutes) || args.readMinutes < 1 || args.readMinutes > 60) {
+  if (
+    !Number.isInteger(args.readMinutes) ||
+    args.readMinutes < 1 ||
+    args.readMinutes > 60
+  ) {
     throw new Error("Read time must be between 1 and 60 minutes.");
   }
 }
@@ -87,6 +97,20 @@ export const create = mutation({
       authorTokenIdentifier: identity.tokenIdentifier,
       status: "draft",
     });
+  },
+});
+
+export const update = mutation({
+  args: {
+    id: v.id("educationContent"),
+    ...contentArgs,
+  },
+  handler: async (ctx, { id, ...args }) => {
+    await requirePublisher(ctx);
+    validateContent(args);
+    const item = await ctx.db.get(id);
+    if (!item) throw new Error("This education item no longer exists.");
+    await ctx.db.patch(id, args);
   },
 });
 
