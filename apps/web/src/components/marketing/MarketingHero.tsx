@@ -2,6 +2,7 @@ import {
   ArrowDownRight,
   ArrowRight,
   Heart,
+  Sparkle,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
@@ -20,8 +21,7 @@ function FamilyIllustration() {
           <div className="absolute bottom-0 left-0 h-40 w-full bg-[linear-gradient(0deg,rgba(108,135,103,0.12),transparent)]" />
 
           <div className="absolute left-5 top-5 z-10 flex items-center gap-2 rounded-full bg-white/75 px-3 py-2 text-[11px] font-semibold text-[#45604a] backdrop-blur sm:left-8 sm:top-8">
-            <Sparkles size={13} aria-hidden="true" />
-            A moment to learn
+            <Sparkles size={13} aria-hidden="true" />A moment to learn
           </div>
           <div className="absolute right-5 top-20 z-10 hidden rotate-6 rounded-2xl bg-[#c37c57] px-4 py-3 text-xs font-medium text-white shadow-lg sm:block">
             Small steps,
@@ -122,7 +122,7 @@ export function MarketingHero() {
                 T
               </span>
               <span className="grid size-8 place-items-center rounded-full border-2 border-[#fbfaf6] bg-[#f2ded1] text-[10px] font-semibold text-[#9b593e]">
-                ✳
+                <Sparkle size={12} strokeWidth={1.8} aria-hidden="true" />
               </span>
             </span>
             <span>Learning shaped around families and community</span>

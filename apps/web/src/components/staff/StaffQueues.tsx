@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 import { demoRequests, statusStyles } from "@/lib/portal";
 
 export function StaffRequests() {
@@ -83,7 +84,9 @@ export function StaffClients() {
                 : "Family learning follow-up"}
             </p>
             <span className="mt-5 inline-block text-sm font-bold text-[#438451]">
-              View summary →
+              <span className="inline-flex items-center gap-2">
+                View summary <ArrowRight size={15} aria-hidden="true" />
+              </span>
             </span>
           </Link>
         ))}

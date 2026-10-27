@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { ArrowLeft } from "lucide-react";
 
 export function ConsultationRequestForm() {
   const [submitted, setSubmitted] = useState(false);
@@ -46,7 +47,10 @@ export function ConsultationRequestForm() {
       className="max-w-3xl rounded-3xl border border-[#dce8de] bg-white p-6 shadow-sm sm:p-8"
     >
       <Link href="/portal" className="text-sm font-bold text-[#438451]">
-        ← Back to portal
+        <span className="inline-flex items-center gap-2">
+          <ArrowLeft size={15} aria-hidden="true" />
+          Back to portal
+        </span>
       </Link>
       <p className="mt-10 text-xs font-bold uppercase tracking-[0.18em] text-[#438451]">
         REQUEST SUPPORT

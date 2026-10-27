@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
+import { ArrowRight } from "lucide-react";
 
 export function PortalDashboard() {
   const { user } = useUser();
@@ -61,7 +62,9 @@ export function PortalDashboard() {
             href="/portal/consultations/new"
             className="mt-6 inline-block rounded-full bg-[#eaf4eb] px-4 py-2.5 text-sm font-bold text-[#287343]"
           >
-            Start a request →
+            <span className="inline-flex items-center gap-2">
+              Start a request <ArrowRight size={15} aria-hidden="true" />
+            </span>
           </Link>
         </section>
         <section className="rounded-3xl bg-[#173e27] p-6 text-white">

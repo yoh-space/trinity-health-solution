@@ -4,6 +4,7 @@ import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
 import Link from "next/link";
 import { useState } from "react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import {
   fallbackEducation,
   matchEducation,
@@ -72,7 +73,10 @@ export function OpalChat() {
     <main className="min-h-screen bg-[#f7faf6] text-[#183b2d]">
       <div className="mx-auto max-w-3xl px-5 py-12 sm:px-8">
         <Link href="/learn" className="text-sm font-bold text-[#438451]">
-          ← Back to learning
+          <span className="inline-flex items-center gap-2">
+            <ArrowLeft size={15} aria-hidden="true" />
+            Back to learning
+          </span>
         </Link>
         <div className="mt-12">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#438451]">
@@ -135,7 +139,10 @@ export function OpalChat() {
                     href={`/learn/${message.source}`}
                     className="mt-3 inline-block text-xs font-bold text-[#287343]"
                   >
-                    Read the source note →
+                    <span className="inline-flex items-center gap-2">
+                      Read the source note{" "}
+                      <ArrowRight size={14} aria-hidden="true" />
+                    </span>
                   </Link>
                 )}
               </div>

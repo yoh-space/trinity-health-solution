@@ -1,10 +1,14 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default function PortalAppointmentsPage() {
   return (
     <section>
       <Link href="/portal" className="text-sm font-bold text-[#438451]">
-        ← Back to portal
+        <span className="inline-flex items-center gap-2">
+          <ArrowLeft size={15} aria-hidden="true" />
+          Back to portal
+        </span>
       </Link>
       <h1 className="mt-10 text-4xl font-semibold">Appointments</h1>
       <p className="mt-3 text-[#68796d]">

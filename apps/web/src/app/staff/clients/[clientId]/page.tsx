@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
 export default async function StaffClientPage({
   params,
@@ -9,7 +10,10 @@ export default async function StaffClientPage({
   return (
     <section>
       <Link href="/staff/clients" className="text-sm font-bold text-[#438451]">
-        ← Back to clients
+        <span className="inline-flex items-center gap-2">
+          <ArrowLeft size={15} aria-hidden="true" />
+          Back to clients
+        </span>
       </Link>
       <div className="mt-10 flex flex-wrap items-end justify-between gap-5">
         <div>

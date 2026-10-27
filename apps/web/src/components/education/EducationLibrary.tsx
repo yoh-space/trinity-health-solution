@@ -4,6 +4,7 @@ import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { Bookmark, BookmarkCheck } from "lucide-react";
 import {
   displaySummary,
   displayTitle,
@@ -120,9 +121,17 @@ export function EducationLibrary() {
                     saved.includes(item._id) ? "Remove saved item" : "Save item"
                   }
                   onClick={() => toggleSaved(item._id)}
-                  className={`text-xl ${saved.includes(item._id) ? "text-[#287343]" : "text-[#a4b4a7]"}`}
+                  className={`rounded-full p-1 ${saved.includes(item._id) ? "text-[#287343]" : "text-[#a4b4a7]"}`}
                 >
-                  {saved.includes(item._id) ? "♥" : "♡"}
+                  {saved.includes(item._id) ? (
+                    <BookmarkCheck
+                      size={20}
+                      strokeWidth={1.8}
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <Bookmark size={20} strokeWidth={1.8} aria-hidden="true" />
+                  )}
                 </button>
               </div>
               <h2 className="mt-5 text-2xl font-semibold leading-tight text-[#23472e]">

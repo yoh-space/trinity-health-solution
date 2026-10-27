@@ -4,6 +4,7 @@ import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
 import Link from "next/link";
 import { useState } from "react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import {
   displayContent,
   displayTitle,
@@ -34,7 +35,9 @@ export function EducationArticle({ slug }: { slug: string }) {
           href="/learn"
           className="mt-8 inline-block text-sm font-bold text-[#287343]"
         >
-          Back to the library →
+          <span className="inline-flex items-center gap-2">
+            Back to the library <ArrowRight size={15} aria-hidden="true" />
+          </span>
         </Link>
       </main>
     );
@@ -43,8 +46,12 @@ export function EducationArticle({ slug }: { slug: string }) {
     <main className="min-h-screen bg-[#fbfaf6] text-[#183b2d]">
       <div className="mx-auto max-w-4xl px-5 py-12 sm:px-8 lg:py-20">
         <Link href="/learn" className="text-sm font-bold text-[#438451]">
-          ←{" "}
-          {language === "am" ? "ወደ ትምህርት ቤተ-መጽሐፍት" : "Back to learning library"}
+          <span className="inline-flex items-center gap-2">
+            <ArrowLeft size={15} aria-hidden="true" />
+            {language === "am"
+              ? "ወደ ትምህርት ቤተ-መጽሐፍት"
+              : "Back to learning library"}
+          </span>
         </Link>
         <div className="mt-12 flex flex-wrap items-start justify-between gap-6">
           <div>
