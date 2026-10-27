@@ -29,13 +29,21 @@ export function MarketingHeader() {
             </Link>
           ))}
         </div>
-        <Link
-          href="/admin"
-          className="inline-flex items-center gap-2 rounded-full border border-[#c9d2c8] px-4 py-2.5 text-sm font-semibold text-[#244c39] transition hover:border-[#1c573e] hover:bg-white"
-        >
-          Publisher portal
-          <ArrowRight size={15} aria-hidden="true" />
-        </Link>
+        <div className="flex items-center gap-2">
+          <Link
+            href="/portal"
+            className="hidden rounded-full bg-[#287343] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#1c573e] sm:inline-flex"
+          >
+            Client portal
+          </Link>
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-2 rounded-full border border-[#c9d2c8] px-4 py-2.5 text-sm font-semibold text-[#244c39] transition hover:border-[#1c573e] hover:bg-white"
+          >
+            Publisher portal
+            <ArrowRight size={15} aria-hidden="true" />
+          </Link>
+        </div>
       </nav>
       <nav
         aria-label="Section navigation"
