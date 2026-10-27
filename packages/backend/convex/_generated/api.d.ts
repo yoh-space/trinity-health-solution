@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as education from "../education.js";
 import type * as notes from "../notes.js";
 import type * as openai from "../openai.js";
 import type * as utils from "../utils.js";
@@ -19,6 +20,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  education: typeof education;
   notes: typeof notes;
   openai: typeof openai;
   utils: typeof utils;
