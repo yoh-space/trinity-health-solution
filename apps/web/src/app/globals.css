@@ -12,6 +12,8 @@
   --font-inter: Inter, sans-serif;
   --font-lato: Lato, sans-serif;
   --font-montserrat: Montserrat, sans-serif;
+  --font-serif: var(--font-newsreader), Newsreader, Georgia, serif;
+  --font-newsreader: var(--font-newsreader), Newsreader, Georgia, serif;
 
   --background-image-gradient-radial: radial-gradient(var(--tw-gradient-stops));
   --background-image-gradient-conic: conic-gradient(
