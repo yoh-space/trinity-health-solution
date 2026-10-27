@@ -1,37 +1,72 @@
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, type StyleProp, type ViewStyle } from "react-native";
 
-const diamonds = Array.from({ length: 31 }, (_, index) => index);
+const diamonds = Array.from({ length: 25 }, (_, index) => index);
 
-export function PatternDivider() {
+interface PatternDividerProps {
+  style?: StyleProp<ViewStyle>;
+}
+
+export function PatternDivider({ style }: PatternDividerProps) {
   return (
-    <View accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={styles.row}>
-      {diamonds.map((diamond) => (
-        <View
-          key={diamond}
-          style={[
-            styles.diamond,
-            diamond % 4 === 0
-              ? styles.darkDiamond
-              : diamond % 2 === 0
-                ? styles.greenDiamond
-                : styles.lightDiamond,
-          ]}
-        />
-      ))}
+    <View
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      style={[styles.container, style]}
+    >
+      <View style={styles.line} />
+      <View style={styles.row}>
+        {diamonds.map((diamond) => (
+          <View key={diamond} style={styles.itemWrapper}>
+            <View
+              style={[
+                styles.diamond,
+                diamond % 2 === 0 ? styles.darkDiamond : styles.greenDiamond,
+              ]}
+            />
+            {diamond % 2 === 0 ? <View style={styles.dot} /> : null}
+          </View>
+        ))}
+      </View>
+      <View style={styles.line} />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    paddingVertical: 4,
+    width: "100%",
+  },
+  line: {
+    backgroundColor: "#D5E6D3",
+    height: 1,
+    opacity: 0.7,
+    width: "100%",
+  },
   row: {
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-between",
     overflow: "hidden",
-    paddingVertical: 5,
+    paddingVertical: 3,
   },
-  diamond: { height: 5, transform: [{ rotate: "45deg" }], width: 5 },
-  darkDiamond: { backgroundColor: "#277943" },
-  greenDiamond: { backgroundColor: "#89C878" },
-  lightDiamond: { backgroundColor: "#B5D8AC" },
+  itemWrapper: {
+    alignItems: "center",
+    flexDirection: "row",
+    gap: 4,
+  },
+  diamond: {
+    height: 4.5,
+    transform: [{ rotate: "45deg" }],
+    width: 4.5,
+  },
+  dot: {
+    backgroundColor: "#2F8F4E",
+    borderRadius: 1.5,
+    height: 2.5,
+    opacity: 0.65,
+    width: 2.5,
+  },
+  darkDiamond: { backgroundColor: "#0E7A33", opacity: 0.88 },
+  greenDiamond: { backgroundColor: "#7DC21E", opacity: 0.88 },
 });

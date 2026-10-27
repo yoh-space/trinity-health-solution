@@ -1,4 +1,4 @@
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter, type Href } from "expo-router";
 import { useState } from "react";
 import {
@@ -13,6 +13,7 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { PatternDivider } from "../components/welcome/PatternDivider";
 import { WelcomeLanguagePicker } from "../components/welcome/WelcomeLanguagePicker";
 import { WelcomeStoryPanel } from "../components/welcome/WelcomeStoryPanel";
 import {
@@ -20,12 +21,6 @@ import {
   welcomeCopy,
 } from "../components/welcome/welcomeCopy";
 import { useTrinityStore } from "../store/useTrinityStore";
-
-const categoryIcons = [
-  "book-outline",
-  "medkit-outline",
-  "heart-outline",
-] as const;
 
 export default function WelcomeScreen() {
   const router = useRouter();
@@ -71,7 +66,7 @@ export default function WelcomeScreen() {
         />
         <View pointerEvents="none" style={styles.heroOverlay}>
           <View style={styles.imageShade} />
-          <Text style={styles.imageBadge}>ጤና ያለ ድንበር 🌍</Text>
+          <Text style={styles.imageBadge}>{copy.badge}</Text>
         </View>
       </View>
 
@@ -92,18 +87,36 @@ export default function WelcomeScreen() {
       </View>
 
       <View style={styles.categories}>
-        {copy.categories.map((category, index) => (
-          <View style={styles.categoryPill} key={category}>
-            <Ionicons
-              name={categoryIcons[index]}
-              size={16}
-              color="#365F42"
-              accessibilityElementsHidden
-            />
-            <Text style={styles.categoryText}>{category}</Text>
-          </View>
-        ))}
+        <View style={styles.categoryPill}>
+          <Ionicons
+            name="book-outline"
+            size={16}
+            color="#365F42"
+            accessibilityElementsHidden
+          />
+          <Text style={styles.categoryText}>{copy.categories[0]}</Text>
+        </View>
+        <View style={styles.categoryPill}>
+          <MaterialCommunityIcons
+            name="stethoscope"
+            size={17}
+            color="#365F42"
+            accessibilityElementsHidden
+          />
+          <Text style={styles.categoryText}>{copy.categories[1]}</Text>
+        </View>
+        <View style={styles.categoryPill}>
+          <Ionicons
+            name="heart-outline"
+            size={16}
+            color="#365F42"
+            accessibilityElementsHidden
+          />
+          <Text style={styles.categoryText}>{copy.categories[2]}</Text>
+        </View>
       </View>
+
+      <PatternDivider style={styles.patternDivider} />
 
       <View style={styles.languageSection}>
         <Text style={styles.languagePrompt}>{copy.languagePrompt}</Text>
@@ -273,19 +286,17 @@ const styles = StyleSheet.create({
   categoryPill: {
     alignItems: "center",
     backgroundColor: "#E8F4EB",
-    borderRadius: 18,
+    borderRadius: 20,
     flexDirection: "row",
-    gap: 5,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    gap: 6,
+    paddingHorizontal: 11,
+    paddingVertical: 7,
   },
-  categoryText: { color: "#365F42", fontFamily: "SemiBold", fontSize: 10 },
+  categoryText: { color: "#365F42", fontFamily: "SemiBold", fontSize: 11 },
+  patternDivider: { marginTop: 14, marginBottom: 2 },
   languageSection: {
-    borderTopColor: "#A7CBA9",
-    borderTopWidth: 1,
-    borderStyle: "dashed",
-    marginTop: 12,
-    paddingTop: 10,
+    marginTop: 6,
+    paddingTop: 4,
   },
   languagePrompt: {
     color: "#26382C",
@@ -300,7 +311,7 @@ const styles = StyleSheet.create({
     gap: 9,
     justifyContent: "center",
     marginTop: 12,
-    minHeight: 58,
+    minHeight: 56,
     paddingHorizontal: 18,
     shadowColor: "#08713B",
     shadowOffset: { width: 0, height: 6 },
@@ -318,10 +329,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     alignSelf: "center",
     flexDirection: "row",
-    gap: 5,
+    gap: 4,
     justifyContent: "center",
     marginTop: 8,
-    minHeight: 42,
+    minHeight: 38,
     paddingHorizontal: 8,
   },
   explorePressed: { opacity: 0.65 },
@@ -329,9 +340,7 @@ const styles = StyleSheet.create({
     color: "#586D5D",
     fontFamily: "SemiBold",
     fontSize: 12,
-    textDecorationLine: "underline",
-    textDecorationColor: "#A6B7A9",
-    textDecorationStyle: "solid",
+    textDecorationLine: "none",
   },
   privacyNote: {
     alignItems: "center",

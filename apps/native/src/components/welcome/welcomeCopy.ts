@@ -2,11 +2,11 @@ export type WelcomeLanguage = "am" | "en";
 
 export const welcomeCopy = {
   am: {
-    eyebrow: "እንኳን ወደ ትሪኒቲ ሄልዝ ሶሉሽን መጡ",
+    eyebrow: "እንኳን ወደ ትሪኒቲ ሄልዝ ሶሉሽን በደህና መጡ",
     headlineFirst: "ለእያንዳንዱ ቤተሰብ",
     headlineSecond: "የተሻለ ጤና!",
     introduction:
-      "ጤናዎ፣ ተልዕኳችን። ግላዊ የአመጋገብ ቴራፒ፣ ታማኝ የጤና ትምህርት እና ሙያዊ ምክክር በአካል ወይም በበይነመረብ፣ ባሉበት ሆነው ያግኙ።",
+      "ጤናዎ፣ ተልዕኳችን። ግላዊ የአመጋገብ ቴራፒ፣ ታማኝ የጤና ትምህርት እና የሙያዊ ምክክር በአካል ወይም በኦንላይን፤ ባሉበት ሆነው ያግኙ።",
     sdg:
       "አብረን የዘላቂ ልማት ግብ 3 (ጥሩ ጤናና ደህንነት) እናሳካለን፤ ጤናማ ሕይወት ለሁሉም ተደራሽ እንዲሆን።",
     closing: "ወደ የተሻለ ጤና የሚደረገው ጉዞዎ እዚህ ይጀምራል!",
@@ -14,6 +14,7 @@ export const welcomeCopy = {
     begin: "አብረን እንጀምር",
     explore: "በቀጥታ ወደ ትምህርቶች",
     privacyNote: "ነፃ መማር። መመዝገብ አያስፈልግም።",
+    badge: "ጤና ያለ ድንበር 🌿",
     categories: ["ትምህርት", "ምክክር", "ቴራፒ"],
   },
   en: {
@@ -29,6 +30,7 @@ export const welcomeCopy = {
     begin: "Let’s begin together",
     explore: "Just here to explore? Skip the setup",
     privacyNote: "Free to learn. No account. No personal details.",
+    badge: "WELLNESS WITHOUT BORDERS 🌍",
     categories: ["Education", "Consultation", "Therapy"],
   },
 } satisfies Record<
@@ -44,6 +46,7 @@ export const welcomeCopy = {
     begin: string;
     explore: string;
     privacyNote: string;
+    badge: string;
     categories: [string, string, string];
   }
 >;
