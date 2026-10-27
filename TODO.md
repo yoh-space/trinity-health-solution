@@ -14,5 +14,9 @@
 - [x] Add admin team-access entry point and preserve the education publisher CMS.
 - [x] Add admin content search, draft/live filters, bilingual editing, article preview, and explicit publish/unpublish/delete confirmations.
 - [x] Add an authenticated education-content update mutation while preserving the existing publisher authorization guard.
+- [x] Add global and route-group loading/error boundaries for public, client, staff, and admin pages.
+- [x] Add recoverable configuration messaging when the web Convex URL is missing.
+- [x] Add not-found experiences for unknown routes and unavailable learning notes.
 - [ ] Connect client requests, profiles, appointments, notes, and saved content to Convex tables with ownership and staff-role authorization.
 - [ ] Replace prototype request actions and demo records with persisted mutations and audit logs.
+- [ ] Add automated end-to-end coverage for client request creation, staff assignment, admin publishing, and unauthorized access.
