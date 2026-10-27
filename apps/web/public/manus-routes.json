@@ -1,0 +1,11 @@
+{
+  "routes": [
+    { "path": "/", "title": "Trinity Health Solution" },
+    { "path": "/learn", "title": "Learning library" },
+    { "path": "/learn/:slug", "title": "Learning note" },
+    { "path": "/ask-opal", "title": "Ask Opal" },
+    { "path": "/notes", "title": "Notes" },
+    { "path": "/notes/:slug", "title": "Note details" },
+    { "path": "/admin", "title": "Publisher portal" }
+  ]
+}

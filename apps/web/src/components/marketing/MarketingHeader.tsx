@@ -6,6 +6,8 @@ const navigationItems = [
   { label: "Our approach", href: "#approach" },
   { label: "Learning topics", href: "#learning" },
   { label: "For communities", href: "#community" },
+  { label: "Learn", href: "/learn" },
+  { label: "Ask Opal", href: "/ask-opal" },
 ];
 
 export function MarketingHeader() {
