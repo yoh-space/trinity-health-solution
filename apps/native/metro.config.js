@@ -1,8 +1,14 @@
 const { getDefaultConfig } = require("expo/metro-config");
 const path = require("path");
+const fs = require("fs");
 
-const projectRoot = __dirname;
-const monorepoRoot = path.resolve(projectRoot, "..", "..");
+// On Windows, drive letters can be lowercase or uppercase depending on how the
+// shell was started (e.g. MinGW bash vs cmd vs PowerShell). Metro's internal
+// RootPathUtils uses case-sensitive string matching for path resolution, which
+// causes duplicate drive letters like "C:\c:\..." if casing differs.
+// Using fs.realpathSync.native ensures canonical uppercase drive letters everywhere.
+const projectRoot = fs.realpathSync.native(__dirname);
+const monorepoRoot = fs.realpathSync.native(path.resolve(projectRoot, "..", ".."));
 
 const config = getDefaultConfig(projectRoot);
 
@@ -21,19 +27,35 @@ config.resolver.nodeModulesPaths = [
 // Metro can resolve deep subpaths such as
 // @packages/backend/convex/_generated/api that fail when the package is only
 // reachable through a symlinked node_modules entry.
-//
-// 4. Shim @expo/metro-runtime/error-overlay — this subpath was added in
-// @expo/metro-runtime@6.x but the hoisted version is 55.0.x which predates
-// that export. The shim is a no-op on native (LogBox handles overlays natively)
-// and is only imported in development mode.
 config.resolver.extraNodeModules = {
   ...(config.resolver.extraNodeModules || {}),
   "@packages/backend": path.resolve(monorepoRoot, "packages", "backend"),
-  "@expo/metro-runtime/error-overlay": path.resolve(
-    projectRoot,
-    "shims",
+};
+
+// 4. Custom resolver to intercept subpath imports that are missing from the
+// hoisted package versions (version skew between expo-router@6 and the
+// installed @expo/metro-runtime@55.x).
+//
+// @expo/metro-runtime/error-overlay: added in @expo/metro-runtime@6.x but
+// the hoisted version is 55.0.x. On native, LogBox handles error overlays
+// natively so this shim is a safe no-op passthrough.
+const shimDir = path.resolve(projectRoot, "shims");
+const SHIMS = {
+  "@expo/metro-runtime/error-overlay": path.join(
+    shimDir,
     "metro-runtime-error-overlay.js"
   ),
+};
+
+const originalResolveRequest = config.resolver.resolveRequest;
+config.resolver.resolveRequest = (context, moduleName, platform) => {
+  if (SHIMS[moduleName]) {
+    return { filePath: SHIMS[moduleName], type: "sourceFile" };
+  }
+  if (originalResolveRequest) {
+    return originalResolveRequest(context, moduleName, platform);
+  }
+  return context.resolveRequest(context, moduleName, platform);
 };
 
 module.exports = config;

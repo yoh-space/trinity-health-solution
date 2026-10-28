@@ -1,5 +1,8 @@
+import "react-native-gesture-handler";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
+import { useEffect } from "react";
 import { Platform, StatusBar, View } from "react-native";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import ConvexClientProvider from "../../ConvexClientProvider";
@@ -8,7 +11,7 @@ const statusBarHeight =
   Platform.OS === "ios" ? 50 : (StatusBar.currentHeight ?? 0);
 
 export default function RootLayout() {
-  const [loaded] = useFonts({
+  const [loaded, error] = useFonts({
     Bold: require("../assets/fonts/Inter-Bold.ttf"),
     SemiBold: require("../assets/fonts/Inter-SemiBold.ttf"),
     Medium: require("../assets/fonts/Inter-Medium.ttf"),
@@ -20,22 +23,30 @@ export default function RootLayout() {
     MLight: require("../assets/fonts/Montserrat-Light.ttf"),
   });
 
-  if (!loaded) return null;
+  useEffect(() => {
+    if (error) {
+      console.warn("Font loading error:", error);
+    }
+  }, [error]);
+
+  if (!loaded && !error) return null;
 
   return (
-    <ConvexClientProvider>
-      <BottomSheetModalProvider>
-        <View style={{ flex: 1 }}>
-          <View style={{ height: statusBarHeight, backgroundColor: "#E6F1E8" }}>
-            <StatusBar
-              translucent
-              backgroundColor="#E6F1E8"
-              barStyle="dark-content"
-            />
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <ConvexClientProvider>
+        <BottomSheetModalProvider>
+          <View style={{ flex: 1 }}>
+            <View style={{ height: statusBarHeight, backgroundColor: "#E6F1E8" }}>
+              <StatusBar
+                translucent
+                backgroundColor="#E6F1E8"
+                barStyle="dark-content"
+              />
+            </View>
+            <Stack screenOptions={{ headerShown: false }} />
           </View>
-          <Stack screenOptions={{ headerShown: false }} />
-        </View>
-      </BottomSheetModalProvider>
-    </ConvexClientProvider>
+        </BottomSheetModalProvider>
+      </ConvexClientProvider>
+    </GestureHandlerRootView>
   );
 }
