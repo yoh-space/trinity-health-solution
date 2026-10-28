@@ -21,9 +21,19 @@ config.resolver.nodeModulesPaths = [
 // Metro can resolve deep subpaths such as
 // @packages/backend/convex/_generated/api that fail when the package is only
 // reachable through a symlinked node_modules entry.
+//
+// 4. Shim @expo/metro-runtime/error-overlay — this subpath was added in
+// @expo/metro-runtime@6.x but the hoisted version is 55.0.x which predates
+// that export. The shim is a no-op on native (LogBox handles overlays natively)
+// and is only imported in development mode.
 config.resolver.extraNodeModules = {
   ...(config.resolver.extraNodeModules || {}),
   "@packages/backend": path.resolve(monorepoRoot, "packages", "backend"),
+  "@expo/metro-runtime/error-overlay": path.resolve(
+    projectRoot,
+    "shims",
+    "metro-runtime-error-overlay.js"
+  ),
 };
 
 module.exports = config;
