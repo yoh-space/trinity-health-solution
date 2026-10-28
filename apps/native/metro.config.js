@@ -47,16 +47,19 @@ const SHIMS = {
   ),
 };
 
+const ENTRY_REGEX = /(^|[\/\\])(node_modules[\/\\])?expo-router[\/\\]entry(\.js)?$/;
+
 const originalResolveRequest = config.resolver.resolveRequest;
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (SHIMS[moduleName]) {
     return { filePath: SHIMS[moduleName], type: "sourceFile" };
   }
-  // In a monorepo, React Native Gradle plugin computes entryFile relative to
-  // apps/native (e.g. ./../../node_modules/expo-router/entry.js), but Metro's
-  // server root is the monorepo root. Intercepting this resolves it directly
-  // to the real file in the monorepo root node_modules.
-  if (moduleName.includes("expo-router/entry")) {
+  // When building for release with Gradle in a monorepo, the React Native
+  // Gradle plugin resolves entryFile relative to apps/native (e.g.
+  // ./../../node_modules/expo-router/entry.js), but Metro's server root is the
+  // monorepo root. We intercept only the exact entry module (not entry-classic)
+  // and redirect it to the actual file in monorepoRoot.
+  if (ENTRY_REGEX.test(moduleName)) {
     return {
       filePath: path.resolve(monorepoRoot, "node_modules", "expo-router", "entry.js"),
       type: "sourceFile",
