@@ -37,7 +37,7 @@ export default function PublicTabs() {
             paddingBottom: 8,
             paddingTop: 7,
           },
-          tabBarLabelStyle: { fontFamily: "Medium", fontSize: 10 },
+          tabBarLabelStyle: { fontFamily: "Righteous_400Regular", fontSize: 10 },
           tabBarIcon: ({ color, size }) => (
             <Ionicons
               color={color}

@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: RFValue(17.5),
-    fontFamily: "MMedium",
+    fontFamily: "Righteous_400Regular",
     color: "#2D2D2D",
   },
   contentContainer: {
@@ -166,14 +166,14 @@ const styles = StyleSheet.create({
   },
   contentTitle: {
     fontSize: RFValue(17.5),
-    fontFamily: "MMedium",
+    fontFamily: "Righteous_400Regular",
     color: "#000",
     textAlign: "center",
     marginTop: 28,
   },
   contentDescription: {
     fontSize: RFValue(17.5),
-    fontFamily: "MRegular",
+    fontFamily: "Righteous_400Regular",
     alignSelf: "center",
     textAlign: "justify",
     paddingLeft: 29,
@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
   },
   footerText: {
     fontSize: RFValue(12.5),
-    fontFamily: "MRegular",
+    fontFamily: "Righteous_400Regular",
   },
   activeTabText: {
     color: "#fff",

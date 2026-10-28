@@ -25,10 +25,10 @@ export default function CareScreen() {
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   page: { flex: 1, backgroundColor: "#F7FAF6", padding: 24 },
-  eyebrow: { color: "#087A3D", fontSize: 12, fontFamily: "Bold", letterSpacing: 1.8 },
-  title: { color: "#183A25", fontSize: 32, fontFamily: "MBold", lineHeight: 39, marginTop: 12 },
-  body: { color: "#5B6B60", fontSize: 16, fontFamily: "Regular", lineHeight: 24, marginTop: 18 },
+  eyebrow: { color: "#087A3D", fontSize: 12, fontFamily: "Righteous_400Regular", letterSpacing: 1.8 },
+  title: { color: "#183A25", fontSize: 32, fontFamily: "Righteous_400Regular", lineHeight: 39, marginTop: 12 },
+  body: { color: "#5B6B60", fontSize: 16, fontFamily: "Righteous_400Regular", lineHeight: 24, marginTop: 18 },
   notice: { backgroundColor: "#EAF4EB", borderRadius: 20, marginTop: 28, padding: 18 },
-  noticeTitle: { color: "#183A25", fontSize: 16, fontFamily: "Bold" },
-  noticeBody: { color: "#4E6153", fontSize: 14, fontFamily: "Regular", lineHeight: 21, marginTop: 6 },
+  noticeTitle: { color: "#183A25", fontSize: 16, fontFamily: "Righteous_400Regular" },
+  noticeBody: { color: "#4E6153", fontSize: 14, fontFamily: "Righteous_400Regular", lineHeight: 21, marginTop: 6 },
 });

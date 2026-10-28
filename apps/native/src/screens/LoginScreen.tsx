@@ -67,7 +67,7 @@ const LoginScreen = () => {
         </TouchableOpacity>
 
         <View style={styles.signupContainer}>
-          <Text style={{ fontFamily: "Regular" }}>Don’t have an account? </Text>
+          <Text style={{ fontFamily: "Righteous_400Regular" }}>Don’t have an account? </Text>
           <Text>Sign up above.</Text>
         </View>
       </View>
@@ -94,13 +94,13 @@ const styles = StyleSheet.create({
   title: {
     marginTop: 49,
     fontSize: RFValue(21),
-    fontFamily: "SemiBold",
+    fontFamily: "Righteous_400Regular",
   },
   subtitle: {
     marginTop: 8,
     fontSize: RFValue(14),
     color: "#000",
-    fontFamily: "Regular",
+    fontFamily: "Righteous_400Regular",
     marginBottom: 32,
     textAlign: "center",
   },
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 14,
     marginBottom: 16,
-    fontFamily: "Regular",
+    fontFamily: "Righteous_400Regular",
     fontSize: RFValue(14),
   },
   buttonEmail: {
@@ -125,7 +125,7 @@ const styles = StyleSheet.create({
   buttonText: {
     textAlign: "center",
     color: "#FFF",
-    fontFamily: "SemiBold",
+    fontFamily: "Righteous_400Regular",
     fontSize: RFValue(14),
   },
   buttonTextWithIcon: {
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   dividerText: {
     marginHorizontal: 10,
     color: "#000",
-    fontFamily: "Medium",
+    fontFamily: "Righteous_400Regular",
   },
   buttonGoogle: {
     flexDirection: "row",
@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
   },
   signupText: {
     color: "#4D9DE0",
-    fontFamily: "SemiBold",
+    fontFamily: "Righteous_400Regular",
   },
   googleIcon: {
     width: 24,
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   errorText: {
     fontSize: RFValue(14),
     color: "tomato",
-    fontFamily: "Medium",
+    fontFamily: "Righteous_400Regular",
     alignSelf: "flex-start",
     marginBottom: 8,
     marginLeft: 4,

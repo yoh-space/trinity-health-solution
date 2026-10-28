@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: RFValue(17.5),
-    fontFamily: "MMedium",
+    fontFamily: "Righteous_400Regular",
     color: "#2D2D2D",
   },
   inputContainer: {
@@ -248,7 +248,7 @@ const styles = StyleSheet.create({
   },
   inputLabel: {
     fontSize: RFValue(15),
-    fontFamily: "MMedium",
+    fontFamily: "Righteous_400Regular",
     color: "#000",
     marginBottom: 6,
   },
@@ -256,7 +256,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
     marginBottom: 30,
     fontSize: RFValue(15),
-    fontFamily: "MLight",
+    fontFamily: "Righteous_400Regular",
     color: "#000",
     borderRadius: 8,
     paddingHorizontal: 14,
@@ -302,12 +302,12 @@ const styles = StyleSheet.create({
   },
   advancedSummarizationText: {
     fontSize: RFValue(15),
-    fontFamily: "MLight",
+    fontFamily: "Righteous_400Regular",
     color: "#000",
   },
   advancedSummarizationSubtext: {
     fontSize: RFValue(12.5),
-    fontFamily: "MRegular",
+    fontFamily: "Righteous_400Regular",
     color: "#A9A9A9",
     paddingHorizontal: 30,
   },
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
   newNoteButtonText: {
     color: "white",
     fontSize: RFValue(15),
-    fontFamily: "MMedium",
+    fontFamily: "Righteous_400Regular",
     marginLeft: 10,
   },
   newNoteButtonContainer: {

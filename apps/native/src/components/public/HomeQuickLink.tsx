@@ -32,6 +32,6 @@ const styles = StyleSheet.create({
   image: { height: 58, marginBottom: 8, width: "100%" },
   iconWrap: { alignItems: "center", backgroundColor: "#EAF4EB", borderRadius: 11, height: 38, justifyContent: "center", margin: 10, width: 38 },
   copy: { flex: 1, paddingHorizontal: 10 },
-  title: { color: "#294433", fontFamily: "SemiBold", fontSize: 10, lineHeight: 14 },
-  subtitle: { color: "#7A887D", fontFamily: "Regular", fontSize: 8, lineHeight: 11, marginTop: 4 },
+  title: { color: "#294433", fontFamily: "Righteous_400Regular", fontSize: 10, lineHeight: 14 },
+  subtitle: { color: "#7A887D", fontFamily: "Righteous_400Regular", fontSize: 8, lineHeight: 11, marginTop: 4 },
 });

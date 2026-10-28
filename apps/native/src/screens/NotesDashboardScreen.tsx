@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: RFValue(17.5),
-    fontFamily: "MMedium",
+    fontFamily: "Righteous_400Regular",
     alignSelf: "center",
   },
   yourNotesContainer: {
@@ -163,7 +163,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: RFValue(15),
-    fontFamily: "MRegular",
+    fontFamily: "Righteous_400Regular",
     color: "#2D2D2D",
   },
   notesList: {
@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
   },
   noteText: {
     fontSize: 16,
-    fontFamily: "MLight",
+    fontFamily: "Righteous_400Regular",
     color: "#2D2D2D",
   },
 
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
   newNoteButtonText: {
     color: "white",
     fontSize: RFValue(15),
-    fontFamily: "MMedium",
+    fontFamily: "Righteous_400Regular",
     marginLeft: 10,
   },
   switchContainer: {
@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     alignSelf: "center",
     fontSize: RFValue(15),
     color: "grey",
-    fontFamily: "MLight",
+    fontFamily: "Righteous_400Regular",
   },
   emptyState: {
     width: "100%",

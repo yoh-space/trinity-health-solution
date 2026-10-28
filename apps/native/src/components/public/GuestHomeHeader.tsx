@@ -36,8 +36,8 @@ const styles = StyleSheet.create({
   brand: { alignItems: "center", flex: 1, flexDirection: "row", gap: 8 },
   symbol: { height: 34, width: 34 },
   brandCopy: { flex: 1, gap: 3 },
-  brandName: { color: "#23472E", fontFamily: "MBold", fontSize: 12 },
-  tagline: { color: "#77867A", fontFamily: "Regular", fontSize: 9 },
+  brandName: { color: "#23472E", fontFamily: "Righteous_400Regular", fontSize: 12 },
+  tagline: { color: "#77867A", fontFamily: "Righteous_400Regular", fontSize: 9 },
   actions: { flexDirection: "row", gap: 8 },
   iconButton: { alignItems: "center", backgroundColor: "#FFFFFF", borderColor: "#E2EAE3", borderRadius: 13, borderWidth: 1, height: 36, justifyContent: "center", width: 36 },
 });

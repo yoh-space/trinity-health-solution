@@ -406,20 +406,20 @@ const styles = StyleSheet.create({
   conversation: { paddingBottom: 10, paddingHorizontal: 15, paddingTop: 13 },
   eyebrow: {
     color: "#438451",
-    fontFamily: "Bold",
+    fontFamily: "Righteous_400Regular",
     fontSize: 8,
     letterSpacing: 1.2,
   },
   title: {
     color: "#203A28",
-    fontFamily: "MBold",
+    fontFamily: "Righteous_400Regular",
     fontSize: 24,
     lineHeight: 29,
     marginTop: 4,
   },
   subtitle: {
     color: "#718075",
-    fontFamily: "Regular",
+    fontFamily: "Righteous_400Regular",
     fontSize: 10,
     lineHeight: 15,
     marginTop: 2,
@@ -449,10 +449,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  welcomeTitle: { color: "#203A28", fontFamily: "Bold", fontSize: 11 },
+  welcomeTitle: { color: "#203A28", fontFamily: "Righteous_400Regular", fontSize: 11 },
   welcomeText: {
     color: "#657568",
-    fontFamily: "Regular",
+    fontFamily: "Righteous_400Regular",
     fontSize: 9,
     lineHeight: 13,
     marginTop: 5,
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
   userBubble: { backgroundColor: "#347346", borderBottomRightRadius: 4 },
   messageText: {
     color: "#435649",
-    fontFamily: "Regular",
+    fontFamily: "Righteous_400Regular",
     fontSize: 11,
     lineHeight: 16,
   },
@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
   sourceLinkText: {
     color: "#087A3D",
     flex: 1,
-    fontFamily: "SemiBold",
+    fontFamily: "Righteous_400Regular",
     fontSize: 8,
     lineHeight: 11,
   },
@@ -519,7 +519,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
     padding: 7,
   },
-  resetText: { color: "#438451", fontFamily: "SemiBold", fontSize: 9 },
+  resetText: { color: "#438451", fontFamily: "Righteous_400Regular", fontSize: 9 },
   quickQuestions: { flexDirection: "row", gap: 7, marginTop: 15 },
   quickQuestion: {
     backgroundColor: "#FFFFFF",
@@ -534,7 +534,7 @@ const styles = StyleSheet.create({
   quickQuestionPressed: { backgroundColor: "#EEF7EF" },
   quickQuestionText: {
     color: "#4B6751",
-    fontFamily: "Medium",
+    fontFamily: "Righteous_400Regular",
     fontSize: 8,
     textAlign: "center",
   },
@@ -553,7 +553,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     color: "#2A4431",
     flex: 1,
-    fontFamily: "Regular",
+    fontFamily: "Righteous_400Regular",
     fontSize: 10,
     height: 38,
     paddingHorizontal: 12,
@@ -569,7 +569,7 @@ const styles = StyleSheet.create({
   sendDisabled: { backgroundColor: "#AFC7B4" },
   disclaimer: {
     color: "#829087",
-    fontFamily: "Regular",
+    fontFamily: "Righteous_400Regular",
     fontSize: 7,
     lineHeight: 10,
     marginHorizontal: 4,
@@ -597,9 +597,9 @@ const styles = StyleSheet.create({
   bottomIconActive: { backgroundColor: "#E5F2E7" },
   bottomLabel: {
     color: "#77857B",
-    fontFamily: "Medium",
+    fontFamily: "Righteous_400Regular",
     fontSize: 8,
     marginTop: 1,
   },
-  bottomLabelActive: { color: "#2D7D49", fontFamily: "Bold" },
+  bottomLabelActive: { color: "#2D7D49", fontFamily: "Righteous_400Regular" },
 });

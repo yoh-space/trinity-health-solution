@@ -18,8 +18,8 @@ const styles = StyleSheet.create({
   pressed: { opacity: 0.82 },
   image: { borderRadius: 10, height: 68, width: 68 },
   copy: { flex: 1, gap: 3, paddingRight: 22 },
-  category: { color: "#39804E", fontFamily: "Bold", fontSize: 8, letterSpacing: 0.4 },
-  title: { color: "#2D4132", fontFamily: "SemiBold", fontSize: 10, lineHeight: 14 },
-  time: { color: "#849187", fontFamily: "Regular", fontSize: 8 },
+  category: { color: "#39804E", fontFamily: "Righteous_400Regular", fontSize: 8, letterSpacing: 0.4 },
+  title: { color: "#2D4132", fontFamily: "Righteous_400Regular", fontSize: 10, lineHeight: 14 },
+  time: { color: "#849187", fontFamily: "Righteous_400Regular", fontSize: 8 },
   save: { alignItems: "center", height: 25, justifyContent: "center", position: "absolute", right: 7, top: 5, width: 25 },
 });

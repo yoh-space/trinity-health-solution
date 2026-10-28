@@ -20,6 +20,9 @@ importers:
       '@clerk/expo':
         specifier: ^3.7.8
         version: 3.7.8(@types/react@19.1.17)(bufferutil@4.1.0)(expo-auth-session@7.0.11(expo@54.0.38)(react-native@0.81.5(@babel/core@7.29.0)(@react-native/metro-config@0.85.2(@babel/core@7.29.0)(bufferutil@4.1.0))(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0))(react@19.1.0))(expo-constants@18.0.14)(expo-crypto@15.0.9(expo@54.0.38))(expo-secure-store@15.0.8(expo@54.0.38))(expo-web-browser@15.0.11(expo@54.0.38)(react-native@0.81.5(@babel/core@7.29.0)(@react-native/metro-config@0.85.2(@babel/core@7.29.0)(bufferutil@4.1.0))(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0)))(expo@54.0.38)(react-dom@19.1.0(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@react-native/metro-config@0.85.2(@babel/core@7.29.0)(bufferutil@4.1.0))(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0))(react@19.1.0)(typescript@5.9.3)(use-sync-external-store@1.6.0(react@19.1.0))(zod@4.3.6)
+      '@expo-google-fonts/righteous':
+        specifier: ^0.4.1
+        version: 0.4.1
       '@expo/metro-runtime':
         specifier: ~6.1.2
         version: 6.1.2(expo@54.0.38)(react-dom@19.1.0(react@19.1.0))(react-native@0.81.5(@babel/core@7.29.0)(@react-native/metro-config@0.85.2(@babel/core@7.29.0)(bufferutil@4.1.0))(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0))(react@19.1.0)
@@ -1343,6 +1346,9 @@ packages:
   '@eslint/plugin-kit@0.4.1':
     resolution: {integrity: sha512-43/qtrDUokr7LJqoF2c3+RInu/t4zfrpYdoSDfYyhg52rwLV6TnOvdG4fXm7IkSB3wErkcmJS9iEhjVtOSEjjA==}
     engines: {node: ^18.18.0 || ^20.9.0 || >=21.1.0}
+
+  '@expo-google-fonts/righteous@0.4.1':
+    resolution: {integrity: sha512-oWlxXmRNYRN5aHW2cLJopUTr7T+mNRGfKjBeQlYLbOIf1yn6UF5kcg9PqkD6gG8BG1pKxzT3jXzcRvFSRL1HKA==}
 
   '@expo/cli@54.0.28':
     resolution: {integrity: sha512-lql0oETgps4OZaewYb11jYvTu7K30CyVZqggPUMRX4sQU7nrnFdOnDgpWIj2TWnZBWgau5MftjwANVgSjJHjrg==}
@@ -8347,6 +8353,8 @@ snapshots:
     dependencies:
       '@eslint/core': 0.17.0
       levn: 0.4.1
+
+  '@expo-google-fonts/righteous@0.4.1': {}
 
   '@expo/cli@54.0.28(bufferutil@4.1.0)(expo-router@6.0.24)(expo@54.0.38)(react-native@0.81.5(@babel/core@7.29.0)(@react-native/metro-config@0.85.2(@babel/core@7.29.0)(bufferutil@4.1.0))(@types/react@19.1.17)(bufferutil@4.1.0)(react@19.1.0))(typescript@5.9.3)':
     dependencies:

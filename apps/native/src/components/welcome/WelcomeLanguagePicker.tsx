@@ -75,13 +75,13 @@ const styles = StyleSheet.create({
   label: { flexShrink: 1 },
   languageName: {
     color: "#203127",
-    fontFamily: "SemiBold",
+    fontFamily: "Righteous_400Regular",
     fontSize: 16,
   },
   selectedText: { color: "#1F7540" },
   translation: {
     color: "#65756A",
-    fontFamily: "Regular",
+    fontFamily: "Righteous_400Regular",
     fontSize: 11,
     marginTop: 3,
   },

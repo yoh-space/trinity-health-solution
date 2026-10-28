@@ -38,14 +38,14 @@ export function OnboardingTextField({
 
 const styles = StyleSheet.create({
   wrapper: { marginTop: 13 },
-  label: { color: "#304334", fontFamily: "SemiBold", fontSize: 11 },
+  label: { color: "#304334", fontFamily: "Righteous_400Regular", fontSize: 11 },
   input: {
     backgroundColor: "#FFFFFF",
     borderColor: "#DFE8DF",
     borderRadius: 12,
     borderWidth: 1,
     color: "#263A2D",
-    fontFamily: "Regular",
+    fontFamily: "Righteous_400Regular",
     fontSize: 12,
     marginTop: 7,
     minHeight: 43,
@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
   multiline: { minHeight: 54, paddingTop: 11 },
   hint: {
     color: "#879489",
-    fontFamily: "Regular",
+    fontFamily: "Righteous_400Regular",
     fontSize: 9,
     lineHeight: 13,
     marginTop: 5,

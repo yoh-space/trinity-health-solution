@@ -125,14 +125,14 @@ const styles = StyleSheet.create({
   optionCopy: { flex: 1, gap: 2 },
   optionText: {
     color: "#293B2E",
-    fontFamily: "SemiBold",
+    fontFamily: "Righteous_400Regular",
     fontSize: 11,
     lineHeight: 15,
   },
   selectedText: { color: "#246B3D" },
   detailText: {
     color: "#78877C",
-    fontFamily: "Regular",
+    fontFamily: "Righteous_400Regular",
     fontSize: 9,
     lineHeight: 12,
   },

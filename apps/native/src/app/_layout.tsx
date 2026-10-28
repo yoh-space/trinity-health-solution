@@ -1,6 +1,7 @@
 import "react-native-gesture-handler";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { useFonts } from "expo-font";
+import { useFonts } from "@expo-google-fonts/righteous/useFonts";
+import { Righteous_400Regular } from "@expo-google-fonts/righteous/400Regular";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
 import { View } from "react-native";
@@ -11,15 +12,7 @@ import ConvexClientProvider from "../../ConvexClientProvider";
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
-    Bold: require("../assets/fonts/Inter-Bold.ttf"),
-    SemiBold: require("../assets/fonts/Inter-SemiBold.ttf"),
-    Medium: require("../assets/fonts/Inter-Medium.ttf"),
-    Regular: require("../assets/fonts/Inter-Regular.ttf"),
-    MBold: require("../assets/fonts/Montserrat-Bold.ttf"),
-    MSemiBold: require("../assets/fonts/Montserrat-SemiBold.ttf"),
-    MMedium: require("../assets/fonts/Montserrat-Medium.ttf"),
-    MRegular: require("../assets/fonts/Montserrat-Regular.ttf"),
-    MLight: require("../assets/fonts/Montserrat-Light.ttf"),
+    Righteous_400Regular,
   });
 
   useEffect(() => {

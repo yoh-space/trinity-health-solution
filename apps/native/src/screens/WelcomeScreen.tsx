@@ -198,7 +198,7 @@ const styles = StyleSheet.create({
   tabletPhoneContent: { paddingHorizontal: 17, paddingTop: 2 },
   brand: { alignItems: "center", flexDirection: "row", gap: 9, height: 47 },
   brandSymbol: { height: 38, width: 43 },
-  brandName: { color: "#1B492C", fontFamily: "MBold", fontSize: 14 },
+  brandName: { color: "#1B492C", fontFamily: "Righteous_400Regular", fontSize: 14 },
   heroImageFrame: {
     borderRadius: 18,
     height: 176,
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     borderWidth: 1,
     color: "#FFFFFF",
-    fontFamily: "SemiBold",
+    fontFamily: "Righteous_400Regular",
     fontSize: 10,
     margin: 10,
     overflow: "hidden",
@@ -234,35 +234,35 @@ const styles = StyleSheet.create({
   intro: { paddingTop: 14 },
   eyebrow: {
     color: "#39834F",
-    fontFamily: "Bold",
+    fontFamily: "Righteous_400Regular",
     fontSize: 10,
     letterSpacing: 0.4,
   },
   title: {
     color: "#14251A",
-    fontFamily: "Bold",
+    fontFamily: "Righteous_400Regular",
     fontSize: 27,
     lineHeight: 33,
     marginTop: 7,
   },
-  titleEmphasis: { color: "#247B44", fontFamily: "MBold" },
+  titleEmphasis: { color: "#247B44", fontFamily: "Righteous_400Regular" },
   description: {
     color: "#35453A",
-    fontFamily: "Regular",
+    fontFamily: "Righteous_400Regular",
     fontSize: 13,
     lineHeight: 19,
     marginTop: 9,
   },
   sdgText: {
     color: "#35453A",
-    fontFamily: "Regular",
+    fontFamily: "Righteous_400Regular",
     fontSize: 12,
     lineHeight: 18,
     marginTop: 7,
   },
   closingText: {
     color: "#267842",
-    fontFamily: "SemiBold",
+    fontFamily: "Righteous_400Regular",
     fontSize: 12,
     lineHeight: 18,
     marginTop: 3,
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
   },
-  categoryText: { color: "#365F42", fontFamily: "SemiBold", fontSize: 10 },
+  categoryText: { color: "#365F42", fontFamily: "Righteous_400Regular", fontSize: 10 },
   languageSection: {
     borderTopColor: "#A7CBA9",
     borderTopWidth: 1,
@@ -287,7 +287,7 @@ const styles = StyleSheet.create({
   },
   languagePrompt: {
     color: "#26382C",
-    fontFamily: "SemiBold",
+    fontFamily: "Righteous_400Regular",
     fontSize: 13,
   },
   primaryButton: {
@@ -309,7 +309,7 @@ const styles = StyleSheet.create({
   buttonPressed: { backgroundColor: "#075F32", opacity: 0.88 },
   primaryButtonText: {
     color: "#FFFFFF",
-    fontFamily: "Bold",
+    fontFamily: "Righteous_400Regular",
     fontSize: 15,
   },
   exploreButton: {
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   explorePressed: { opacity: 0.65 },
   exploreText: {
     color: "#586D5D",
-    fontFamily: "SemiBold",
+    fontFamily: "Righteous_400Regular",
     fontSize: 12,
     textDecorationLine: "underline",
     textDecorationColor: "#A6B7A9",
@@ -342,7 +342,7 @@ const styles = StyleSheet.create({
   privacyText: {
     color: "#558262",
     flexShrink: 1,
-    fontFamily: "Medium",
+    fontFamily: "Righteous_400Regular",
     fontSize: 11,
     textAlign: "center",
   },
