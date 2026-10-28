@@ -9,16 +9,12 @@ def projectRoot = rootDir.getAbsoluteFile().getParentFile().getAbsolutePath()
  * By default you don't need to apply any configuration, just uncomment the lines you need.
  */
 react {
-    // Resolve the hoisted workspace entry directly. Expo's resolver can emit a
-    // ../../node_modules path on Windows, which Metro then resolves from the
-    // repository root instead of apps/native and cannot find expo-router.
-   entryFile = file([
+    // Resolve the JS entry file using require.resolve so it correctly finds
+    // expo-router/entry in a hoisted pnpm monorepo without path traversal issues.
+    entryFile = file([
         "node",
-        "-e",
-        "require('expo/scripts/resolveAppEntry')",
-        projectRoot,
-        "android",
-        "absolute"
+        "-p",
+        "require.resolve('expo-router/entry')"
     ].execute(null, rootDir).text.trim())
     reactNativeDir = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsoluteFile()
     hermesCommand = new File(["node", "--print", "require.resolve('react-native/package.json')"].execute(null, rootDir).text.trim()).getParentFile().getAbsolutePath() + "/sdks/hermesc/%OS-BIN%/hermesc"
