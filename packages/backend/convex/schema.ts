@@ -11,6 +11,8 @@ export default defineSchema({
   }).index("by_userId", ["userId"]),
   educationContent: defineTable({
     authorTokenIdentifier: v.string(),
+    contentKey: v.optional(v.string()),
+    seedVersion: v.optional(v.number()),
     title: v.string(),
     titleAm: v.string(),
     summary: v.string(),
@@ -18,10 +20,25 @@ export default defineSchema({
     content: v.string(),
     contentAm: v.string(),
     category: v.string(),
+    categoryKey: v.optional(v.string()),
     readMinutes: v.number(),
+    sections: v.optional(
+      v.array(
+        v.object({
+          title: v.string(),
+          titleAm: v.string(),
+          body: v.string(),
+          bodyAm: v.string(),
+        }),
+      ),
+    ),
+    takeaway: v.optional(v.string()),
+    takeawayAm: v.optional(v.string()),
     status: v.union(v.literal("draft"), v.literal("published")),
     publishedAt: v.optional(v.number()),
   })
     .index("by_status", ["status"])
-    .index("by_authorTokenIdentifier", ["authorTokenIdentifier"]),
+    .index("by_authorTokenIdentifier", ["authorTokenIdentifier"])
+    .index("by_category", ["category"])
+    .index("by_contentKey", ["contentKey"]),
 });

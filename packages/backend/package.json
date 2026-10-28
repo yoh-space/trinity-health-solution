@@ -4,6 +4,7 @@
   "description": "",
   "scripts": {
     "dev": "convex dev",
+    "seed:education:dev": "node scripts/seed-education-dev.mjs",
     "setup": "convex dev --until-success",
     "typecheck": "tsc --noEmit -p convex"
   },
