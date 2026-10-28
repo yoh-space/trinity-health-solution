@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useUser } from "@clerk/expo";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { useTrinityStore } from "../../../store/useTrinityStore";
 
 export default function ProfileScreen() {
@@ -7,27 +8,30 @@ export default function ProfileScreen() {
   const { language, setLanguage, savedIds } = useTrinityStore();
 
   return (
-    <View style={styles.page}>
-      <Text style={styles.eyebrow}>TRINITY</Text>
-      <Text style={styles.title}>Your learning space</Text>
-      <Text style={styles.body}>{user?.firstName ? `Welcome, ${user.firstName}.` : "Welcome to Trinity."}</Text>
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Language</Text>
-        <View style={styles.row}>
-          <Pressable onPress={() => setLanguage("am")} style={[styles.option, language === "am" && styles.optionActive]}><Text style={[styles.optionText, language === "am" && styles.optionTextActive]}>አማርኛ</Text></Pressable>
-          <Pressable onPress={() => setLanguage("en")} style={[styles.option, language === "en" && styles.optionActive]}><Text style={[styles.optionText, language === "en" && styles.optionTextActive]}>English</Text></Pressable>
+    <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
+      <View style={styles.page}>
+        <Text style={styles.eyebrow}>TRINITY</Text>
+        <Text style={styles.title}>Your learning space</Text>
+        <Text style={styles.body}>{user?.firstName ? `Welcome, ${user.firstName}.` : "Welcome to Trinity."}</Text>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Language</Text>
+          <View style={styles.row}>
+            <Pressable onPress={() => setLanguage("am")} style={[styles.option, language === "am" && styles.optionActive]}><Text style={[styles.optionText, language === "am" && styles.optionTextActive]}>አማርኛ</Text></Pressable>
+            <Pressable onPress={() => setLanguage("en")} style={[styles.option, language === "en" && styles.optionActive]}><Text style={[styles.optionText, language === "en" && styles.optionTextActive]}>English</Text></Pressable>
+          </View>
+        </View>
+        <View style={styles.card}>
+          <Text style={styles.cardTitle}>Saved learning</Text>
+          <Text style={styles.body}>{savedIds.length} item{savedIds.length === 1 ? "" : "s"} saved for later.</Text>
         </View>
       </View>
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Saved learning</Text>
-        <Text style={styles.body}>{savedIds.length} item{savedIds.length === 1 ? "" : "s"} saved for later.</Text>
-      </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  page: { flex: 1, backgroundColor: "#F7FAF6", padding: 24, paddingTop: 52 },
+  safeArea: { flex: 1 },
+  page: { flex: 1, backgroundColor: "#F7FAF6", padding: 24 },
   eyebrow: { color: "#087A3D", fontSize: 12, fontFamily: "Bold", letterSpacing: 1.8 },
   title: { color: "#183A25", fontSize: 32, fontFamily: "MBold", marginTop: 12 },
   body: { color: "#5B6B60", fontSize: 15, fontFamily: "Regular", lineHeight: 22, marginTop: 8 },

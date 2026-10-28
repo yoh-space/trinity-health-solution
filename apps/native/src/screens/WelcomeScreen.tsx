@@ -6,7 +6,6 @@ import {
   ImageBackground,
   Pressable,
   ScrollView,
-  StatusBar,
   StyleSheet,
   Text,
   View,
@@ -154,7 +153,6 @@ export default function WelcomeScreen() {
       style={styles.background}
       imageStyle={styles.patternImage}
     >
-      <StatusBar backgroundColor="#E6F1E8" barStyle="dark-content" />
       <SafeAreaView style={styles.safeArea}>
         {isTablet ? (
           <View style={styles.tabletLayout}>

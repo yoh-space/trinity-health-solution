@@ -3,12 +3,11 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { useEffect } from "react";
-import { Platform, StatusBar, View } from "react-native";
+import { View } from "react-native";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import { SystemBars } from "react-native-edge-to-edge";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 import ConvexClientProvider from "../../ConvexClientProvider";
-
-const statusBarHeight =
-  Platform.OS === "ios" ? 50 : (StatusBar.currentHeight ?? 0);
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -33,20 +32,16 @@ export default function RootLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <ConvexClientProvider>
-        <BottomSheetModalProvider>
-          <View style={{ flex: 1 }}>
-            <View style={{ height: statusBarHeight, backgroundColor: "#E6F1E8" }}>
-              <StatusBar
-                translucent
-                backgroundColor="#E6F1E8"
-                barStyle="dark-content"
-              />
+      <SafeAreaProvider>
+        <SystemBars style="dark" />
+        <ConvexClientProvider>
+          <BottomSheetModalProvider>
+            <View style={{ flex: 1 }}>
+              <Stack screenOptions={{ headerShown: false }} />
             </View>
-            <Stack screenOptions={{ headerShown: false }} />
-          </View>
-        </BottomSheetModalProvider>
-      </ConvexClientProvider>
+          </BottomSheetModalProvider>
+        </ConvexClientProvider>
+      </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
