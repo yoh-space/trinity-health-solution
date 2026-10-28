@@ -12,9 +12,15 @@ const monorepoRoot = fs.realpathSync.native(path.resolve(projectRoot, "..", ".."
 
 const config = getDefaultConfig(projectRoot);
 
-// 1. Tell Metro to watch the monorepo root so it can access workspace packages
-// (e.g. packages/backend) and hoisted node_modules outside apps/native.
-config.watchFolders = [monorepoRoot];
+// 1. Watch only the workspace packages that need hot-reloading, not the entire
+// monorepo root. Watching the whole monorepo root on Windows without watchman
+// causes Metro's file watcher to time out ("Failed to start watch mode") because
+// it has to crawl too many files (node_modules, android/, ios/, .expo/, etc.).
+//
+// Module *resolution* from the monorepo root is already handled by
+// nodeModulesPaths and extraNodeModules below, so watchFolders only needs to
+// cover directories whose file changes should trigger a Metro reload.
+config.watchFolders = [path.resolve(monorepoRoot, "packages", "backend")];
 
 // 2. Let Metro find hoisted dependencies in the monorepo root node_modules
 // in addition to apps/native/node_modules.
