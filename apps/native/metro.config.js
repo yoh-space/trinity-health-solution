@@ -52,6 +52,16 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
   if (SHIMS[moduleName]) {
     return { filePath: SHIMS[moduleName], type: "sourceFile" };
   }
+  // In a monorepo, React Native Gradle plugin computes entryFile relative to
+  // apps/native (e.g. ./../../node_modules/expo-router/entry.js), but Metro's
+  // server root is the monorepo root. Intercepting this resolves it directly
+  // to the real file in the monorepo root node_modules.
+  if (moduleName.includes("expo-router/entry")) {
+    return {
+      filePath: path.resolve(monorepoRoot, "node_modules", "expo-router", "entry.js"),
+      type: "sourceFile",
+    };
+  }
   if (originalResolveRequest) {
     return originalResolveRequest(context, moduleName, platform);
   }
