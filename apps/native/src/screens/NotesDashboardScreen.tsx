@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { Feather, AntDesign } from "@expo/vector-icons";
 import { RFValue } from "react-native-responsive-fontsize";
-import { useUser } from "@clerk/clerk-expo";
+import { useUser } from "@clerk/expo";
 import { api } from "@packages/backend/convex/_generated/api";
 import { type Doc } from "@packages/backend/convex/_generated/dataModel";
 import { useQuery } from "convex/react";

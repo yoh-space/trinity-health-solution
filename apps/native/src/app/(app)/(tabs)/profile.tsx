@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { useUser } from "@clerk/clerk-expo";
+import { useUser } from "@clerk/expo";
 import { useTrinityStore } from "../../../store/useTrinityStore";
 
 export default function ProfileScreen() {
