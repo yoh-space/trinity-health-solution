@@ -38,7 +38,28 @@ config.resolver.extraNodeModules = {
   "@packages/backend": path.resolve(monorepoRoot, "packages", "backend"),
 };
 
-// 4. Custom resolver to intercept subpath imports that are missing from the
+// 5. Redirect React for the `convex` package's react-clerk sub-package so it uses
+// the app's React 19 instead of its bundled React 18. The `convex` npm package
+// (v1.35.x) bundles its own `react` v18 in `node_modules/convex/node_modules/react`.
+// When `ConvexProviderWithClerk` is rendered in the app's React 19 context, this
+// causes "Invalid hook call" errors because the hook dispatcher resolves to the
+// wrong React instance. By mapping the nested React to the app's React, we ensure
+// a single React instance.
+const convexNestedReact = path.resolve(
+  monorepoRoot,
+  "node_modules",
+  "convex",
+  "node_modules",
+  "react"
+);
+const appReact = path.resolve(projectRoot, "node_modules", "react");
+config.resolver.extraNodeModules = {
+  ...(config.resolver.extraNodeModules || {}),
+  "@packages/backend": path.resolve(monorepoRoot, "packages", "backend"),
+  [convexNestedReact]: appReact,
+};
+
+// 5. Custom resolver to intercept subpath imports that are missing from the
 // hoisted package versions (version skew between expo-router@6 and the
 // installed @expo/metro-runtime@55.x).
 //

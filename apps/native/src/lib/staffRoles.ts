@@ -1,6 +1,11 @@
 import type { Href } from "expo-router";
 
 export type StaffRoleId = "counselor" | "clinician" | "admin";
+export type StaffTabId = "home" | "requests" | "team";
+
+export function isStaffRoleId(value: unknown): value is StaffRoleId {
+  return value === "counselor" || value === "clinician" || value === "admin";
+}
 
 export type StaffRole = {
   id: StaffRoleId;
@@ -32,7 +37,7 @@ export const staffRoles: StaffRole[] = [
     id: "admin",
     label: "Admin",
     shortLabel: "Admin",
-    description: "Queue & team",
+    description: "Service overview",
     deskLabel: "ADMIN DESK",
     icon: "people-outline",
   },
@@ -44,4 +49,29 @@ export function getStaffRole(value: string | string[] | undefined): StaffRole {
 }
 
 export const staffDashboardPath = (role: StaffRoleId): Href =>
-  `/staff-dashboard?role=${role}` as Href;
+  role === "clinician"
+    ? ("/staff/clinical" as Href)
+    : role === "counselor"
+      ? ("/staff/counselor" as Href)
+      : ("/staff/admin" as Href);
+
+const staffTabPaths: Record<StaffRoleId, Record<StaffTabId, string>> = {
+  counselor: {
+    home: "/staff/counselor",
+    requests: "/staff/counselor-requests",
+    team: "/staff/counselor-team",
+  },
+  clinician: {
+    home: "/staff/clinical",
+    requests: "/staff/clinical-requests",
+    team: "/staff/clinical-team",
+  },
+  admin: {
+    home: "/staff/admin",
+    requests: "/staff/admin-requests",
+    team: "/staff/admin-team",
+  },
+};
+
+export const staffTabPath = (role: StaffRoleId, tab: StaffTabId): Href =>
+  staffTabPaths[role][tab] as Href;
