@@ -57,14 +57,24 @@ export default function AdminManager() {
       }
     | undefined;
 
-  const teamPage = useQuery(anyApi.staff.listTeamMembers, {
-    paginationOpts: { numItems: 25, cursor: null },
-    includeInactive: true,
-  }) as { page: TeamMemberItem[] } | undefined;
+  const [now] = useState(() => Date.now());
+  const teamPaginationArgs = useMemo(
+    () => ({
+      paginationOpts: { numItems: 25, cursor: null },
+      includeInactive: true,
+    }),
+    []
+  );
 
-  const upcomingAppointments = useQuery(anyApi.appointments.listUpcomingForAdmin, {
-    now: Date.now(),
-  }) as AppointmentItem[] | undefined;
+  const teamPage = useQuery(
+    anyApi.staff.listTeamMembers,
+    teamPaginationArgs
+  ) as { page: TeamMemberItem[] } | undefined;
+
+  const upcomingAppointments = useQuery(
+    anyApi.appointments.listUpcomingForAdmin,
+    useMemo(() => ({ now }), [now])
+  ) as AppointmentItem[] | undefined;
 
   // Content Mutations
   const create = useMutation(anyApi.education.create);

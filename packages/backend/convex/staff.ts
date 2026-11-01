@@ -7,6 +7,8 @@ import { mutation, query } from "./_generated/server";
 import {
   requireActiveStaff,
   requireIdentity,
+  isDesignatedAdminEmail,
+  getEffectiveRole,
   type StaffRole,
 } from "./auth";
 
@@ -80,12 +82,14 @@ export const getMyProfile = query({
       .unique();
     if (!profile) return null;
 
+    const effectiveRole = getEffectiveRole(identity);
+
     return {
       _id: profile._id,
       _creationTime: profile._creationTime,
-      ...(identity.role === "admin" ? { clerkUserId: profile.clerkUserId } : {}),
+      ...(effectiveRole === "admin" ? { clerkUserId: profile.clerkUserId } : {}),
       role: profile.role,
-      authorized: profile.active && profile.role === identity.role,
+      authorized: profile.active && profile.role === effectiveRole,
       displayName: profile.displayName,
       specialty: profile.specialty,
       availability: profile.availability,
@@ -108,7 +112,7 @@ export const ensureMyProfile = mutation({
   returns: v.id("staffProfiles"),
   handler: async (ctx, args) => {
     const identity = await requireIdentity(ctx);
-    const role = getStaffRole(identity.role);
+    const role = isDesignatedAdminEmail(identity.email) ? "admin" : getStaffRole(identity.role);
     const displayName = normalizeProfileText(args.displayName, "Name", 80);
     const specialty = normalizeProfileText(args.specialty, "Specialty", 100);
     const existing = await ctx.db
@@ -120,11 +124,19 @@ export const ensureMyProfile = mutation({
 
     if (existing) {
       if (existing.role !== role) {
+        if (role === "admin" && isDesignatedAdminEmail(identity.email)) {
+          await ctx.db.patch(existing._id, { role: "admin", active: true, updatedAt: Date.now() });
+          return existing._id;
+        }
         throw new Error(
           "Your Clerk role does not match the staff directory. Ask an administrator to correct it.",
         );
       }
       if (!existing.active) {
+        if (role === "admin" && isDesignatedAdminEmail(identity.email)) {
+          await ctx.db.patch(existing._id, { active: true, updatedAt: Date.now() });
+          return existing._id;
+        }
         throw new Error(
           "Your staff access is inactive. Ask an administrator to restore it.",
         );
@@ -155,7 +167,7 @@ export const listTeamMembers = query({
   returns: paginationResultValidator(teamMemberValidator),
   handler: async (ctx, args) => {
     const identity = await requireIdentity(ctx);
-    const role = getStaffRole(identity.role);
+    const role = isDesignatedAdminEmail(identity.email) ? "admin" : getStaffRole(identity.role);
     await requireActiveStaff(ctx, role);
     const includeInactive = args.includeInactive === true && role === "admin";
 
@@ -305,7 +317,7 @@ export const updateMyAvailability = mutation({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Authentication required.");
-    const role = getStaffRole(identity.role);
+    const role = isDesignatedAdminEmail(identity.email) ? "admin" : getStaffRole(identity.role);
     await requireActiveStaff(ctx, role);
     const profile = await ctx.db
       .query("staffProfiles")
@@ -322,4 +334,6 @@ export const updateMyAvailability = mutation({
     return null;
   },
 });
+
+
 
