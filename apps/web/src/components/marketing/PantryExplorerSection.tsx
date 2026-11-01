@@ -149,6 +149,7 @@ export function PantryExplorerSection() {
                 src="/images/kitchen-meal.jpg"
                 alt="Ethiopian kitchen nutrition meal"
                 fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent lg:bg-gradient-to-r lg:from-white/10 lg:to-transparent" />

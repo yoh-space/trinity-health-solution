@@ -163,6 +163,7 @@ export function MarketingHero() {
                 src={screenshotMap[activeTab]}
                 alt="Trinity Health Solution Android release application screenshot"
                 fill
+                sizes="(max-width: 768px) 100vw, 340px"
                 priority
                 className="object-cover object-top transition-opacity duration-300"
               />
