@@ -1,134 +1,200 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import {
-  ArrowDownRight,
   ArrowRight,
-  Heart,
-  Sparkle,
+  Download,
   ShieldCheck,
   Sparkles,
+  Smartphone,
+  BookOpen,
+  Heart,
+  CheckCircle2,
 } from "lucide-react";
-import Link from "next/link";
-
-function FamilyIllustration() {
-  return (
-    <div className="relative mx-auto w-full max-w-[590px] lg:ml-auto">
-      <div className="absolute -left-5 top-10 size-24 rounded-full bg-[#e9d6a8]/60 blur-2xl sm:-left-10 sm:size-36" />
-      <div className="absolute -bottom-8 right-4 size-32 rounded-full bg-[#b9c8a9]/60 blur-3xl" />
-      <div className="relative overflow-hidden rounded-[2rem] border border-white/80 bg-[#e9eee3] p-4 shadow-[0_30px_90px_rgba(39,68,48,0.12)] sm:rounded-[2.5rem] sm:p-6">
-        <div className="relative min-h-[370px] overflow-hidden rounded-[1.5rem] bg-[#dfe8da] sm:min-h-[470px] sm:rounded-[2rem]">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_80%_15%,rgba(255,255,255,0.85),transparent_45%),linear-gradient(145deg,#eaf0e4_5%,#d8e4d4_100%)]" />
-          <div className="absolute -right-14 -top-14 size-64 rounded-full border border-[#b9c9b5]/60 sm:size-80" />
-          <div className="absolute -right-2 top-0 size-52 rounded-full border border-[#b9c9b5]/50 sm:size-64" />
-          <div className="absolute bottom-0 left-0 h-40 w-full bg-[linear-gradient(0deg,rgba(108,135,103,0.12),transparent)]" />
-
-          <div className="absolute left-5 top-5 z-10 flex items-center gap-2 rounded-full bg-white/75 px-3 py-2 text-[11px] font-semibold text-[#45604a] backdrop-blur sm:left-8 sm:top-8">
-            <Sparkles size={13} aria-hidden="true" />A moment to learn
-          </div>
-          <div className="absolute right-5 top-20 z-10 hidden rotate-6 rounded-2xl bg-[#c37c57] px-4 py-3 text-xs font-medium text-white shadow-lg sm:block">
-            Small steps,
-            <br />
-            lasting habits.
-          </div>
-
-          <div className="absolute bottom-[-4px] left-1/2 flex h-[275px] w-[250px] -translate-x-1/2 items-end justify-center sm:h-[335px] sm:w-[305px]">
-            <div className="absolute bottom-0 h-[190px] w-[240px] rounded-t-[48%] bg-[#bd916f] sm:h-[225px] sm:w-[290px]" />
-            <div className="absolute bottom-0 left-8 h-[158px] w-[102px] -rotate-6 rounded-t-[48%] bg-[#476c52] sm:left-10 sm:h-[188px] sm:w-[122px]" />
-            <div className="absolute bottom-0 right-8 h-[163px] w-[108px] rotate-6 rounded-t-[48%] bg-[#c17e5d] sm:right-10 sm:h-[193px] sm:w-[130px]" />
-            <div className="absolute bottom-[111px] left-[61px] z-10 size-[74px] rounded-full bg-[#5d382c] sm:bottom-[140px] sm:left-[72px] sm:size-[88px]" />
-            <div className="absolute bottom-[115px] right-[59px] z-10 size-[74px] rounded-full bg-[#6d4838] sm:bottom-[145px] sm:right-[70px] sm:size-[88px]" />
-            <div className="absolute bottom-0 left-1/2 z-20 h-[175px] w-[84px] -translate-x-1/2 rounded-t-[42%] bg-[#e4c98d] sm:h-[208px] sm:w-[100px]" />
-            <div className="absolute bottom-[150px] left-1/2 z-30 size-[82px] -translate-x-1/2 rounded-full bg-[#875b44] sm:bottom-[186px] sm:size-[98px]" />
-            <div className="absolute bottom-[195px] left-1/2 z-30 h-[28px] w-[88px] -translate-x-1/2 rounded-[50%_50%_35%_35%] bg-[#253c30] sm:bottom-[239px] sm:h-[32px] sm:w-[104px]" />
-            <div className="absolute bottom-[76px] left-1/2 z-40 h-[77px] w-[66px] -translate-x-1/2 rotate-[-9deg] rounded-lg border-[5px] border-[#f5f0e2] bg-[#f8f4e9] shadow-md sm:bottom-[91px] sm:h-[94px] sm:w-[80px]">
-              <div className="mx-auto mt-4 h-1 w-7 rounded-full bg-[#7d9a74] sm:w-9" />
-              <div className="mx-auto mt-2 h-1 w-9 rounded-full bg-[#d1d9ca] sm:w-11" />
-              <div className="mx-auto mt-2 h-1 w-6 rounded-full bg-[#d1d9ca] sm:w-8" />
-            </div>
-          </div>
-
-          <div className="absolute bottom-5 left-5 z-10 rounded-2xl border border-white/80 bg-white/85 p-4 shadow-[0_12px_28px_rgba(42,70,48,0.1)] backdrop-blur sm:bottom-8 sm:left-8 sm:p-5">
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-[#84917f]">
-              This week&apos;s focus
-            </p>
-            <p className="mt-1.5 text-sm font-semibold text-[#244733] sm:text-base">
-              Healthy everyday choices
-            </p>
-            <div className="mt-3 flex items-center gap-2 text-[11px] text-[#718075]">
-              <ShieldCheck
-                size={14}
-                className="text-[#66815e]"
-                aria-hidden="true"
-              />
-              Reviewed learning, not clinical care
-            </div>
-          </div>
-          <div className="absolute bottom-7 right-6 z-10 grid size-11 place-items-center rounded-full bg-[#f4e5c1] text-[#765f32] shadow-md sm:bottom-10 sm:right-9 sm:size-14">
-            <Heart size={21} strokeWidth={1.7} aria-hidden="true" />
-          </div>
-        </div>
-      </div>
-      <div className="absolute -bottom-5 right-4 rounded-full border border-[#e7e4d8] bg-[#fbfaf6] px-4 py-2 text-xs font-medium text-[#65746a] shadow-sm sm:-right-4 sm:bottom-9">
-        Made with care, for everyday life
-      </div>
-    </div>
-  );
-}
+import { useMarketingLanguage } from "./MarketingLanguageContext";
 
 export function MarketingHero() {
+  const { language, t } = useMarketingLanguage();
+  const [activeTab, setActiveTab] = useState<"home" | "learn" | "food">("home");
+
+  const screenshotMap = {
+    home: "/images/app-screen-home.png",
+    learn: "/images/app-screen-learn.png",
+    food: "/images/app-screen-food.png",
+  };
+
   return (
-    <section className="relative">
+    <section className="relative overflow-hidden bg-gradient-to-b from-[#fbfaf6] via-[#f7f5ed] to-[#fbfaf6]">
+      {/* Background ambient circular rings */}
       <div className="pointer-events-none absolute -right-36 -top-24 size-[540px] rounded-full border border-[#dfe5d8] sm:-right-24 sm:top-[-150px] sm:size-[760px]" />
       <div className="pointer-events-none absolute -right-16 top-16 size-[390px] rounded-full border border-[#e8ebdf] sm:right-[-3rem] sm:top-[-3rem] sm:size-[600px]" />
-      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-16 sm:px-8 sm:pb-28 sm:pt-24 lg:grid-cols-[1.02fr_0.98fr] lg:gap-16 lg:px-12 lg:pb-32 lg:pt-28">
+      <div className="pointer-events-none absolute left-[-10rem] top-1/3 size-96 rounded-full bg-[#e9f0e3]/40 blur-3xl" />
+
+      <div className="relative mx-auto grid max-w-7xl items-center gap-12 px-5 pb-20 pt-12 sm:px-8 sm:pb-28 sm:pt-20 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14 lg:px-12 lg:pb-32 lg:pt-24">
+        {/* Left Column: Headline, Value Proposition, Action CTAs */}
         <div className="relative z-10">
-          <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-[#dce4d8] bg-white/75 px-3.5 py-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#44634d]">
-            <span className="size-1.5 rounded-full bg-[#c78157]" />
-            የጤና ትምህርት · Health learning
+          {/* Eyebrow badge */}
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#d6dfd2] bg-white/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#3b5e45] shadow-xs backdrop-blur">
+            <span className="size-2 rounded-full bg-[#c78157] animate-pulse" />
+            {t("የጤና ትምህርት · Practical Health Learning", "የጤና ትምህርት · Practical Health Learning")}
           </div>
-          <h1 className="max-w-[720px] text-[clamp(3.25rem,7vw,6.5rem)] font-medium leading-[0.98] tracking-[-0.075em] text-[#193b2d]">
-            A little more
-            <br />
-            <span className="font-serif italic text-[#718469]">
-              well-informed.
-            </span>
-            <br />
-            Every day.
+
+          {/* Main Title */}
+          <h1 className="max-w-[700px] text-[clamp(2.75rem,5.5vw,5.5rem)] font-medium leading-[1.02] tracking-[-0.06em] text-[#193b2d]">
+            {language === "am" ? (
+              <>
+                ትንሽ እውቀት።
+                <br />
+                <span className="font-serif italic text-[#4a7356]">
+                  ብዙ እንክብካቤ።
+                </span>
+                <br />
+                በየዕለቱ።
+              </>
+            ) : (
+              <>
+                A little more
+                <br />
+                <span className="font-serif italic text-[#4a7356]">
+                  well-informed.
+                </span>
+                <br />
+                Every single day.
+              </>
+            )}
           </h1>
-          <p className="mt-7 max-w-[560px] text-base leading-7 text-[#65746a] sm:mt-8 sm:text-lg sm:leading-8">
-            Clear, practical health learning for Ethiopian families—first in
-            Amharic, made to feel useful in everyday life.
+
+          {/* Subtitle description */}
+          <p className="mt-6 max-w-[560px] text-base leading-7 text-[#57695e] sm:mt-7 sm:text-lg sm:leading-8">
+            {t(
+              "Clear, practical health learning designed for Ethiopian families—grounded in Amharic, familiar pantry staples, and verified by health professionals.",
+              "ለኢትዮጵያውያን ቤተሰቦች የተዘጋጀ ግልጽ እና ተግባራዊ የጤና ትምህርት—በአማርኛ፣ በየቤታችን በሚገኙ የምግብ ዓይነቶችና በጤና ባለሙያዎች የተረጋገጠ።"
+            )}
           </p>
-          <div className="mt-9 flex flex-wrap items-center gap-3.5">
+
+          {/* Primary Action Buttons */}
+          <div className="mt-8 flex flex-wrap items-center gap-3.5 sm:mt-10">
             <Link
-              href="/notes"
-              className="inline-flex items-center gap-3 rounded-full bg-[#1c573e] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_10px_24px_rgba(28,87,62,0.16)] transition hover:-translate-y-0.5 hover:bg-[#164832]"
+              href="/learn"
+              className="inline-flex items-center gap-2.5 rounded-full bg-[#1c573e] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_12px_28px_rgba(28,87,62,0.18)] transition hover:-translate-y-0.5 hover:bg-[#154631] active:translate-y-0"
             >
-              Explore the app
+              {t("Explore Learning Library", "ትምህርቶችን በነፃ ይጀምሩ")}
               <ArrowRight size={16} aria-hidden="true" />
             </Link>
-            <Link
-              href="#approach"
-              className="inline-flex items-center gap-2 rounded-full px-5 py-3.5 text-sm font-semibold text-[#3d5a48] transition hover:bg-white"
+
+            <a
+              href="#mobile-app"
+              className="inline-flex items-center gap-2 rounded-full border border-[#c4cec2] bg-white/90 px-5 py-3.5 text-sm font-semibold text-[#294d3a] shadow-xs transition hover:border-[#1c573e] hover:bg-white active:scale-95"
             >
-              Get to know us
-              <ArrowDownRight size={16} aria-hidden="true" />
-            </Link>
+              <Smartphone size={16} className="text-[#1c573e]" />
+              {t("Get Mobile App (APK)", "የአንድሮይድ መተግበሪያ")}
+            </a>
           </div>
-          <div className="mt-11 flex items-center gap-3 text-sm text-[#708075]">
-            <span className="flex -space-x-2">
-              <span className="grid size-8 place-items-center rounded-full border-2 border-[#fbfaf6] bg-[#e6d9c5] text-[10px] font-semibold text-[#6d5940]">
-                አ
-              </span>
-              <span className="grid size-8 place-items-center rounded-full border-2 border-[#fbfaf6] bg-[#dce7d8] text-[10px] font-semibold text-[#476742]">
-                T
-              </span>
-              <span className="grid size-8 place-items-center rounded-full border-2 border-[#fbfaf6] bg-[#f2ded1] text-[10px] font-semibold text-[#9b593e]">
-                <Sparkle size={12} strokeWidth={1.8} aria-hidden="true" />
-              </span>
-            </span>
-            <span>Learning shaped around families and community</span>
+
+          {/* Proof Badges */}
+          <div className="mt-10 flex flex-wrap items-center gap-4 border-t border-[#183b2d]/10 pt-7 text-xs font-medium text-[#65766a]">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 size={16} className="text-[#287343]" />
+              <span>{t("100% Free & Open Access", "100% ነፃ እና ክፍት")}</span>
+            </div>
+            <span className="text-[#cbd4c8]">•</span>
+            <div className="flex items-center gap-2">
+              <ShieldCheck size={16} className="text-[#287343]" />
+              <span>{t("UNICEF-Aligned Guidance", "ከዩኒሴፍ መመሪያዎች ጋር የተጣጣመ")}</span>
+            </div>
+            <span className="text-[#cbd4c8]">•</span>
+            <div className="flex items-center gap-2">
+              <Sparkles size={16} className="text-[#c78157]" />
+              <span>{t("Bilingual Amharic + English", "በአማርኛ እና በእንግሊዝኛ")}</span>
+            </div>
           </div>
         </div>
-        <FamilyIllustration />
+
+        {/* Right Column: Realistic Interactive Phone & App Mockup */}
+        <div className="relative mx-auto w-full max-w-[480px] lg:ml-auto">
+          {/* Subtle colorful backdrops */}
+          <div className="absolute -left-6 top-12 size-36 rounded-full bg-[#f1dfba]/50 blur-3xl" />
+          <div className="absolute -bottom-10 right-2 size-48 rounded-full bg-[#c3dbc0]/60 blur-3xl" />
+
+          {/* Interactive Screen Selector Pills */}
+          <div className="mb-4 flex items-center justify-center gap-2">
+            <button
+              onClick={() => setActiveTab("home")}
+              className={`rounded-full px-3.5 py-1 text-xs font-semibold transition ${
+                activeTab === "home"
+                  ? "bg-[#1c573e] text-white shadow-xs"
+                  : "bg-white/80 text-[#54685b] border border-[#d2ddd0] hover:bg-white"
+              }`}
+            >
+              {t("Daily Home", "መነሻ")}
+            </button>
+            <button
+              onClick={() => setActiveTab("learn")}
+              className={`rounded-full px-3.5 py-1 text-xs font-semibold transition ${
+                activeTab === "learn"
+                  ? "bg-[#1c573e] text-white shadow-xs"
+                  : "bg-white/80 text-[#54685b] border border-[#d2ddd0] hover:bg-white"
+              }`}
+            >
+              {t("Lessons", "ትምህርቶች")}
+            </button>
+            <button
+              onClick={() => setActiveTab("food")}
+              className={`rounded-full px-3.5 py-1 text-xs font-semibold transition ${
+                activeTab === "food"
+                  ? "bg-[#1c573e] text-white shadow-xs"
+                  : "bg-white/80 text-[#54685b] border border-[#d2ddd0] hover:bg-white"
+              }`}
+            >
+              {t("Pantry Meal", "የምግብ ሀሳብ")}
+            </button>
+          </div>
+
+          {/* Smartphone Frame */}
+          <div className="relative mx-auto w-full max-w-[340px] rounded-[3rem] border-[9px] border-[#1f2823] bg-[#1a211d] p-1.5 shadow-[0_25px_60px_-15px_rgba(20,40,28,0.35)]">
+            {/* Top speaker notch / camera */}
+            <div className="absolute left-1/2 top-3 z-30 h-4 w-28 -translate-x-1/2 rounded-full bg-[#111613]" />
+
+            {/* Inner Phone Display */}
+            <div className="relative aspect-[9/19.5] w-full overflow-hidden rounded-[2.3rem] bg-[#fbfaf6]">
+              <Image
+                src={screenshotMap[activeTab]}
+                alt="Trinity Health Solution Android release application screenshot"
+                fill
+                priority
+                className="object-cover object-top transition-opacity duration-300"
+              />
+            </div>
+          </div>
+
+          {/* Floating Trust Badge */}
+          <div className="absolute -bottom-4 -left-4 z-20 flex items-center gap-3 rounded-2xl border border-white/90 bg-white/95 p-3.5 shadow-[0_16px_36px_rgba(28,50,35,0.12)] backdrop-blur-md sm:-bottom-5 sm:-left-8 sm:p-4">
+            <div className="grid size-10 place-items-center rounded-xl bg-[#e5eddf] text-[#1c573e]">
+              <Smartphone size={20} />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#79887d]">
+                {t("Android Release APK", "የአንድሮይድ መተግበሪያ")}
+              </p>
+              <p className="text-xs font-bold text-[#1f3f2f]">
+                {t("100% Offline Capable", "ያለ ኢንተርኔት ይሰራል")}
+              </p>
+            </div>
+          </div>
+
+          {/* Floating Opal AI Badge */}
+          <div className="absolute -right-4 top-24 z-20 hidden rounded-2xl border border-white/90 bg-[#1c573e] p-3 text-white shadow-[0_16px_36px_rgba(28,50,35,0.18)] sm:block">
+            <div className="flex items-center gap-2 text-xs font-semibold">
+              <Sparkles size={14} className="text-[#f1dfba]" />
+              <span>{t("Ask Opal AI Assistant", "ኦፓል የጤና ረዳት")}</span>
+            </div>
+            <p className="mt-1 text-[11px] text-[#d6e5d8]">
+              {t("Verified maternal & nutrition answers", "የተረጋገጡ የጤና እና አመጋገብ መልሶች")}
+            </p>
+          </div>
+        </div>
       </div>
     </section>
   );
