@@ -316,6 +316,66 @@ export default function AdminManager() {
     });
   }, [content]);
 
+  // Memoized Chart Data to prevent re-render thrashing
+  const chartRequestCounts = useMemo(
+    () => ({
+      clinical: {
+        submitted: Number(adminOverview?.counts.clinical.submitted ?? 3),
+        inReview: Number(adminOverview?.counts.clinical.inReview ?? 4),
+        contacted: Number(adminOverview?.counts.clinical.contacted ?? 5),
+        closed: Number(adminOverview?.counts.clinical.closed ?? 10),
+      },
+      counselling: {
+        submitted: Number(adminOverview?.counts.counselling.submitted ?? 4),
+        inReview: Number(adminOverview?.counts.counselling.inReview ?? 6),
+        contacted: Number(adminOverview?.counts.counselling.contacted ?? 8),
+        closed: Number(adminOverview?.counts.counselling.closed ?? 14),
+      },
+    }),
+    [
+      adminOverview?.counts.clinical.submitted,
+      adminOverview?.counts.clinical.inReview,
+      adminOverview?.counts.clinical.contacted,
+      adminOverview?.counts.clinical.closed,
+      adminOverview?.counts.counselling.submitted,
+      adminOverview?.counts.counselling.inReview,
+      adminOverview?.counts.counselling.contacted,
+      adminOverview?.counts.counselling.closed,
+    ]
+  );
+
+  const chartStaffDistribution = useMemo(() => {
+    const clinicians = effectiveTeam.filter((m) => m.role === "clinician");
+    const counselors = effectiveTeam.filter((m) => m.role === "counselor");
+    const admins = effectiveTeam.filter((m) => m.role === "admin");
+
+    return {
+      clinicians: {
+        active: clinicians.length,
+        available: clinicians.filter((m) => m.availability === "available").length,
+        caseload: 6,
+      },
+      counselors: {
+        active: counselors.length,
+        available: counselors.filter((m) => m.availability === "available").length,
+        caseload: 8,
+      },
+      admins: {
+        active: admins.length,
+        available: admins.filter((m) => m.availability === "available").length,
+        caseload: 0,
+      },
+    };
+  }, [effectiveTeam]);
+
+  const chartAppointmentSplit = useMemo(
+    () => ({
+      online: effectiveAppointments.filter((a) => a.format === "online").length,
+      inPerson: effectiveAppointments.filter((a) => a.format === "inPerson").length,
+    }),
+    [effectiveAppointments]
+  );
+
   // Content Handlers
   function startNew() {
     setEditingItem(null);
@@ -405,7 +465,7 @@ export default function AdminManager() {
   }
 
   return (
-    <AdminShell>
+    <AdminShell activeTab={activeTab} onTabChange={setActiveTab}>
       {/* Executive Command Header */}
       <header className="mb-8 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
         <div>
@@ -494,47 +554,9 @@ export default function AdminManager() {
         <TabsContent value="overview">
           <div className="space-y-8">
             <AdminCharts
-              requestStatusCounts={{
-                clinical: {
-                  submitted: Number(adminOverview?.counts.clinical.submitted ?? 3),
-                  inReview: Number(adminOverview?.counts.clinical.inReview ?? 4),
-                  contacted: Number(adminOverview?.counts.clinical.contacted ?? 5),
-                  closed: Number(adminOverview?.counts.clinical.closed ?? 10),
-                },
-                counselling: {
-                  submitted: Number(adminOverview?.counts.counselling.submitted ?? 4),
-                  inReview: Number(adminOverview?.counts.counselling.inReview ?? 6),
-                  contacted: Number(adminOverview?.counts.counselling.contacted ?? 8),
-                  closed: Number(adminOverview?.counts.counselling.closed ?? 14),
-                },
-              }}
-              staffDistribution={{
-                clinicians: {
-                  active: effectiveTeam.filter((m) => m.role === "clinician").length,
-                  available: effectiveTeam.filter(
-                    (m) => m.role === "clinician" && m.availability === "available"
-                  ).length,
-                  caseload: 6,
-                },
-                counselors: {
-                  active: effectiveTeam.filter((m) => m.role === "counselor").length,
-                  available: effectiveTeam.filter(
-                    (m) => m.role === "counselor" && m.availability === "available"
-                  ).length,
-                  caseload: 8,
-                },
-                admins: {
-                  active: effectiveTeam.filter((m) => m.role === "admin").length,
-                  available: effectiveTeam.filter(
-                    (m) => m.role === "admin" && m.availability === "available"
-                  ).length,
-                  caseload: 0,
-                },
-              }}
-              appointmentFormatSplit={{
-                online: effectiveAppointments.filter((a) => a.format === "online").length,
-                inPerson: effectiveAppointments.filter((a) => a.format === "inPerson").length,
-              }}
+              requestStatusCounts={chartRequestCounts}
+              staffDistribution={chartStaffDistribution}
+              appointmentFormatSplit={chartAppointmentSplit}
               contentCategoryDistribution={contentCategoryDistribution}
             />
 

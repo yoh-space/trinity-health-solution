@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import {
   ResponsiveContainer,
   BarChart,
@@ -46,6 +46,12 @@ export function AdminCharts({
   appointmentFormatSplit,
   contentCategoryDistribution,
 }: ChartProps) {
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   // Chart 1: Request Status Throughput data
   const statusData = useMemo(
     () => [
@@ -70,7 +76,16 @@ export function AdminCharts({
         Counselling: requestStatusCounts.counselling.closed,
       },
     ],
-    [requestStatusCounts]
+    [
+      requestStatusCounts.clinical.submitted,
+      requestStatusCounts.clinical.inReview,
+      requestStatusCounts.clinical.contacted,
+      requestStatusCounts.clinical.closed,
+      requestStatusCounts.counselling.submitted,
+      requestStatusCounts.counselling.inReview,
+      requestStatusCounts.counselling.contacted,
+      requestStatusCounts.counselling.closed,
+    ]
   );
 
   // Chart 2: Staff Capacity by Role data
@@ -95,7 +110,17 @@ export function AdminCharts({
         Caseload: staffDistribution.admins.caseload,
       },
     ],
-    [staffDistribution]
+    [
+      staffDistribution.clinicians.active,
+      staffDistribution.clinicians.available,
+      staffDistribution.clinicians.caseload,
+      staffDistribution.counselors.active,
+      staffDistribution.counselors.available,
+      staffDistribution.counselors.caseload,
+      staffDistribution.admins.active,
+      staffDistribution.admins.available,
+      staffDistribution.admins.caseload,
+    ]
   );
 
   // Chart 3: Consultation Format Pie data
@@ -104,8 +129,21 @@ export function AdminCharts({
       { name: "Online Video/Audio", value: Math.max(1, appointmentFormatSplit.online) },
       { name: "In-Person Clinic", value: Math.max(0, appointmentFormatSplit.inPerson) },
     ],
-    [appointmentFormatSplit]
+    [appointmentFormatSplit.online, appointmentFormatSplit.inPerson]
   );
+
+  if (!isMounted) {
+    return (
+      <div className="grid gap-6 lg:grid-cols-2">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="h-80 animate-pulse bg-white/60 p-6">
+            <div className="h-5 w-40 rounded-md bg-[#eaf0e6]" />
+            <div className="mt-4 h-56 w-full rounded-xl bg-[#f4f7f2]" />
+          </Card>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="grid gap-6 lg:grid-cols-2">
@@ -124,7 +162,7 @@ export function AdminCharts({
         </CardHeader>
         <CardContent>
           <div className="h-72 w-full pt-4">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={260}>
               <BarChart data={statusData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e4eae2" />
                 <XAxis dataKey="status" tick={{ fill: "#607466", fontSize: 12 }} stroke="#cbd6cb" />
@@ -162,7 +200,7 @@ export function AdminCharts({
         </CardHeader>
         <CardContent>
           <div className="h-72 w-full pt-4">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={260}>
               <BarChart data={staffData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e4eae2" />
                 <XAxis dataKey="role" tick={{ fill: "#607466", fontSize: 12 }} stroke="#cbd6cb" />
@@ -201,7 +239,7 @@ export function AdminCharts({
         </CardHeader>
         <CardContent>
           <div className="flex h-72 items-center justify-center">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={260}>
               <PieChart>
                 <Pie
                   data={formatPieData}
@@ -247,7 +285,7 @@ export function AdminCharts({
         </CardHeader>
         <CardContent>
           <div className="h-72 w-full pt-4">
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="100%" height={260}>
               <BarChart
                 layout="vertical"
                 data={contentCategoryDistribution}

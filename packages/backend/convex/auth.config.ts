@@ -2,16 +2,19 @@ import { type AuthConfig } from "convex/server";
 
 const clerkJwtIssuerDomain = process.env.CLERK_JWT_ISSUER_DOMAIN;
 
-if (!clerkJwtIssuerDomain)
-  throw new Error(
-    "Missing CLERK_JWT_ISSUER_DOMAIN in Convex environment variables",
-  );
+const issuerDomains = Array.from(
+  new Set(
+    [
+      clerkJwtIssuerDomain,
+      "https://enabled-stag-589.clerk.accounts.dev",
+      "https://promoted-raven-5308.clerk.accounts.dev",
+    ].filter(Boolean) as string[],
+  ),
+);
 
 export default {
-  providers: [
-    {
-      domain: clerkJwtIssuerDomain,
-      applicationID: "convex",
-    },
-  ],
+  providers: issuerDomains.map((domain) => ({
+    domain,
+    applicationID: "convex",
+  })),
 } satisfies AuthConfig;
