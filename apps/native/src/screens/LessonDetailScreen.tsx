@@ -3,13 +3,33 @@ import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   getEducationContent,
   type EducationItem,
 } from "../components/public/educationContent";
 import { useTrinityStore } from "../store/useTrinityStore";
+
+const CATEGORY_HERO_FALLBACKS: Record<string, string> = {
+  "food-safety":
+    "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=1000&q=80",
+  "maternal-nutrition":
+    "https://images.unsplash.com/photo-1544126592-807ade215a0b?auto=format&fit=crop&w=1000&q=80",
+  "child-feeding":
+    "https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?auto=format&fit=crop&w=1000&q=80",
+  default:
+    "https://images.unsplash.com/photo-1490818387583-1baba5e638af?auto=format&fit=crop&w=1000&q=80",
+};
+
+function resolveHeroImage(item: EducationItem): string {
+  if (item.coverImageUrl) return item.coverImageUrl;
+  const cat = (item.category || "").toLowerCase();
+  if (cat.includes("food") || cat.includes("safe")) return CATEGORY_HERO_FALLBACKS["food-safety"];
+  if (cat.includes("matern") || cat.includes("pregnan")) return CATEGORY_HERO_FALLBACKS["maternal-nutrition"];
+  if (cat.includes("child") || cat.includes("feed")) return CATEGORY_HERO_FALLBACKS["child-feeding"];
+  return CATEGORY_HERO_FALLBACKS.default;
+}
 
 export default function LessonDetailScreen() {
   const router = useRouter();
@@ -98,7 +118,19 @@ export default function LessonDetailScreen() {
           </Pressable>
         </View>
 
-        <Text style={styles.category}>{item.category.toUpperCase()}</Text>
+        {/* Hero Cover Image Banner */}
+        <View style={styles.heroCard}>
+          <Image
+            source={{ uri: resolveHeroImage(item) }}
+            style={styles.heroImage}
+            resizeMode="cover"
+          />
+          <View style={styles.heroOverlay} />
+          <View style={styles.heroBadge}>
+            <Text style={styles.heroBadgeText}>{item.category.toUpperCase()}</Text>
+          </View>
+        </View>
+
         <Text style={styles.title}>{am ? item.titleAm : item.title}</Text>
         <View style={styles.metaRow}>
           <Ionicons name="time-outline" size={14} color="#718075" />
@@ -197,7 +229,40 @@ const styles = StyleSheet.create({
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBottom: 23,
+    marginBottom: 12,
+  },
+  heroCard: {
+    backgroundColor: "#163826",
+    borderRadius: 20,
+    height: 190,
+    marginTop: 6,
+    marginBottom: 16,
+    overflow: "hidden",
+    position: "relative",
+    width: "100%",
+  },
+  heroImage: {
+    height: "100%",
+    width: "100%",
+  },
+  heroOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(16, 40, 25, 0.25)",
+  },
+  heroBadge: {
+    backgroundColor: "rgba(8, 122, 61, 0.92)",
+    borderRadius: 12,
+    bottom: 12,
+    left: 12,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    position: "absolute",
+  },
+  heroBadgeText: {
+    color: "#FFFFFF",
+    fontFamily: "Righteous_400Regular",
+    fontSize: 10,
+    letterSpacing: 0.8,
   },
   backButton: {
     alignItems: "center",

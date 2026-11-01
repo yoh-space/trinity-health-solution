@@ -223,17 +223,57 @@ export const listTeamMembers = query({
   },
 });
 
+export const listAllActiveStaff = query({
+  args: {},
+  returns: v.array(
+    v.object({
+      _id: v.id("staffProfiles"),
+      clerkUserId: v.string(),
+      role: staffRoleValidator,
+      displayName: v.string(),
+      specialty: v.string(),
+      availability: availabilityValidator,
+      active: v.boolean(),
+    }),
+  ),
+  handler: async (ctx) => {
+    const identity = await requireIdentity(ctx);
+    const role = isDesignatedAdminEmail(identity.email) ? "admin" : getStaffRole(identity.role);
+    await requireActiveStaff(ctx, role);
+
+    const activeStaff = await ctx.db
+      .query("staffProfiles")
+      .withIndex("by_active_updatedAt", (q) => q.eq("active", true))
+      .order("desc")
+      .take(100);
+
+    return activeStaff.map((p) => ({
+      _id: p._id,
+      clerkUserId: p.clerkUserId,
+      role: p.role,
+      displayName: p.displayName,
+      specialty: p.specialty,
+      availability: p.availability,
+      active: p.active,
+    }));
+  },
+});
+
 export const createTeamMember = mutation({
   args: {
-    clerkUserId: v.string(),
+    clerkUserId: v.optional(v.string()),
     role: staffRoleValidator,
     displayName: v.string(),
     specialty: v.string(),
+    availability: v.optional(availabilityValidator),
   },
   returns: v.id("staffProfiles"),
   handler: async (ctx, args) => {
     const admin = await requireActiveStaff(ctx, "admin");
-    const clerkUserId = normalizeProfileText(args.clerkUserId, "Clerk user ID", 255);
+    const rawClerkId =
+      args.clerkUserId?.trim() ||
+      `staff_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
+    const clerkUserId = normalizeProfileText(rawClerkId, "Clerk user ID", 255);
     const displayName = normalizeProfileText(args.displayName, "Name", 80);
     const specialty = normalizeProfileText(args.specialty, "Specialty", 100);
     const existing = await ctx.db
@@ -241,7 +281,7 @@ export const createTeamMember = mutation({
       .withIndex("by_clerkUserId", (q) => q.eq("clerkUserId", clerkUserId))
       .unique();
     if (existing) {
-      throw new Error("This Clerk user already has a staff directory profile.");
+      throw new Error("A staff profile with this User ID already exists.");
     }
 
     const now = Date.now();
@@ -250,7 +290,7 @@ export const createTeamMember = mutation({
       role: args.role,
       displayName,
       specialty,
-      availability: "available",
+      availability: args.availability ?? "available",
       active: true,
       createdBy: admin.subject,
       createdAt: now,
@@ -264,6 +304,8 @@ export const updateTeamMember = mutation({
     profileId: v.id("staffProfiles"),
     displayName: v.string(),
     specialty: v.string(),
+    role: v.optional(staffRoleValidator),
+    availability: v.optional(availabilityValidator),
     active: v.boolean(),
   },
   returns: v.null(),
@@ -304,9 +346,54 @@ export const updateTeamMember = mutation({
     await ctx.db.patch(args.profileId, {
       displayName: normalizeProfileText(args.displayName, "Name", 80),
       specialty: normalizeProfileText(args.specialty, "Specialty", 100),
+      ...(args.role ? { role: args.role } : {}),
+      ...(args.availability ? { availability: args.availability } : {}),
       active: args.active,
       updatedAt: Date.now(),
     });
+    return null;
+  },
+});
+
+export const removeTeamMember = mutation({
+  args: {
+    profileId: v.id("staffProfiles"),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const admin = await requireActiveStaff(ctx, "admin");
+    const profile = await ctx.db.get(args.profileId);
+    if (!profile) throw new Error("This staff profile no longer exists.");
+    if (profile.clerkUserId === admin.subject) {
+      throw new Error("You cannot delete your own admin profile.");
+    }
+
+    const openRequests = await Promise.all(
+      (["submitted", "inReview", "contacted"] as const).map((status) =>
+        ctx.db
+          .query("careRequests")
+          .withIndex("by_assignedTo_status_createdAt", (q) =>
+            q.eq("assignedTo", profile.clerkUserId).eq("status", status),
+          )
+          .take(1),
+      ),
+    );
+    const scheduledAppointments = await ctx.db
+      .query("careAppointments")
+      .withIndex("by_staffUserId_status_scheduledAt", (q) =>
+        q.eq("staffUserId", profile.clerkUserId).eq("status", "scheduled"),
+      )
+      .take(1);
+    if (
+      openRequests.some((requests) => requests.length > 0) ||
+      scheduledAppointments.length > 0
+    ) {
+      throw new Error(
+        "Reassign open requests and resolve scheduled sessions before removing the profile.",
+      );
+    }
+
+    await ctx.db.delete(args.profileId);
     return null;
   },
 });

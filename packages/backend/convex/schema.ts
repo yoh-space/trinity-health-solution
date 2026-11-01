@@ -34,6 +34,8 @@ export default defineSchema({
     ),
     takeaway: v.optional(v.string()),
     takeawayAm: v.optional(v.string()),
+    coverImageStorageId: v.optional(v.id("_storage")),
+    coverImageUrl: v.optional(v.string()),
     status: v.union(v.literal("draft"), v.literal("published")),
     publishedAt: v.optional(v.number()),
   })

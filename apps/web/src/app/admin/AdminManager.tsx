@@ -416,7 +416,20 @@ export default function AdminManager() {
     setSaving(true);
     setMessage("");
     setError("");
-    const payload = { ...form, readMinutes: Number(form.readMinutes) };
+    const payload = {
+      title: form.title,
+      titleAm: form.titleAm,
+      summary: form.summary,
+      summaryAm: form.summaryAm,
+      content: form.content,
+      contentAm: form.contentAm,
+      category: form.category,
+      readMinutes: Number(form.readMinutes),
+      ...(form.coverImageStorageId
+        ? { coverImageStorageId: form.coverImageStorageId as any }
+        : {}),
+      ...(form.coverImageUrl ? { coverImageUrl: form.coverImageUrl } : {}),
+    };
     try {
       if (editingItem) {
         await update({ id: editingItem._id, ...payload });
@@ -572,14 +585,20 @@ export default function AdminManager() {
 
             {/* Quick Triage Stream in Overview */}
             <div className="mt-8">
-              <AdminTriageQueue requests={effectiveRequests.slice(0, 5)} />
+              <AdminTriageQueue
+                requests={effectiveRequests.slice(0, 5)}
+                staffList={effectiveTeam}
+              />
             </div>
           </div>
         </TabsContent>
 
         {/* Tab 2: Care Queue & Triage Table */}
         <TabsContent value="triage">
-          <AdminTriageQueue requests={effectiveRequests} />
+          <AdminTriageQueue
+            requests={effectiveRequests}
+            staffList={effectiveTeam}
+          />
         </TabsContent>
 
         {/* Tab 3: Staff Roster & Availability */}

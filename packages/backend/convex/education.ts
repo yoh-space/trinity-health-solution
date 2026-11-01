@@ -12,10 +12,27 @@ const contentArgs = {
   contentAm: v.string(),
   category: v.string(),
   readMinutes: v.number(),
+  coverImageStorageId: v.optional(v.id("_storage")),
+  coverImageUrl: v.optional(v.string()),
 };
 
 async function requirePublisher(ctx: { auth: Auth }) {
   return await requireRole(ctx, "admin");
+}
+
+async function hydrateCoverImageUrl<
+  T extends { coverImageStorageId?: string; coverImageUrl?: string },
+>(
+  ctx: { storage: { getUrl: (id: any) => Promise<string | null> } },
+  item: T,
+): Promise<T> {
+  if (item.coverImageStorageId) {
+    const url = await ctx.storage.getUrl(item.coverImageStorageId);
+    if (url) {
+      return { ...item, coverImageUrl: url };
+    }
+  }
+  return item;
 }
 
 function validateContent(args: {
@@ -51,31 +68,53 @@ function validateContent(args: {
   }
 }
 
+export const generateUploadUrl = mutation({
+  args: {},
+  handler: async (ctx) => {
+    await requirePublisher(ctx);
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const getById = query({
+  args: { id: v.id("educationContent") },
+  handler: async (ctx, { id }) => {
+    const doc = await ctx.db.get(id);
+    if (!doc) return null;
+    return await hydrateCoverImageUrl(ctx, doc);
+  },
+});
+
 export const listPublished = query({
   args: {},
-  handler: async (ctx) =>
-    await ctx.db
+  handler: async (ctx) => {
+    const docs = await ctx.db
       .query("educationContent")
       .withIndex("by_status", (q) => q.eq("status", "published"))
       .order("desc")
-      .take(50),
+      .take(50);
+    return await Promise.all(docs.map((doc) => hydrateCoverImageUrl(ctx, doc)));
+  },
 });
 
 export const listPublishedForOpal = internalQuery({
   args: {},
-  handler: async (ctx) =>
-    await ctx.db
+  handler: async (ctx) => {
+    const docs = await ctx.db
       .query("educationContent")
       .withIndex("by_status", (q) => q.eq("status", "published"))
       .order("desc")
-      .take(50),
+      .take(50);
+    return await Promise.all(docs.map((doc) => hydrateCoverImageUrl(ctx, doc)));
+  },
 });
 
 export const listForAdmin = query({
   args: {},
   handler: async (ctx) => {
     await requirePublisher(ctx);
-    return await ctx.db.query("educationContent").order("desc").take(100);
+    const docs = await ctx.db.query("educationContent").order("desc").take(100);
+    return await Promise.all(docs.map((doc) => hydrateCoverImageUrl(ctx, doc)));
   },
 });
 

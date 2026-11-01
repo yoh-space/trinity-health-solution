@@ -1,6 +1,19 @@
 "use client";
 
-import { Calendar, Clock, Video, MapPin, Stethoscope, HeartHandshake, CheckCircle2 } from "lucide-react";
+import { useState } from "react";
+import { useMutation } from "convex/react";
+import { anyApi } from "convex/server";
+import {
+  Calendar,
+  Clock,
+  Video,
+  MapPin,
+  Stethoscope,
+  HeartHandshake,
+  CheckCircle2,
+  XCircle,
+  AlertCircle,
+} from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { Badge } from "./ui/badge";
 
@@ -12,6 +25,7 @@ export interface AppointmentItem {
   scheduledAt: number;
   durationMinutes: number;
   format: "online" | "inPerson";
+  status?: "scheduled" | "completed" | "cancelled";
 }
 
 export function AdminAppointments({
@@ -19,6 +33,26 @@ export function AdminAppointments({
 }: {
   appointments: AppointmentItem[];
 }) {
+  const updateAppointmentStatus = useMutation(anyApi.appointments.updateAppointmentStatus);
+  const [feedback, setFeedback] = useState<{ text: string; error?: boolean } | null>(null);
+
+  function notify(text: string, error = false) {
+    setFeedback({ text, error });
+    setTimeout(() => setFeedback(null), 4000);
+  }
+
+  async function handleStatusChange(appointmentId: string, status: "completed" | "cancelled") {
+    try {
+      await updateAppointmentStatus({
+        appointmentId: appointmentId as any,
+        status,
+      });
+      notify(`Session successfully marked as ${status}.`);
+    } catch (err) {
+      notify(err instanceof Error ? err.message : "Failed to update session.", true);
+    }
+  }
+
   return (
     <Card>
       <CardHeader className="border-b border-[#eef2ea] pb-5">
@@ -29,8 +63,21 @@ export function AdminAppointments({
               Scheduled tele-health sessions and in-person community center consultations
             </CardDescription>
           </div>
-          <Badge variant="info">{appointments.length} Scheduled</Badge>
+          <Badge variant="info">{appointments.length} Consultations</Badge>
         </div>
+
+        {feedback && (
+          <div
+            className={`mt-3 flex items-center gap-2 rounded-xl px-3.5 py-2 text-xs font-semibold ${
+              feedback.error
+                ? "bg-red-50 text-red-700 border border-red-200"
+                : "bg-emerald-50 text-emerald-800 border border-emerald-200"
+            }`}
+          >
+            {feedback.error ? <AlertCircle size={14} /> : <CheckCircle2 size={14} />}
+            <span>{feedback.text}</span>
+          </div>
+        )}
       </CardHeader>
 
       <CardContent className="p-0">
@@ -43,19 +90,21 @@ export function AdminAppointments({
                 <th className="px-6 py-3.5">Service Type</th>
                 <th className="px-6 py-3.5">Assigned Staff</th>
                 <th className="px-6 py-3.5">Duration</th>
-                <th className="px-6 py-3.5 text-right">Status</th>
+                <th className="px-6 py-3.5">Status</th>
+                <th className="px-6 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#f0f4ee]">
               {appointments.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-xs text-[#718476]">
+                  <td colSpan={7} className="px-6 py-12 text-center text-xs text-[#718476]">
                     No upcoming appointments scheduled at this moment.
                   </td>
                 </tr>
               ) : (
                 appointments.map((appt) => {
                   const dateObj = new Date(appt.scheduledAt);
+                  const isFuture = appt.scheduledAt > Date.now();
                   return (
                     <tr key={appt._id} className="transition hover:bg-[#f6f9f5]">
                       <td className="px-6 py-4">
@@ -117,8 +166,40 @@ export function AdminAppointments({
                           <span>{appt.durationMinutes} minutes</span>
                         </span>
                       </td>
+                      <td className="px-6 py-4">
+                        <Badge
+                          variant={
+                            appt.status === "completed"
+                              ? "success"
+                              : appt.status === "cancelled"
+                                ? "destructive"
+                                : "info"
+                          }
+                        >
+                          {appt.status || "Scheduled"}
+                        </Badge>
+                      </td>
                       <td className="px-6 py-4 text-right">
-                        <Badge variant="success">Confirmed</Badge>
+                        <div className="flex items-center justify-end gap-1.5">
+                          <button
+                            type="button"
+                            onClick={() => handleStatusChange(appt._id, "completed")}
+                            title="Mark Session Completed"
+                            className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-1 text-[11px] font-bold text-emerald-800 hover:bg-emerald-100 transition"
+                          >
+                            <CheckCircle2 size={12} />
+                            <span>Complete</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleStatusChange(appt._id, "cancelled")}
+                            title="Cancel Session"
+                            className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-white px-2 py-1 text-[11px] font-bold text-red-600 hover:bg-red-50 transition"
+                          >
+                            <XCircle size={12} />
+                            <span>Cancel</span>
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );

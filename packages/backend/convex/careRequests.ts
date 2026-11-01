@@ -738,6 +738,49 @@ export const assignAdminRequest = mutation({
   },
 });
 
+export const updateAdminRequestStatus = mutation({
+  args: {
+    requestId: v.id("careRequests"),
+    status: requestStatusValidator,
+  },
+  returns: v.null(),
+  handler: async (ctx, { requestId, status }) => {
+    const admin = await requireActiveStaff(ctx, "admin");
+    const request = await ctx.db.get(requestId);
+    if (!request) throw new Error("This request no longer exists.");
+
+    if (status === "closed") {
+      const scheduledAppointment = await ctx.db
+        .query("careAppointments")
+        .withIndex("by_requestId_status_scheduledAt", (q) =>
+          q.eq("requestId", requestId).eq("status", "scheduled"),
+        )
+        .take(1);
+      if (scheduledAppointment.length > 0) {
+        throw new Error(
+          "Complete or cancel the scheduled session before closing this request.",
+        );
+      }
+    }
+
+    const now = Date.now();
+    await ctx.db.patch(requestId, {
+      status,
+      updatedAt: now,
+    });
+    await ctx.db.insert("careRequestEvents", {
+      requestId,
+      actorUserId: admin.subject,
+      actorRole: "admin",
+      action: "statusChanged",
+      fromStatus: request.status,
+      toStatus: status,
+      createdAt: now,
+    });
+    return null;
+  },
+});
+
 async function updateStaffRequestStatus(
   ctx: MutationCtx,
   {

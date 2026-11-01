@@ -109,47 +109,67 @@ export function EducationLibrary() {
           {visible.map((item) => (
             <article
               key={item._id}
-              className="flex min-h-[260px] flex-col rounded-3xl border border-[#dce8de] bg-white p-6 shadow-[0_12px_30px_rgba(36,87,51,0.06)]"
+              className="flex min-h-[300px] flex-col overflow-hidden rounded-3xl border border-[#dce8de] bg-white shadow-[0_12px_30px_rgba(36,87,51,0.06)] transition hover:-translate-y-1 hover:shadow-md"
             >
-              <div className="flex items-start justify-between gap-4">
-                <span className="text-xs font-bold uppercase tracking-[0.14em] text-[#579165]">
-                  {item.category}
-                </span>
-                <button
-                  type="button"
-                  aria-label={
-                    saved.includes(item._id) ? "Remove saved item" : "Save item"
-                  }
-                  onClick={() => toggleSaved(item._id)}
-                  className={`rounded-full p-1 ${saved.includes(item._id) ? "text-[#287343]" : "text-[#a4b4a7]"}`}
-                >
-                  {saved.includes(item._id) ? (
-                    <BookmarkCheck
-                      size={20}
-                      strokeWidth={1.8}
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <Bookmark size={20} strokeWidth={1.8} aria-hidden="true" />
+              {item.coverImageUrl ? (
+                <div className="relative aspect-16/9 w-full overflow-hidden bg-slate-900">
+                  <img
+                    src={item.coverImageUrl}
+                    alt={item.title}
+                    className="h-full w-full object-cover transition duration-300 hover:scale-105"
+                  />
+                  <div className="absolute top-3 left-3">
+                    <span className="rounded-full bg-black/60 px-2.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wider backdrop-blur-xs">
+                      {item.category}
+                    </span>
+                  </div>
+                </div>
+              ) : null}
+              <div className="flex flex-1 flex-col p-6">
+                <div className="flex items-start justify-between gap-4">
+                  {!item.coverImageUrl && (
+                    <span className="text-xs font-bold uppercase tracking-[0.14em] text-[#579165]">
+                      {item.category}
+                    </span>
                   )}
-                </button>
-              </div>
-              <h2 className="mt-5 text-2xl font-semibold leading-tight text-[#23472e]">
-                {displayTitle(item, language)}
-              </h2>
-              <p className="mt-4 flex-1 text-sm leading-7 text-[#68796d]">
-                {displaySummary(item, language)}
-              </p>
-              <div className="mt-6 flex items-center justify-between">
-                <span className="text-xs text-[#829086]">
-                  {item.readMinutes} {language === "am" ? "ደቂቃ" : "min read"}
-                </span>
-                <Link
-                  href={`/learn/${item._id}?lang=${language}`}
-                  className="rounded-full bg-[#eaf4eb] px-4 py-2 text-sm font-bold text-[#287343] hover:bg-[#dcefe0]"
-                >
-                  {language === "am" ? "አንብብ" : "Read note"}
-                </Link>
+                  <div className={item.coverImageUrl ? "ml-auto" : ""}>
+                    <button
+                      type="button"
+                      aria-label={
+                        saved.includes(item._id) ? "Remove saved item" : "Save item"
+                      }
+                      onClick={() => toggleSaved(item._id)}
+                      className={`rounded-full p-1 ${saved.includes(item._id) ? "text-[#287343]" : "text-[#a4b4a7]"}`}
+                    >
+                      {saved.includes(item._id) ? (
+                        <BookmarkCheck
+                          size={20}
+                          strokeWidth={1.8}
+                          aria-hidden="true"
+                        />
+                      ) : (
+                        <Bookmark size={20} strokeWidth={1.8} aria-hidden="true" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+                <h2 className="mt-3 text-2xl font-bold leading-tight text-[#23472e]">
+                  {displayTitle(item, language)}
+                </h2>
+                <p className="mt-3 flex-1 text-sm leading-relaxed text-[#68796d]">
+                  {displaySummary(item, language)}
+                </p>
+                <div className="mt-6 flex items-center justify-between border-t border-[#f0f4ee] pt-4">
+                  <span className="text-xs font-semibold text-[#829086]">
+                    {item.readMinutes} {language === "am" ? "ደቂቃ" : "min read"}
+                  </span>
+                  <Link
+                    href={`/learn/${item._id}?lang=${language}`}
+                    className="rounded-full bg-[#1c573e] px-4 py-2 text-xs font-bold text-white hover:bg-[#154631] transition shadow-2xs"
+                  >
+                    {language === "am" ? "አንብብ" : "Read note"}
+                  </Link>
+                </div>
               </div>
             </article>
           ))}

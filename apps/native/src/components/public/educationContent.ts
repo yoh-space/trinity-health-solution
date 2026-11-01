@@ -16,6 +16,8 @@ export type EducationItem = {
   summaryAm: string;
   content: string;
   contentAm: string;
+  coverImageStorageId?: string;
+  coverImageUrl?: string;
   sections?: EducationSection[];
   takeaway?: string;
   takeawayAm?: string;

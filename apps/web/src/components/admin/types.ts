@@ -12,6 +12,8 @@ export type EducationItem = {
   readMinutes: number;
   status: ContentStatus;
   publishedAt?: number;
+  coverImageStorageId?: string;
+  coverImageUrl?: string;
 };
 
 export type EducationForm = Omit<
@@ -28,6 +30,8 @@ export const emptyEducationForm: EducationForm = {
   contentAm: "",
   category: "Family wellbeing",
   readMinutes: "4",
+  coverImageStorageId: undefined,
+  coverImageUrl: "",
 };
 
 export function formFromItem(item: EducationItem): EducationForm {
@@ -40,5 +44,7 @@ export function formFromItem(item: EducationItem): EducationForm {
     contentAm: item.contentAm,
     category: item.category,
     readMinutes: String(item.readMinutes),
+    coverImageStorageId: item.coverImageStorageId,
+    coverImageUrl: item.coverImageUrl || "",
   };
 }
