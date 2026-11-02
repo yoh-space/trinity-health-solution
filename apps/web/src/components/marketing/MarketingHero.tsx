@@ -32,12 +32,6 @@ export function MarketingHero() {
       <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-5 sm:px-8 lg:grid-cols-[1.1fr_0.9fr] lg:gap-12 lg:px-12">
         {/* Left Column: Minimal, Crisp Value Proposition */}
         <div className="relative z-10">
-          {/* Eyebrow badge */}
-          <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-[#d6dfd2] bg-white px-3.5 py-1 text-[11px] font-bold uppercase tracking-[0.16em] text-[#294d3a] shadow-2xs">
-            <span className="size-2 rounded-full bg-[#287343]" />
-            {t("የተረጋገጠ የጤና ትምህርት · Practical Health Learning", "የተረጋገጠ የጤና ትምህርት · Practical Health Learning")}
-          </div>
-
           {/* Compact, Powerful Title */}
           <h1 className="text-3xl font-extrabold tracking-tight text-[#163826] sm:text-4xl lg:text-5xl leading-[1.12]">
             {language === "am" ? (
