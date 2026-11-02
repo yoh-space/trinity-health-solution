@@ -2,6 +2,7 @@
 
 import { useState, ReactNode, Suspense } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 import { Menu, PlusCircle, ShieldCheck, Heart, User } from "lucide-react";
@@ -38,6 +39,18 @@ function PortalHeader({ onOpenMobile }: { onOpenMobile: () => void }) {
         >
           <Menu size={18} />
         </button>
+
+        {/* Mobile Header Logo */}
+        <Link href="/" className="flex items-center lg:hidden" aria-label="Trinity Health Solution home">
+          <Image
+            src="/images/logo-trinity-web.png"
+            alt="Trinity Health Solution Logo"
+            width={110}
+            height={32}
+            priority
+            className="h-8 w-auto object-contain"
+          />
+        </Link>
 
         {/* Breadcrumb Navigation */}
         <div className="flex items-center gap-2 text-xs">

@@ -2,6 +2,7 @@
 
 import { useUser } from "@clerk/nextjs";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, ReactNode } from "react";
 import {
@@ -45,18 +46,19 @@ export function StaffShell({ children }: { children: ReactNode }) {
     <div className="flex h-full flex-col justify-between border-r border-[#dbe4db] bg-white text-[#183a25]">
       <div>
         <div className="flex h-16 items-center justify-between border-b border-[#e5ede4] px-5">
-          <Link href="/" className="flex items-center gap-2.5">
-            <span className="grid size-8 place-items-center rounded-xl bg-[#1c573e] text-white font-extrabold text-xs shadow-xs">
-              T
-            </span>
-            <div className="flex flex-col">
-              <span className="font-bold text-xs tracking-tight text-[#163826]">
-                Trinity Staff
-              </span>
-              <span className="text-[10px] text-[#697d70] font-medium capitalize">
-                {role} Workspace
-              </span>
-            </div>
+          <Link
+            href="/"
+            className="flex items-center gap-2.5 transition hover:opacity-90"
+            aria-label="Trinity Health Solution home"
+          >
+            <Image
+              src="/images/logo-trinity-web.png"
+              alt="Trinity Health Solution Logo"
+              width={140}
+              height={44}
+              priority
+              className="h-10 w-auto object-contain"
+            />
           </Link>
 
           <button
@@ -154,6 +156,16 @@ export function StaffShell({ children }: { children: ReactNode }) {
             >
               <Menu size={18} />
             </button>
+            <Link href="/" className="flex items-center lg:hidden" aria-label="Trinity Health Solution home">
+              <Image
+                src="/images/logo-trinity-web.png"
+                alt="Trinity Health Solution Logo"
+                width={110}
+                height={32}
+                priority
+                className="h-8 w-auto object-contain"
+              />
+            </Link>
             <span className="text-xs font-bold capitalize text-[#1a3a28]">
               {pathname.replace("/staff", "").replace("/", "") || "Overview"}
             </span>

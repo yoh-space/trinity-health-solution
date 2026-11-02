@@ -2,6 +2,7 @@
 
 import { useState, ReactNode } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, ShieldCheck, Layers, LogOut } from "lucide-react";
 import { AdminSidebar } from "./AdminSidebar";
 import { Badge } from "./ui/badge";
@@ -40,6 +41,18 @@ export function AdminShell({
             >
               <Menu size={18} />
             </button>
+
+            {/* Mobile Logo Image */}
+            <Link href="/" className="flex items-center lg:hidden" aria-label="Trinity Health Solution home">
+              <Image
+                src="/images/logo-trinity-web.png"
+                alt="Trinity Health Solution Logo"
+                width={110}
+                height={32}
+                priority
+                className="h-8 w-auto object-contain"
+              />
+            </Link>
 
             {/* Breadcrumb / Title */}
             <div className="flex items-center gap-2">

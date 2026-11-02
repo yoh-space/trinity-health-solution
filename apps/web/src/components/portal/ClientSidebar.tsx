@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useUser, useClerk } from "@clerk/nextjs";
 import {
@@ -155,19 +156,17 @@ export function ClientSidebar({
           <Link
             href="/"
             onClick={onCloseMobile}
-            className="flex items-center gap-3 transition hover:opacity-90"
+            className="flex items-center gap-2.5 transition hover:opacity-90"
+            aria-label="Trinity Health Solution home"
           >
-            <div className="grid size-10 place-items-center rounded-xl bg-[#1c573e] text-white shadow-sm">
-              <Heart size={20} className="fill-white" />
-            </div>
-            <div>
-              <span className="block text-sm font-black tracking-tight text-[#163826]">
-                Trinity Health
-              </span>
-              <span className="block text-[11px] font-bold uppercase tracking-wider text-[#1c573e]">
-                Client Care Portal
-              </span>
-            </div>
+            <Image
+              src="/images/logo-trinity-web.png"
+              alt="Trinity Health Solution Logo"
+              width={160}
+              height={50}
+              priority
+              className="h-12 w-auto object-contain"
+            />
           </Link>
 
           {/* Close button on mobile */}
@@ -179,6 +178,21 @@ export function ClientSidebar({
           >
             <X size={16} />
           </button>
+        </div>
+
+        {/* Workspace Indicator Pill */}
+        <div className="px-4 pt-3 pb-1">
+          <div className="flex items-center justify-between rounded-xl border border-[#d6e2d6] bg-[#f4f7f2] px-3.5 py-2">
+            <div className="flex items-center gap-2">
+              <span className="size-2 rounded-full bg-[#227242] animate-pulse" />
+              <p className="text-[11px] font-bold text-[#1a3828]">
+                Client Care Space
+              </p>
+            </div>
+            <span className="rounded-md bg-[#eaf4eb] px-2 py-0.5 text-[10px] font-bold text-[#1c573e] uppercase">
+              Active
+            </span>
+          </div>
         </div>
 
         {/* Navigation Option Items */}

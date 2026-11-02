@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useUser, useClerk } from "@clerk/nextjs";
 import {
@@ -127,18 +128,19 @@ export function AdminSidebar({
       {/* Top Header & Branding */}
       <div>
         <div className="flex h-16 items-center justify-between border-b border-[#e5ede4] px-5">
-          <Link href="/" className="flex items-center gap-2.5">
-            <span className="grid size-8 place-items-center rounded-xl bg-[#1c573e] text-white font-extrabold text-xs shadow-xs">
-              T
-            </span>
-            <div className="flex flex-col">
-              <span className="font-bold text-xs tracking-tight text-[#163826]">
-                Trinity Health
-              </span>
-              <span className="text-[10px] text-[#697d70] font-medium">
-                Solution Platform
-              </span>
-            </div>
+          <Link
+            href="/"
+            className="flex items-center gap-2.5 transition hover:opacity-90"
+            aria-label="Trinity Health Solution home"
+          >
+            <Image
+              src="/images/logo-trinity-web.png"
+              alt="Trinity Health Solution Logo"
+              width={140}
+              height={44}
+              priority
+              className="h-10 w-auto object-contain"
+            />
           </Link>
 
           {onCloseMobile && (
