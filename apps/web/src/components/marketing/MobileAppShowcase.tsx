@@ -1,8 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { Download, Smartphone, QrCode, WifiOff, ShieldCheck, CheckCircle } from "lucide-react";
+import { Download, Smartphone, QrCode, WifiOff, ShieldCheck, CheckCircle, ExternalLink } from "lucide-react";
 import { useMarketingLanguage } from "./MarketingLanguageContext";
+import { ReleaseQrCode } from "./ReleaseQrCode";
+
+const LATEST_RELEASE_APK_URL =
+  "https://github.com/yoh-space/trinity-health-solution/releases/latest/download/trinity-health-release.apk";
+const ALL_RELEASES_URL =
+  "https://github.com/yoh-space/trinity-health-solution/releases";
 
 export function MobileAppShowcase() {
   const { language, t } = useMarketingLanguage();
@@ -62,12 +68,21 @@ export function MobileAppShowcase() {
             {/* Action Download Strip */}
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <a
-                href="/downloads/trinity-health-release.apk"
-                download="trinity-health-release.apk"
+                href={LATEST_RELEASE_APK_URL}
                 className="inline-flex items-center gap-2.5 rounded-full bg-[#f4e6c3] px-7 py-4 text-sm font-bold text-[#1a3828] shadow-lg transition hover:-translate-y-0.5 hover:bg-white active:scale-95"
               >
                 <Download size={18} />
-                <span>{t("Download Android APK (v1.0.0)", "የአንድሮይድ APK አውርድ (52 MB)")}</span>
+                <span>{t("Download Android APK (Latest)", "የአንድሮይድ APK አውርድ (አዲስ ስሪት)")}</span>
+              </a>
+
+              <a
+                href={ALL_RELEASES_URL}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-5 py-4 text-sm font-semibold text-white backdrop-blur-xs transition hover:bg-white/20 active:scale-95"
+              >
+                <span>{t("Releases & Notes", "ስሪቶችና ማስታወሻዎች")}</span>
+                <ExternalLink size={14} className="opacity-80" />
               </a>
 
               <span className="text-xs text-[#a2baa8]">
@@ -76,7 +91,7 @@ export function MobileAppShowcase() {
             </div>
           </div>
 
-          {/* Right Column: QR Code & Direct Mobile Scan Card */}
+          {/* Right Column: Scannable QR Code & Direct Mobile Scan Card */}
           <div className="relative mx-auto w-full max-w-[420px] rounded-[2.5rem] border border-white/15 bg-white/10 p-8 text-center backdrop-blur-md">
             <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-[#f4e6c3] text-[#1a3828]">
               <QrCode size={24} />
@@ -87,58 +102,23 @@ export function MobileAppShowcase() {
             </h3>
             <p className="mt-1.5 text-xs text-[#b8ccbe]">
               {t(
-                "Point your mobile camera to download and install instantly.",
-                "የስልክዎን ካሜራ በማነጣጠር በቀጥታ ወደ ስልክዎ ያውርዱ።"
+                "Point your mobile camera to download the APK directly from GitHub Releases.",
+                "የስልክዎን ካሜራ በማነጣጠር በቀጥታ ከ GitHub Releases ያውርዱ።"
               )}
             </p>
 
-            {/* Simulated Modern QR Presentation */}
-            <div className="mx-auto my-6 grid size-48 place-items-center rounded-2xl border-4 border-white bg-white p-3 shadow-inner">
-              <svg
-                viewBox="0 0 100 100"
-                className="size-full fill-[#163a2a]"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                {/* QR Finder patterns */}
-                <rect x="5" y="5" width="26" height="26" rx="4" />
-                <rect x="9" y="9" width="18" height="18" fill="white" rx="2" />
-                <rect x="13" y="13" width="10" height="10" rx="1" />
-
-                <rect x="69" y="5" width="26" height="26" rx="4" />
-                <rect x="73" y="9" width="18" height="18" fill="white" rx="2" />
-                <rect x="77" y="13" width="10" height="10" rx="1" />
-
-                <rect x="5" y="69" width="26" height="26" rx="4" />
-                <rect x="9" y="73" width="18" height="18" fill="white" rx="2" />
-                <rect x="13" y="77" width="10" height="10" rx="1" />
-
-                {/* Decorative data blocks */}
-                <rect x="36" y="8" width="6" height="6" />
-                <rect x="46" y="8" width="14" height="6" />
-                <rect x="36" y="18" width="8" height="8" />
-                <rect x="48" y="18" width="8" height="8" />
-                <rect x="36" y="36" width="28" height="8" />
-                <rect x="8" y="36" width="8" height="12" />
-                <rect x="20" y="36" width="8" height="8" />
-                <rect x="8" y="52" width="12" height="8" />
-                <rect x="72" y="36" width="12" height="12" />
-                <rect x="88" y="36" width="6" height="16" />
-                <rect x="72" y="52" width="8" height="8" />
-                <rect x="36" y="48" width="8" height="16" />
-                <rect x="48" y="48" width="16" height="8" />
-                <rect x="56" y="60" width="8" height="16" />
-                <rect x="36" y="68" width="14" height="8" />
-                <rect x="36" y="80" width="8" height="14" />
-                <rect x="48" y="80" width="16" height="8" />
-                <rect x="72" y="72" width="22" height="8" />
-                <rect x="72" y="84" width="8" height="10" />
-                <rect x="84" y="84" width="10" height="10" />
-              </svg>
-            </div>
+            {/* Camera-scannable QR code */}
+            <a
+              href={LATEST_RELEASE_APK_URL}
+              className="group mx-auto my-6 block size-52 overflow-hidden rounded-2xl border-4 border-white bg-white p-2.5 shadow-2xl transition hover:scale-105"
+              title="Click or scan to download Trinity Health APK"
+            >
+              <ReleaseQrCode className="size-full transition group-hover:opacity-95" />
+            </a>
 
             <div className="flex items-center justify-center gap-2 text-[11px] font-medium text-[#c0d4c6]">
               <CheckCircle size={14} className="text-[#f4e6c3]" />
-              <span>{t("Verified SHA-256 release build", "በጥንቃቄ የተረጋገጠ የፕሮጀክት ስሪት")}</span>
+              <span>{t("Verified SHA-256 release builds via GitHub Actions", "በ GitHub Actions የተረጋገጠ የፕሮጀክት ስሪት")}</span>
             </div>
           </div>
         </div>

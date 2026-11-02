@@ -24,7 +24,8 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.unicef.trinityhealthsolution"
+      "package": "com.unicef.trinityhealthsolution",
+      "versionCode": 10000
     },
     "web": {
       "bundler": "metro",
