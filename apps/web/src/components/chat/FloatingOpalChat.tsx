@@ -94,8 +94,8 @@ function generateOpalResponse(
     return {
       text:
         language === "am"
-          ? "በተረጋገጡ አጠቃላይ የጤና ትምህርቶቻችን ብቻ ልረዳ እችላለሁ። ስለ ንጹህ ውሃ፣ የእናቶች አመጋገብ፣ የህፃናት ምግብ፣ ወይም የምግብ አያያዝ ይጠይቁ።"
-          : "I can help with verified curriculum topics regarding clean water, maternal nutrition, infant feeding, and safe food storage. Try asking about one of those topics.",
+          ? "በተገመገሙ አጠቃላይ የጤና ትምህርቶቻችን ብቻ ልረዳ እችላለሁ። ስለ ንጹህ ውሃ፣ የእናቶች አመጋገብ፣ የህፃናት ምግብ፣ ወይም የምግብ አያያዝ ይጠይቁ።"
+          : "I can help with reviewed educational curriculum topics regarding clean water, maternal nutrition, infant feeding, and safe food storage. Try asking about one of those topics.",
     };
   }
 

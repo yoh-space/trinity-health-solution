@@ -155,6 +155,8 @@ jobs:
           ANDROID_KEY_PASSWORD: ${{ env.ANDROID_KEY_PASSWORD }}
           VERSION_CODE: ${{ steps.versioning.outputs.VERSION_CODE }}
           VERSION: ${{ steps.versioning.outputs.VERSION }}
+          EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY || 'pk_test_ZW5hYmxlZC1zdGFnLTU4OS5jbGVyay5hY2NvdW50cy5kZXYk' }}
+          EXPO_PUBLIC_CONVEX_URL: ${{ secrets.EXPO_PUBLIC_CONVEX_URL || 'https://limitless-squirrel-32.convex.cloud' }}
         run: |
           cd apps/native/android
           chmod +x gradlew

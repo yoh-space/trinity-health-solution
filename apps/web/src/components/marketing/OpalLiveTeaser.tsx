@@ -96,12 +96,12 @@ export function OpalLiveTeaser() {
                     Opal Health Assistant
                   </h3>
                   <p className="text-[11px] text-[#718276]">
-                    {t("Online · Grounded in verified notes", "ዝግጁ · በተረጋገጡ ትምህርቶች የተመሰረተ")}
+                    {t("Educational Assistant · Grounded in reviewed lessons", "ትምህርታዊ ረዳት · በተገመገሙ ትምህርቶች ላይ የተመሰረተ")}
                   </p>
                 </div>
               </div>
               <span className="rounded-full bg-[#e8f1e5] px-2.5 py-1 text-[10px] font-bold text-[#2d5c3f]">
-                {t("Curated Health Knowledge", "የተረጋገጠ የጤና እውቀት")}
+                {t("General Health Education", "አጠቃላይ የጤና ትምህርት")}
               </span>
             </div>
 

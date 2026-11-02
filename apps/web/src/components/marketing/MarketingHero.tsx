@@ -56,8 +56,8 @@ export function MarketingHero() {
           {/* Subtitle description */}
           <p className="mt-3 max-w-[520px] text-xs leading-relaxed text-[#53685a] sm:text-sm sm:leading-6">
             {t(
-              "Clear, practical health learning designed for Ethiopian families—grounded in Amharic, familiar pantry staples, and verified by health professionals.",
-              "ለኢትዮጵያውያን ቤተሰቦች የተዘጋጀ ግልጽ እና ተግባራዊ የጤና ትምህርት—በአማርኛ፣ በየቤታችን በሚገኙ የምግብ ዓይነቶችና በጤና ባለሙያዎች የተረጋገጠ።"
+              "Accessible health and nutrition education supporting women, girls, and families—grounded in Amharic, familiar pantry staples, and reviewed public health resources.",
+              "ለሴቶች፣ ወጣት ልጃገረዶች እና ቤተሰቦች የተዘጋጀ ተደራሽ የጤና እና የአመጋገብ ትምህርት—በአማርኛ፣ በየቤታችን በሚገኙ የምግብ ዓይነቶች እና በተገመገሙ የጤና መረጃዎች ላይ ያተኮረ።"
             )}
           </p>
 
@@ -89,7 +89,7 @@ export function MarketingHero() {
             <span className="text-[#cbd4c8]">•</span>
             <div className="flex items-center gap-1.5">
               <ShieldCheck size={13} className="text-[#287343]" />
-              <span>{t("UNICEF-Aligned", "ከዩኒሴፍ መመሪያዎች ጋር የተጣጣመ")}</span>
+              <span>{t("Community Health Grounded", "በማህበረሰብ ጤና እውቀት ላይ የተመሰረተ")}</span>
             </div>
             <span className="text-[#cbd4c8]">•</span>
             <div className="flex items-center gap-1.5">
@@ -168,7 +168,7 @@ export function MarketingHero() {
                 {t("Android APK", "የአንድሮይድ መተግበሪያ")}
               </p>
               <p className="text-[10px] font-bold text-[#1f3f2f]">
-                {t("100% Offline", "ያለ ኢንተርኔት")}
+                {t("Offline Learning Notes", "ያለ ኢንተርኔት የሚነበቡ ማስታወሻዎች")}
               </p>
             </div>
           </div>
@@ -180,7 +180,7 @@ export function MarketingHero() {
               <span>{t("Ask Opal Guidance", "ኦፓል የጤና መመሪያ")}</span>
             </div>
             <p className="text-[9px] text-[#d6e5d8]">
-              {t("Verified maternal & nutrition answers", "የተረጋገጡ የጤና መልሶች")}
+              {t("Reviewed maternal & nutrition learning", "የተገመገሙ የእናቶችና የተመጣጠነ ምግብ ትምህርቶች")}
             </p>
           </div>
         </div>

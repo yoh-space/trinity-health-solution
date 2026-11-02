@@ -44,10 +44,10 @@ export function MobileAppShowcase() {
                 <WifiOff size={20} className="shrink-0 text-[#e8d2a7]" />
                 <div>
                   <p className="font-bold text-white">
-                    {t("100% Offline Mode", "ያለ ኢንተርኔት ይሰራል")}
+                    {t("Offline Core Notes", "ትምህርቶችን ያለ ኢንተርኔት ማንበብ")}
                   </p>
                   <p className="mt-0.5 text-[#b2c7b7]">
-                    {t("Zero mobile data needed after install", "ከተጫነ በኋላ ዳታ አይፈልግም")}
+                    {t("Read downloaded lesson notes anytime offline", "ዋና የጤና ማስታወሻዎችን ያለ ዳታ ያንብቡ")}
                   </p>
                 </div>
               </div>

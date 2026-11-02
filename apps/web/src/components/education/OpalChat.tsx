@@ -118,7 +118,7 @@ export function OpalChat() {
               <p className="mt-3 text-sm leading-relaxed text-[#5a6e60] sm:text-base">
                 {language === "am"
                   ? "በትሪኒቲ የተረጋገጡ የጤና እና የአመጋገብ ትምህርቶች ላይ የተመሰረተ ፈጣን እና አስተማማኝ መመሪያ።"
-                  : "Direct, verified family health guidance retrieved from Trinity’s curated community health curriculum."}
+                  : "Carefully curated health learning for women, girls, and families, retrieved from Trinity’s community health curriculum."}
               </p>
             </div>
 
@@ -156,8 +156,8 @@ export function OpalChat() {
             </p>
             <p>
               {language === "am"
-                ? "ኦፓል የተዘጋጁ አጠቃላይ የጤና ትምህርቶችን የሚያቀርብ መመሪያ ነው። የግል ህክምና ምርመራ ወይም መድኃኒት ማዘዝ አይችልም። ለአስቸኳይ ሁኔታ እባክዎ በአቅራቢያዎ ወደሚገኝ የጤና ተቋም ይሂዱ።"
-                : "Opal answers questions using Trinity's verified public health curriculum. It does not diagnose, prescribe medications, or replace direct clinical consultation. In emergencies, contact your local clinic immediately."}
+                ? "ኦፓል ከተዘጋጁ አጠቃላይ የጤና ትምህርቶች መረጃ ይሰጣል፤ የግል ምርመራ፣ መድኃኒት ማዘዝ ወይም የግል ሕክምና መስጠት አይችልም። ለአስቸኳይ ምልክቶች ወዲያውኑ በአቅራቢያዎ ወደሚገኝ ጤና ጣቢያ ያምሩ።"
+                : "Opal provides general health education from Trinity's reviewed public health curriculum. It does not diagnose, prescribe medications, formulate individual dietary therapy, or replace direct clinical care. In emergencies or urgent symptoms, contact your local health facility immediately."}
             </p>
           </div>
         </div>
@@ -197,7 +197,7 @@ export function OpalChat() {
             <p>
               {language === "am"
                 ? "ሰላም! ስለ ምግብ ንጽህና፣ አስተማማኝ ውሃ፣ እርግዝና እና የህፃናት አመጋገብ የተዘጋጁ መመሪያዎችን እዚህ ማግኘት ይችላሉ። ጥያቄዎን ከላይ ካሉት ይምረጡ ወይም ከታች ይጻፉ።"
-                : "Welcome. Opal retrieves guidance from Trinity's verified curriculum on maternal health, infant nutrition, clean water, and safe food preparation. Select a prompt above or type your question below."}
+                : "Welcome. Opal provides general educational information from Trinity's reviewed curriculum on maternal health, infant nutrition, clean water, and safe food preparation. Select a prompt above or type your question below."}
             </p>
           </div>
 
@@ -224,7 +224,7 @@ export function OpalChat() {
                         <span>
                           {language === "am"
                             ? "ሙሉውን የትምህርት ማስታወሻ ያንብቡ"
-                            : "Read the full verified lesson note"}
+                            : "Read the full reviewed lesson note"}
                         </span>
                         <ArrowRight size={13} aria-hidden="true" />
                       </Link>

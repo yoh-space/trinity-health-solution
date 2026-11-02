@@ -113,8 +113,8 @@ export function MarketingFooter() {
             </p>
             <p className="mt-2 text-xs text-[#687a6d]">
               {t(
-                "UNICEF Maternal & Child Health Partner Framework",
-                "ከዩኒሴፍ የእናቶችና ህፃናት ጤና አጋርነት ጋር የተጣጣመ"
+                "Primary Care & Maternal-Child Health Learning Focus",
+                "የእናቶች፣ ወጣቶችና ህፃናት ጤና ትምህርት ትኩረት"
               )}
             </p>
           </div>

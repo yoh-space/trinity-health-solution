@@ -153,9 +153,9 @@ export const approachSteps: ApproachStep[] = [
     titleEn: "Verified with care",
     titleAm: "በጥንቃቄ የተገመገመና የታመነ",
     descriptionEn:
-      "Reviewed by health educators and aligned with UNICEF and public health standards before publishing.",
+      "Prepared in collaboration with health educators and aligned with public health nutrition guidance.",
     descriptionAm:
-      "በጤና ባለሙያዎች የተረጋገጠ እና ከዩኒሴፍ (UNICEF) የጤና መመሪያዎች ጋር የተጣጣመ።",
+      "ከጤና አስተማሪዎች ጋር በመተባበር የተዘጋጀ እና ከህዝብ ጤና የአመጋገብ መመሪያዎች ጋር የተጣጣመ።",
   },
 ];
 
@@ -168,24 +168,24 @@ export const commitments: Commitment[] = [
     icon: BookOpen,
   },
   {
-    titleEn: "100% Offline-Ready",
-    titleAm: "ያለ ኢንተርኔት የሚሰራ (Offline)",
-    descriptionEn: "Once installed, read and learn anywhere without data.",
-    descriptionAm: "አንዴ ከጫኑ በኋላ ያለ ኢንተርኔት በየትኛውም ቦታ ይሰራል።",
+    titleEn: "Offline-Accessible Notes",
+    titleAm: "ያለ ኢንተርኔት የሚነበቡ ማስታወሻዎች",
+    descriptionEn: "Read downloaded core health lessons without active mobile data.",
+    descriptionAm: "ዋና የጤና ትምህርቶችን ያለ ሞባይል ዳታ በየትኛውም ቦታ ያንብቡ።",
     icon: Smartphone,
   },
   {
-    titleEn: "Verified Guidance",
+    titleEn: "Carefully Curated Guidance",
     titleAm: "የተረጋገጠ የጤና መረጃ",
-    descriptionEn: "Educational notes reviewed against trusted health benchmarks.",
+    descriptionEn: "Educational notes developed with health educators and referenced standards.",
     descriptionAm: "በጤና መመሪያዎች የተረጋገጠ አስተማማኝ ትምህርታዊ ይዘት።",
     icon: ShieldCheck,
   },
   {
-    titleEn: "Community Centered",
+    titleEn: "Women & Community Centered",
     titleAm: "ማህበረሰብ አቀፍ እንክብካቤ",
-    descriptionEn: "Connecting mothers, families, and community counselors.",
-    descriptionAm: "እናቶችን፣ ቤተሰቦችንና የማህበረሰብ ጤና አማካሪዎችን ያገናኛል።",
+    descriptionEn: "Supporting mothers, adolescent girls, and community health counselors.",
+    descriptionAm: "እናቶችን፣ ወጣት ልጃገረዶችንና የማህበረሰብ ጤና አማካሪዎችን ያግዛል።",
     icon: Users,
   },
 ];
@@ -303,12 +303,12 @@ export const audiencePathways: AudiencePathway[] = [
       "ያለ ክፍያ በቀላሉ የሚገኝ የጤና እውቀት በእጅዎ ስልክ። የተወሳሰበ የህክምና ቋንቋ የሌለው፣ ለዕለት ተዕለት ተግባራዊ የሚሆን።",
     pointsEn: [
       "Bilingual in Amharic & English",
-      "Works 100% offline without mobile data",
+      "Offline-accessible reading for core lessons",
       "Ask Opal AI assistant for guidance anytime",
     ],
     pointsAm: [
       "በአማርኛ እና በእንግሊዝኛ የተዘጋጀ",
-      "ያለ ኢንተርኔት (Offline) ሙሉ በሙሉ ይሰራል",
+      "ዋና ትምህርቶችን ያለ ኢንተርኔት ማንበብ የሚያስችል",
       "በየትኛውም ሰዓት ኦፓልን (Opal AI) ይጠይቁ",
     ],
     ctaLabelEn: "Explore Free Lessons",
@@ -345,10 +345,10 @@ export const audiencePathways: AudiencePathway[] = [
   },
   {
     id: "partners",
-    badgeEn: "Public Health Partners",
-    badgeAm: "ለአጋር ድርጅቶችና ዩኒሴፍ",
-    titleEn: "For Partners & UNICEF",
-    titleAm: "ለአጋሮች እና ዩኒሴፍ (UNICEF)",
+    badgeEn: "Public Health Focus",
+    badgeAm: "ለአጋር ድርጅቶችና የጤና ተቋማት",
+    titleEn: "For Community & Public Health Partners",
+    titleAm: "ለአጋር ድርጅቶችና የህዝብ ጤና አስተማሪዎች",
     descriptionEn:
       "Scale high-impact maternal, newborn, and child health interventions through verified digital dissemination.",
     descriptionAm:

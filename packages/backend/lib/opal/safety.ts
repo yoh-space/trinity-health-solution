@@ -25,11 +25,13 @@ const clinicalPatterns = [
   /symptom/i,
   /pain|fever|vomit|vomiting|diarrhea/i,
   /blood sugar|blood pressure/i,
+  /calculate (?:my )?(?:calories|bmr|tdee|macros)|my calorie target|prescribe (?:a )?diet/i,
   /ምርመራ/,
   /በሽታ/,
   /መድሃኒት|መድኃኒት/,
   /ህመም/,
   /ትኩሳት/,
+  /የካሎሪ መጠን አስላልኝ|የግል የአመጋገብ ማዘዣ/,
 ];
 
 export function classifyOpalQuestion(question: string): OpalSafetyIntent {
@@ -79,6 +81,6 @@ export function getOpalSafetyResponse(
       : "This question may describe an urgent concern. Opal cannot assess emergencies. Please contact your local emergency service or a qualified health professional now.";
   }
   return language === "am"
-    ? "ኦፓል ምርመራ፣ የመድሃኒት ምክር ወይም የግል ሕክምና ሕክምና ሊሰጥ አይችልም። ከብቁ የጤና ባለሙያ ጋር ይነጋገሩ። ኦፓል ከተዘጋጁ አጠቃላይ የጤና ትምህርቶች ጋር ብቻ ሊረዳ ይችላል።"
-    : "Opal cannot diagnose, recommend medicine, or provide individual treatment. Please speak with a qualified health professional. Opal can only help with prepared general learning topics.";
+    ? "ኦፓል ምርመራ፣ የመድኃኒት ምክር፣ የግል የካሎሪ/ንጥረ-ነገር ማዘዣ ወይም የግል ሕክምና ሊሰጥ አይችልም። ከብቁ የጤና ባለሙያ ጋር ይነጋገሩ። ኦፓል ከተዘጋጁ አጠቃላይ የጤና ትምህርቶች ጋር ብቻ ሊረዳ ይችላል።"
+    : "Opal cannot diagnose, recommend medicine, provide individual clinical treatment, or calculate personal calorie/macronutrient prescriptions. Please speak with a qualified health professional. Opal can only help with prepared general learning topics.";
 }
