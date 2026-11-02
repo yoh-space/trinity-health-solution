@@ -12,6 +12,15 @@ const lato = Lato({ weight: "400", subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Trinity Health Solution",
   description: "Practical, family-centered health learning for Ethiopian families.",
+  icons: {
+    icon: [
+      { url: "/favicon.ico" },
+      { url: "/icon.png", type: "image/png" },
+    ],
+    apple: [
+      { url: "/apple-icon.png" },
+    ],
+  },
 };
 
 export default function RootLayout({

@@ -89,20 +89,35 @@ export function ContentList({
           <p className="text-sm text-[#c7ddcb]">Loading content…</p>
         )}
         {filtered?.map((item) => (
-          <article className="rounded-2xl bg-white/10 p-4" key={item._id}>
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <p className="text-xs font-bold tracking-[0.12em] text-[#a7d9af]">
-                  {item.status.toUpperCase()} · {item.category}
-                </p>
-                <h3 className="mt-2 font-semibold">{item.title}</h3>
-                <p className="mt-1 text-xs text-[#c7ddcb]">{item.titleAm}</p>
+          <article className="rounded-2xl bg-white/10 p-4 transition hover:bg-white/[0.14]" key={item._id}>
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex items-start gap-3.5">
+                {item.coverImageUrl ? (
+                  <div className="relative size-14 shrink-0 overflow-hidden rounded-xl border border-white/20 bg-black/20">
+                    <img
+                      src={item.coverImageUrl}
+                      alt={item.title}
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <div className="grid size-14 shrink-0 place-items-center rounded-xl bg-white/10 text-xs font-bold text-[#a7d9af]">
+                    NOTE
+                  </div>
+                )}
+                <div>
+                  <p className="text-[11px] font-bold tracking-[0.12em] text-[#a7d9af]">
+                    {item.status.toUpperCase()} · {item.category}
+                  </p>
+                  <h3 className="mt-1 font-bold text-sm text-white">{item.title}</h3>
+                  <p className="mt-0.5 text-xs text-[#c7ddcb]">{item.titleAm}</p>
+                </div>
               </div>
-              <span className="shrink-0 text-xs text-[#c7ddcb]">
+              <span className="shrink-0 rounded-full bg-white/10 px-2.5 py-1 text-[11px] font-medium text-[#c7ddcb]">
                 {item.readMinutes} min
               </span>
             </div>
-            <div className="mt-4 flex flex-wrap gap-2">
+            <div className="mt-4 flex flex-wrap gap-2 pt-2 border-t border-white/10">
               <button
                 type="button"
                 onClick={() => onEdit(item)}

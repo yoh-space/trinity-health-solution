@@ -1,23 +1,44 @@
-import React from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
 import { useSSO } from "@clerk/expo";
-import { RFValue } from "react-native-responsive-fontsize";
 import { AntDesign } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import * as AuthSession from "expo-auth-session";
+import { useRouter, type Href } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { RFValue } from "react-native-responsive-fontsize";
+import GoogleIcon from "../components/icons/GoogleIcon";
+import { AUTHENTICATED_HOME_TABS } from "../constants/authRoutes";
+import { useTrinityStore } from "../store/useTrinityStore";
+
+WebBrowser.maybeCompleteAuthSession();
 
 type OAuthStrategy = "oauth_google" | "oauth_apple";
 
 const LoginScreen = () => {
   const router = useRouter();
   const { startSSOFlow } = useSSO();
+  const authReturnTo = useTrinityStore((state) => state.authReturnTo);
 
   const onPress = async ({ strategy }: { strategy: OAuthStrategy }) => {
     try {
-      const { createdSessionId, setActive } = await startSSOFlow({ strategy });
+      const { createdSessionId, setActive } = await startSSOFlow({
+        strategy,
+        redirectUrl: AuthSession.makeRedirectUri({ path: "sso-callback" }),
+      });
       if (!createdSessionId || !setActive) return;
 
-      await setActive({ session: createdSessionId });
-      router.replace("/(app)");
+      await setActive({
+        session: createdSessionId,
+        navigate: async ({ decorateUrl }) => {
+          const destination = authReturnTo ?? AUTHENTICATED_HOME_TABS;
+          const url = decorateUrl(destination);
+
+          if (url.startsWith("http") && typeof window !== "undefined") {
+            window.location.href = url;
+          } else {
+            router.replace(url as Href);
+          }
+        },
+      });
     } catch (err) {
       const message = String(err);
       if (message.includes("already signed in")) {
@@ -31,10 +52,10 @@ const LoginScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Image
-          source={require("../assets/icons/logo.png")} // Ensure the correct path to your logo image file
+        {/* <Image
+          source={require("./assets/icon.png")} // Ensure the correct path to your logo image file
           style={styles.logo}
-        />
+        /> */}
         <Text style={styles.title}>Log in to your account</Text>
         <Text style={styles.subtitle}>Welcome! Please login below.</Text>
         <TouchableOpacity
@@ -43,10 +64,7 @@ const LoginScreen = () => {
             onPress({ strategy: "oauth_google" });
           }}
         >
-          <Image
-            style={styles.googleIcon}
-            source={require("../assets/icons/google.png")}
-          />
+          <GoogleIcon size={20} />
           <Text style={{ ...styles.buttonText, color: "#344054" }}>
             Continue with Google
           </Text>
@@ -67,7 +85,9 @@ const LoginScreen = () => {
         </TouchableOpacity>
 
         <View style={styles.signupContainer}>
-          <Text style={{ fontFamily: "Righteous_400Regular" }}>Don’t have an account? </Text>
+          <Text style={{ fontFamily: "Righteous_400Regular" }}>
+            Don’t have an account?{" "}
+          </Text>
           <Text>Sign up above.</Text>
         </View>
       </View>
@@ -177,11 +197,6 @@ const styles = StyleSheet.create({
   signupText: {
     color: "#4D9DE0",
     fontFamily: "Righteous_400Regular",
-  },
-  googleIcon: {
-    width: 24,
-    height: 24,
-    marginRight: 12,
   },
   errorText: {
     fontSize: RFValue(14),

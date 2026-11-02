@@ -4,17 +4,19 @@ import Link from "next/link";
 interface Props {
   isMobile?: boolean;
   className?: string;
+  href?: string;
 }
 
-const Logo = ({ isMobile, className }: Props) => {
+const Logo = ({ isMobile, className, href = "/" }: Props) => {
   return (
-    <Link href="/" aria-label="Trinity Health Solution home">
+    <Link href={href} aria-label="Trinity Health Solution home" className="inline-flex items-center">
       <Image
         src="/images/logo-trinity-web.png"
         width={192}
         height={128}
-        alt="Trinity Health Solution"
-        className={`w-auto object-contain ${className ?? (isMobile ? "h-14" : "h-16")}`}
+        priority
+        alt="Trinity Health Solution Logo"
+        className={`w-auto object-contain ${className ?? (isMobile ? "h-11 sm:h-12" : "h-14 sm:h-16")}`}
       />
     </Link>
   );

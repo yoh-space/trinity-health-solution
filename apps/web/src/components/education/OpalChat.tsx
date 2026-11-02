@@ -4,43 +4,68 @@ import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import {
+  ArrowRight,
+  ShieldCheck,
+  HelpCircle,
+  MessageSquare,
+  Send,
+  BookOpen,
+} from "lucide-react";
 import {
   fallbackEducation,
   matchEducation,
   displayContent,
   displayTitle,
   type EducationItem,
-  type EducationLanguage,
 } from "@/lib/education";
+import { useMarketingLanguage } from "@/components/marketing/MarketingLanguageContext";
 
-const prompts = [
-  "How can I keep food preparation clean?",
-  "How do I make drinking water safe?",
-  "What foods can I choose during pregnancy?",
+interface PromptItem {
+  en: string;
+  am: string;
+}
+
+const PROMPT_SUGGESTIONS: PromptItem[] = [
+  {
+    en: "How can I keep food preparation clean at home?",
+    am: "የምግብ ማዘጋጃ ቦታን እንዴት በንጽህና መያዝ እችላለሁ?",
+  },
+  {
+    en: "How do I make drinking water safe for my family?",
+    am: "በቤት ውስጥ የመጠጥ ውሃን እንዴት አስተማማኝ ማድረግ ይቻላል?",
+  },
+  {
+    en: "What nutritious foods should I choose during pregnancy?",
+    am: "በእርግዝና ወቅት ምን አይነት አልሚ ምግቦችን መመገብ አለብኝ?",
+  },
+  {
+    en: "What should I feed my 6-month-old infant?",
+    am: "ለ 6 ወር ህጻን ምን አይነት ተጨማሪ ምግብ መስጠት አለብኝ?",
+  },
 ];
 
 function responseFor(
   question: string,
-  language: EducationLanguage,
+  language: "en" | "am",
   items: EducationItem[],
 ) {
   const lower = question.toLocaleLowerCase();
   if (/emergency|urgent|can't breathe|heavy bleeding|አስቸኳይ/.test(lower))
     return language === "am"
-      ? "ይህ አስቸኳይ ሊሆን የሚችል ጥያቄ ነው። ኦፓል አስቸኳይ ሁኔታን ሊገመግም አይችልም። እባክዎ ወዲያውኑ የአካባቢዎን የአስቸኳይ አገልግሎት ያነጋግሩ።"
-      : "This may be urgent. Opal cannot assess emergencies. Please contact your local emergency service or a qualified health professional now.";
+      ? "ይህ አስቸኳይ ሊሆን የሚችል ጥያቄ ነው። ኦፓል አስቸኳይ ሁኔታን ሊገመግም አይችልም። እባክዎ ወዲያውኑ የአካባቢዎን የአስቸኳይ አገልግሎት ወይም ጤና ጣቢያ ያነጋግሩ።"
+      : "This may be urgent. Opal cannot assess emergencies. Please contact your local emergency service or a qualified health facility now.";
   if (
     /diagnos|medicine|dose|treatment|symptom|pain|fever|መድሃኒት|ህመም/.test(lower)
   )
     return language === "am"
-      ? "ኦፓል ምርመራ፣ የመድሃኒት ምክር ወይም የግል ሕክምና ሊሰጥ አይችልም። ከብቁ የጤና ባለሙያ ጋር ይነጋገሩ።"
-      : "Opal cannot diagnose, recommend medicine, or provide individual treatment. Please speak with a qualified health professional.";
+      ? "ኦፓል ምርመራ፣ የመድሃኒት ምክር ወይም የግል ሕክምና ሊሰጥ አይችልም። ከብቁ የጤና ባለሙያ ጋር በአካል ይነጋገሩ።"
+      : "Opal cannot diagnose, recommend medicine, or provide individual medical treatment. Please speak with a qualified health professional.";
   const item = matchEducation(question, items);
   if (!item)
     return language === "am"
-      ? "በተዘጋጁ አጠቃላይ ትምህርቶች ብቻ ልረዳ እችላለሁ። የምግብ፣ ውሃ ወይም የቤተሰብ አመጋገብ ጥያቄ ይሞክሩ።"
-      : "I can help with prepared general notes about food, water, pregnancy, and family nutrition. Try one of those topics.";
+      ? "በተዘጋጁ አጠቃላይ የጤና ትምህርቶች ብቻ ልረዳ እችላለሁ። የምግብ ንጽህና፣ አስተማማኝ ውሃ፣ ወይም የቤተሰብ አመጋገብ ጥያቄ ይሞክሩ።"
+      : "I can help with verified curriculum topics regarding clean water, maternal nutrition, infant feeding, and safe food storage. Try asking about one of those topics.";
   return `${displayContent(item, language)}\n\n${displayTitle(item, language)}`;
 }
 
@@ -49,11 +74,12 @@ export function OpalChat() {
     | EducationItem[]
     | undefined;
   const items = remote?.length ? remote : fallbackEducation;
-  const [language, setLanguage] = useState<EducationLanguage>("en");
+  const { language, setLanguage } = useMarketingLanguage();
   const [draft, setDraft] = useState("");
   const [messages, setMessages] = useState<
     Array<{ role: "user" | "opal"; text: string; source?: string }>
   >([]);
+
   const ask = (question: string) => {
     const text = question.trim();
     if (!text) return;
@@ -69,107 +95,176 @@ export function OpalChat() {
     ]);
     setDraft("");
   };
+
   return (
-    <main className="min-h-screen bg-[#f7faf6] text-[#183b2d]">
-      <div className="mx-auto max-w-3xl px-5 py-12 sm:px-8">
-        <Link href="/learn" className="text-sm font-bold text-[#438451]">
-          <span className="inline-flex items-center gap-2">
-            <ArrowLeft size={15} aria-hidden="true" />
-            Back to learning
-          </span>
-        </Link>
-        <div className="mt-12">
-          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#438451]">
-            A LITTLE GUIDANCE
-          </p>
-          <div className="flex flex-wrap items-end justify-between gap-5">
-            <div>
-              <h1 className="mt-3 text-5xl font-semibold tracking-tight">
-                Ask Opal
+    <div className="py-8 sm:py-12">
+      {/* Editorial Header Section */}
+      <section className="border-b border-[#e2eae1] pb-10">
+        <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
+          <div className="flex flex-col justify-between gap-6 md:flex-row md:items-end">
+            <div className="max-w-2xl">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#1c573e]">
+                  COMMUNITY HEALTH GUIDANCE
+                </span>
+                <span className="text-[#cbd6cc]">•</span>
+                <span className="text-xs font-semibold text-[#667e6e]">
+                  Curated Curriculum Answers
+                </span>
+              </div>
+              <h1 className="mt-3 text-3xl font-extrabold tracking-tight text-[#163826] sm:text-5xl">
+                {language === "am" ? "ኦፓል የጤና መመሪያ" : "Ask Opal Health Guide"}
               </h1>
-              <p className="mt-3 text-sm leading-7 text-[#6d7e72]">
-                Answers matched from Trinity’s prepared learning notes.
+              <p className="mt-3 text-sm leading-relaxed text-[#5a6e60] sm:text-base">
+                {language === "am"
+                  ? "በትሪኒቲ የተረጋገጡ የጤና እና የአመጋገብ ትምህርቶች ላይ የተመሰረተ ፈጣን እና አስተማማኝ መመሪያ።"
+                  : "Direct, verified family health guidance retrieved from Trinity’s curated community health curriculum."}
               </p>
             </div>
-            <div className="flex rounded-full border border-[#bcd4bf] bg-white p-1 text-sm font-semibold">
-              <button
-                type="button"
-                onClick={() => setLanguage("en")}
-                className={`rounded-full px-3 py-1.5 ${language === "en" ? "bg-[#287343] text-white" : "text-[#5e7564]"}`}
-              >
-                English
-              </button>
-              <button
-                type="button"
-                onClick={() => setLanguage("am")}
-                className={`rounded-full px-3 py-1.5 ${language === "am" ? "bg-[#287343] text-white" : "text-[#5e7564]"}`}
-              >
-                አማርኛ
-              </button>
+
+            {/* Language Selection */}
+            <div className="flex rounded-full border border-[#cbd8cb] bg-white p-0.5 text-xs font-bold shadow-2xs self-start md:self-end">
+              {(["en", "am"] as const).map((value) => (
+                <button
+                  key={value}
+                  type="button"
+                  onClick={() => setLanguage(value)}
+                  className={`rounded-full px-4 py-1.5 transition ${
+                    language === value
+                      ? "bg-[#1c573e] text-white shadow-2xs"
+                      : "text-[#5e7564] hover:text-[#183b2d]"
+                  }`}
+                >
+                  {value === "en" ? "English" : "አማርኛ"}
+                </button>
+              ))}
             </div>
           </div>
         </div>
-        <div className="mt-10 rounded-3xl border border-[#dce8de] bg-white p-6 shadow-sm sm:p-8">
-          <div className="rounded-2xl bg-[#eaf4eb] p-5 text-sm leading-7 text-[#46624d]">
-            {language === "am"
-              ? "ሰላም! ከታች ያለውን ጥያቄ ይምረጡ ወይም የራስዎን ይጻፉ።"
-              : "Selam! Choose a prompt below or ask your own general learning question."}
+      </section>
+
+      {/* Main Interactive Dialogue Workspace */}
+      <section className="mx-auto max-w-4xl px-5 py-8 sm:px-8">
+        {/* Clinical Scope Notice Banner */}
+        <div className="rounded-2xl border border-[#d2ded2] bg-[#f4f7f4] p-4 text-xs leading-relaxed text-[#3a5442] flex items-start gap-3 shadow-2xs mb-8">
+          <ShieldCheck className="w-5 h-5 text-[#1c573e] shrink-0 mt-0.5" />
+          <div>
+            <p className="font-bold text-[#1c573e] mb-0.5">
+              {language === "am"
+                ? "የህክምና ወሰን ማስታወቂያ"
+                : "Clinical Scope Notice"}
+            </p>
+            <p>
+              {language === "am"
+                ? "ኦፓል የተዘጋጁ አጠቃላይ የጤና ትምህርቶችን የሚያቀርብ መመሪያ ነው። የግል ህክምና ምርመራ ወይም መድኃኒት ማዘዝ አይችልም። ለአስቸኳይ ሁኔታ እባክዎ በአቅራቢያዎ ወደሚገኝ የጤና ተቋም ይሂዱ።"
+                : "Opal answers questions using Trinity's verified public health curriculum. It does not diagnose, prescribe medications, or replace direct clinical consultation. In emergencies, contact your local clinic immediately."}
+            </p>
           </div>
-          <div className="mt-5 flex flex-wrap gap-2">
-            {prompts.map((prompt) => (
-              <button
-                type="button"
-                key={prompt}
-                onClick={() => ask(prompt)}
-                className="rounded-full border border-[#cfe0d2] bg-[#fbfdfb] px-3 py-2 text-left text-xs font-semibold text-[#4b6751] hover:bg-[#eef7ef]"
-              >
-                {prompt}
-              </button>
-            ))}
+        </div>
+
+        {/* Suggestion Chips */}
+        <div className="mb-6">
+          <div className="flex items-center gap-2 mb-3">
+            <HelpCircle size={14} className="text-[#1c573e]" />
+            <span className="text-xs font-bold uppercase tracking-wider text-[#546b5a]">
+              {language === "am"
+                ? "የተለመዱ ጥያቄዎች (ይምረጡ)"
+                : "Common Inquiries (Click to Ask)"}
+            </span>
           </div>
-          <div className="mt-6 grid gap-3">
-            {messages.map((message, index) => (
-              <div
-                key={`${message.role}-${index}`}
-                className={`max-w-[90%] rounded-2xl px-4 py-3 text-sm leading-7 ${message.role === "user" ? "ml-auto bg-[#347346] text-white" : "border border-[#dce8de] bg-[#fbfdfb] text-[#4d6251]"}`}
-              >
-                <p className="whitespace-pre-line">{message.text}</p>
-                {message.source && (
-                  <Link
-                    href={`/learn/${message.source}`}
-                    className="mt-3 inline-block text-xs font-bold text-[#287343]"
-                  >
-                    <span className="inline-flex items-center gap-2">
-                      Read the source note{" "}
-                      <ArrowRight size={14} aria-hidden="true" />
-                    </span>
-                  </Link>
-                )}
-              </div>
-            ))}
+          <div className="flex flex-wrap gap-2">
+            {PROMPT_SUGGESTIONS.map((item, idx) => {
+              const text = language === "am" ? item.am : item.en;
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => ask(text)}
+                  className="rounded-full border border-[#d0ded0] bg-white px-3.5 py-2 text-left text-xs font-semibold text-[#2f4d38] shadow-2xs hover:border-[#1c573e] hover:bg-[#f1f7f1] transition active:scale-98"
+                >
+                  {text}
+                </button>
+              );
+            })}
           </div>
-          <div className="mt-6 flex gap-2">
+        </div>
+
+        {/* Chat Dialogue Card */}
+        <div className="rounded-3xl border border-[#dce8de] bg-white p-5 shadow-xs sm:p-7">
+          {/* Welcome Message */}
+          <div className="rounded-2xl border border-[#e4ede3] bg-[#f8faf7] p-4 text-xs sm:text-sm leading-relaxed text-[#3b5443] mb-6 flex items-start gap-3">
+            <MessageSquare size={16} className="text-[#1c573e] shrink-0 mt-0.5" />
+            <p>
+              {language === "am"
+                ? "ሰላም! ስለ ምግብ ንጽህና፣ አስተማማኝ ውሃ፣ እርግዝና እና የህፃናት አመጋገብ የተዘጋጁ መመሪያዎችን እዚህ ማግኘት ይችላሉ። ጥያቄዎን ከላይ ካሉት ይምረጡ ወይም ከታች ይጻፉ።"
+                : "Welcome. Opal retrieves guidance from Trinity's verified curriculum on maternal health, infant nutrition, clean water, and safe food preparation. Select a prompt above or type your question below."}
+            </p>
+          </div>
+
+          {/* Messages List */}
+          {messages.length > 0 && (
+            <div className="space-y-4 mb-6">
+              {messages.map((message, index) => (
+                <div
+                  key={`${message.role}-${index}`}
+                  className={`max-w-[88%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed ${
+                    message.role === "user"
+                      ? "ml-auto bg-[#1c573e] text-white shadow-xs"
+                      : "border border-[#dce8de] bg-[#fbfdfb] text-[#22392c] shadow-2xs"
+                  }`}
+                >
+                  <p className="whitespace-pre-line">{message.text}</p>
+                  {message.source && (
+                    <div className="mt-3 pt-2.5 border-t border-[#e6eee5]">
+                      <Link
+                        href={`/learn/${message.source}`}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1c573e] hover:underline"
+                      >
+                        <BookOpen size={13} aria-hidden="true" />
+                        <span>
+                          {language === "am"
+                            ? "ሙሉውን የትምህርት ማስታወሻ ያንብቡ"
+                            : "Read the full verified lesson note"}
+                        </span>
+                        <ArrowRight size={13} aria-hidden="true" />
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Input field */}
+          <div className="flex gap-2">
             <input
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
               onKeyDown={(event) => event.key === "Enter" && ask(draft)}
-              placeholder="Ask about food, water, or hygiene..."
-              className="min-w-0 flex-1 rounded-full border border-[#cfe0d2] px-5 py-3 text-sm outline-none focus:ring-2 focus:ring-[#87b791]"
+              placeholder={
+                language === "am"
+                  ? "ስለ ምግብ፣ ውሃ ወይም የእርግዝና አመጋገብ ይጠይቁ..."
+                  : "Ask about safe water, child feeding, maternal health..."
+              }
+              className="min-w-0 flex-1 rounded-xl border border-[#cfe0d2] px-4 py-3 text-sm text-[#183b2d] placeholder:text-[#8d9e92] outline-none focus:border-[#1c573e] focus:ring-2 focus:ring-[#1c573e]/20"
             />
             <button
               type="button"
               onClick={() => ask(draft)}
-              className="rounded-full bg-[#287343] px-5 py-3 text-sm font-bold text-white"
+              className="rounded-xl bg-[#1c573e] px-5 py-3 text-sm font-bold text-white shadow-xs hover:bg-[#154631] transition shrink-0 flex items-center gap-1.5"
             >
-              Send
+              <span>{language === "am" ? "ላክ" : "Send"}</span>
+              <Send size={14} />
             </button>
           </div>
-          <p className="mt-4 text-center text-xs leading-5 text-[#829086]">
-            Please do not share names, phone numbers, or health details. Opal is
-            general education, not medical care.
+
+          <p className="mt-3 text-center text-[11px] leading-4 text-[#788a7d]">
+            {language === "am"
+              ? "እባክዎ የግል መረጃዎችን (ስም፣ ስልክ) አያጋሩ። ኦፓል አጠቃላይ የትምህርት መረጃ ብቻ ይሰጣል።"
+              : "Please do not share personal identifiers or medical records. Opal provides general educational guidance."}
           </p>
         </div>
-      </div>
-    </main>
+      </section>
+    </div>
   );
 }

@@ -1,0 +1,220 @@
+name: Build & Publish Mobile Release
+
+on:
+  push:
+    branches:
+      - main
+      - fix-more
+    paths:
+      - 'apps/native/**'
+      - 'packages/backend/**'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/build-mobile-release.yml'
+  workflow_dispatch:
+    inputs:
+      version_bump:
+        description: 'SemVer increment type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+          - current
+          - manual
+      custom_version:
+        description: 'Explicit version string (if manual chosen, e.g. 1.1.0)'
+        required: false
+        type: string
+        default: ''
+      release_notes:
+        description: 'Custom release notes (optional)'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: mobile-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build-and-publish:
+    name: Build Android Release APK & Publish
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10.33.0
+          run_install: false
+
+      - name: Determine & Bump Native Version
+        id: versioning
+        run: |
+          BUMP_TYPE="${{ github.event.inputs.version_bump || 'patch' }}"
+          CUSTOM_VER="${{ github.event.inputs.custom_version || '' }}"
+          node tools/scripts/bump-native-version.mjs "$BUMP_TYPE" "$CUSTOM_VER"
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install Monorepo Dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          cache-read-only: false
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Configure Keystore
+        id: keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD || 'trinityhealth2026' }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS || 'trinityhealth' }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD || 'trinityhealth2026' }}
+        run: |
+          cd apps/native/android/app
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "Decoding provided release keystore from secrets..."
+            echo "$KEYSTORE_BASE64" | base64 --decode > release.keystore
+          else
+            echo "No ANDROID_KEYSTORE_BASE64 secret provided. Generating valid fallback release keystore..."
+            keytool -genkeypair -v \
+              -keystore release.keystore \
+              -alias "$KEY_ALIAS" \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -storepass "$KEYSTORE_PASSWORD" \
+              -keypass "$KEY_PASSWORD" \
+              -dname "CN=Trinity Health, OU=Mobile, O=Trinity Health Solution, L=Addis Ababa, C=ET"
+          fi
+          echo "ANDROID_KEYSTORE_PATH=apps/native/android/app/release.keystore" >> $GITHUB_ENV
+          echo "ANDROID_KEYSTORE_PASSWORD=$KEYSTORE_PASSWORD" >> $GITHUB_ENV
+          echo "ANDROID_KEY_ALIAS=$KEY_ALIAS" >> $GITHUB_ENV
+          echo "ANDROID_KEY_PASSWORD=$KEY_PASSWORD" >> $GITHUB_ENV
+
+      - name: Build Android Release APK
+        env:
+          ANDROID_KEYSTORE_PATH: apps/native/android/app/release.keystore
+          ANDROID_KEYSTORE_PASSWORD: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ env.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ env.ANDROID_KEY_PASSWORD }}
+          VERSION_CODE: ${{ steps.versioning.outputs.VERSION_CODE }}
+          VERSION: ${{ steps.versioning.outputs.VERSION }}
+        run: |
+          cd apps/native/android
+          chmod +x gradlew
+          ./gradlew assembleRelease
+
+      - name: Prepare Release Assets & Checksums
+        id: artifacts
+        run: |
+          mkdir -p build_artifacts
+          APK_PATH=$(find apps/native/android/app/build/outputs/apk/release -name "*.apk" | head -n 1)
+
+          if [ ! -f "$APK_PATH" ]; then
+            echo "Error: Release APK not found!"
+            exit 1
+          fi
+
+          echo "Found generated APK: $APK_PATH"
+          cp "$APK_PATH" build_artifacts/trinity-health-release.apk
+          cp "$APK_PATH" "build_artifacts/trinity-health-v${{ steps.versioning.outputs.VERSION }}.apk"
+
+          cd build_artifacts
+          sha256sum trinity-health-release.apk "trinity-health-v${{ steps.versioning.outputs.VERSION }}.apk" > SHA256SUMS.txt
+          cat SHA256SUMS.txt
+          cd ..
+
+      - name: Generate Changelog & Release Notes
+        id: notes
+        run: |
+          VERSION="${{ steps.versioning.outputs.VERSION }}"
+          CUSTOM_NOTES="${{ github.event.inputs.release_notes }}"
+          
+          cat << 'EOF' > release_body.md
+          ## Trinity Health Solution Mobile Release
+
+          ### What's New:
+          EOF
+
+          if [ -n "$CUSTOM_NOTES" ]; then
+            echo "$CUSTOM_NOTES" >> release_body.md
+          else
+            echo "- Automated release for Trinity Health Solution Mobile (v$VERSION)" >> release_body.md
+            echo "- Updated lessons, offline sync, Amharic localization, and health companion features" >> release_body.md
+          fi
+
+          cat << 'EOF' >> release_body.md
+
+          ### Download & Installation
+          - **Direct APK Download**: [trinity-health-release.apk](https://github.com/${{ github.repository }}/releases/latest/download/trinity-health-release.apk)
+          - **Versioned Archive**: `trinity-health-v${{ steps.versioning.outputs.VERSION }}.apk`
+          - **Compatibility**: Android 7.0+ (API Level 24+)
+          - **Offline First**: All vital lessons and local recipes run 100% offline after installation.
+
+          ### Verification (SHA-256)
+          ```text
+          EOF
+          cat build_artifacts/SHA256SUMS.txt >> release_body.md
+          echo '```' >> release_body.md
+
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.versioning.outputs.TAG }}
+          name: "Trinity Health Solution ${{ steps.versioning.outputs.TAG }}"
+          body_path: release_body.md
+          files: |
+            build_artifacts/trinity-health-release.apk
+            build_artifacts/trinity-health-v${{ steps.versioning.outputs.VERSION }}.apk
+            build_artifacts/SHA256SUMS.txt
+          make_latest: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Commit & Push Version Changes (if on main)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add apps/native/app.json apps/native/package.json
+          git diff-index --quiet HEAD || git commit -m "chore(release): bump native app to ${{ steps.versioning.outputs.TAG }} [skip ci]"
+          git push origin main

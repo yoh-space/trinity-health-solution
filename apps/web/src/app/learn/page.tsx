@@ -1,28 +1,27 @@
-import Link from "next/link";
 import { EducationLibrary } from "@/components/education/EducationLibrary";
+import { MarketingHeader } from "@/components/marketing/MarketingHeader";
+import { MarketingFooter } from "@/components/marketing/MarketingFooter";
+import { MarketingLanguageProvider } from "@/components/marketing/MarketingLanguageContext";
+import { BackToTopButton } from "@/components/common/BackToTopButton";
+import { FloatingOpalChat } from "@/components/chat/FloatingOpalChat";
 
-export const metadata = { title: "Learning library | Trinity Health Solution" };
+export const metadata = {
+  title: "Health Education Library | Trinity Health Solution",
+  description: "Curated bilingual health guides on nutrition, food hygiene, and family wellbeing.",
+};
 
 export default function LearnPage() {
   return (
-    <>
-      <header className="border-b border-[#183b2d]/10 bg-[#fbfaf6]">
-        <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-5 sm:px-8 lg:px-12">
-          <Link href="/" className="text-lg font-semibold text-[#23472e]">
-            Trinity Health Solution
-          </Link>
-          <div className="flex items-center gap-4 text-sm font-semibold text-[#52705b]">
-            <Link href="/ask-opal">Ask Opal</Link>
-            <Link
-              href="/admin"
-              className="rounded-full bg-[#287343] px-4 py-2 text-white"
-            >
-              Publisher portal
-            </Link>
-          </div>
-        </nav>
-      </header>
-      <EducationLibrary />
-    </>
+    <MarketingLanguageProvider>
+      <div className="min-h-screen bg-[#fbfaf6] text-[#183b2d]">
+        <MarketingHeader />
+        <main>
+          <EducationLibrary />
+        </main>
+        <MarketingFooter />
+        <BackToTopButton />
+        <FloatingOpalChat />
+      </div>
+    </MarketingLanguageProvider>
   );
 }

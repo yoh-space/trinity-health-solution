@@ -8,6 +8,8 @@ export type EducationItem = {
   summaryAm: string;
   content: string;
   contentAm: string;
+  coverImageStorageId?: string;
+  coverImageUrl?: string;
   sections?: Array<{
     title: string;
     titleAm: string;

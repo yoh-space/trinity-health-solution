@@ -1,41 +1,57 @@
-import { ArrowRight } from "lucide-react";
+"use client";
+
+import { ArrowRight, Heart, BookOpen } from "lucide-react";
 import Link from "next/link";
+import { useMarketingLanguage } from "./MarketingLanguageContext";
 
 export function CommunityCta() {
+  const { language, t } = useMarketingLanguage();
+
   return (
     <section
       id="community"
       className="scroll-mt-20 mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28 lg:px-12"
     >
-      <div className="relative overflow-hidden rounded-[2rem] bg-[#1c573e] px-6 py-10 text-white sm:rounded-[2.5rem] sm:px-12 sm:py-14 lg:px-16">
+      <div className="relative overflow-hidden rounded-[2.5rem] bg-[#1c573e] px-7 py-12 text-white sm:px-14 sm:py-16 lg:px-20">
         <div className="pointer-events-none absolute -right-20 -top-40 size-96 rounded-full border border-white/10" />
         <div className="pointer-events-none absolute -right-4 -top-24 size-64 rounded-full border border-white/10" />
+
         <div className="relative flex flex-col justify-between gap-8 md:flex-row md:items-end">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#d9c99f]">
-              For families & publishers
-            </p>
-            <h2 className="mt-4 max-w-2xl text-3xl font-medium leading-tight tracking-[-0.055em] sm:text-5xl">
-              Better health learning, shared together.
+            <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#e6d8b5]">
+              <Heart size={13} />
+              {t("For Families & Health Workers", "ለቤተሰቦችና ለጤና ሰራተኞች")}
+            </div>
+
+            <h2 className="mt-4 max-w-2xl text-3xl font-medium leading-tight tracking-tight sm:text-5xl">
+              {t(
+                "Better health learning, shared together.",
+                "የተሻለ የጤና እውቀት፣ በጋራ የምንማረው።"
+              )}
             </h2>
+
             <p className="mt-4 max-w-xl text-sm leading-6 text-[#d4e1d6] sm:text-base">
-              Explore learning in the app, or use the publisher portal to
-              manage content for your community.
+              {t(
+                "Access free lessons in the web app, download the offline Android app, or use the publisher portal to manage content for your community.",
+                "ትምህርቶችን በነፃ በዌብሳይቱ ያግኙ፣ ከመስመር ውጭ የሚሰራውን የአንድሮይድ መተግበሪያ ያውርዱ፣ ወይም ለአካባቢዎ የሚሆን የጤና ይዘት በአሳታሚ ፖርታል ያስተዳድሩ።"
+              )}
             </p>
           </div>
-          <div className="flex shrink-0 flex-wrap gap-3">
+
+          <div className="flex shrink-0 flex-wrap gap-3.5">
             <Link
-              href="/notes"
-              className="inline-flex items-center gap-2 rounded-full bg-[#f3e8c9] px-5 py-3 text-sm font-semibold text-[#244a35] transition hover:bg-white"
+              href="/learn"
+              className="inline-flex items-center gap-2 rounded-full bg-[#f4e6c3] px-6 py-3.5 text-xs font-bold text-[#1c573e] transition hover:bg-white"
             >
-              Open the app
-              <ArrowRight size={15} aria-hidden="true" />
+              {t("Explore Free Lessons", "ትምህርቶችን ይጀምሩ")}
+              <ArrowRight size={14} aria-hidden="true" />
             </Link>
+
             <Link
-              href="/admin"
-              className="inline-flex items-center gap-2 rounded-full border border-white/30 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10"
+              href="/portal"
+              className="inline-flex items-center gap-2 rounded-full border border-white/30 px-6 py-3.5 text-xs font-bold text-white transition hover:bg-white/10"
             >
-              Publisher portal
+              {t("Client Portal", "የተገልጋይ ፖርታል")}
             </Link>
           </div>
         </div>

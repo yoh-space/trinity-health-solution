@@ -6,7 +6,12 @@ import { demoRequests, statusStyles } from "@/lib/portal";
 
 export function StaffDashboard() {
   const { user } = useUser();
-  const role = String(user?.publicMetadata?.role ?? "counselor");
+  const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
+  const isAdmin =
+    userEmail === "yohansdam@gmail.com" ||
+    userEmail === "yashaknike@gmail.com" ||
+    user?.publicMetadata?.role === "admin";
+  const role = isAdmin ? "admin" : String(user?.publicMetadata?.role ?? "counselor");
   return (
     <>
       <div className="flex flex-wrap items-end justify-between gap-5">

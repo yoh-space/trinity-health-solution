@@ -1,5 +1,7 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { type Auth } from "convex/server";
+import { internalQuery, mutation, query } from "./_generated/server";
+import { requireRole } from "./auth";
 
 const contentArgs = {
   title: v.string(),
@@ -10,30 +12,27 @@ const contentArgs = {
   contentAm: v.string(),
   category: v.string(),
   readMinutes: v.number(),
+  coverImageStorageId: v.optional(v.id("_storage")),
+  coverImageUrl: v.optional(v.string()),
 };
 
-async function requirePublisher(ctx: {
-  auth: {
-    getUserIdentity: () => Promise<{
-      subject: string;
-      tokenIdentifier: string;
-    } | null>;
-  };
-}) {
-  const identity = await ctx.auth.getUserIdentity();
-  if (!identity)
-    throw new Error("Sign in is required to manage education content.");
+async function requirePublisher(ctx: { auth: Auth }) {
+  return await requireRole(ctx, "admin");
+}
 
-  const allowedUsers = (process.env.ADMIN_CLERK_USER_IDS ?? "")
-    .split(",")
-    .map((id) => id.trim())
-    .filter(Boolean);
-
-  if (!allowedUsers.includes(identity.subject)) {
-    throw new Error("Only Trinity publishers can manage education content.");
+async function hydrateCoverImageUrl<
+  T extends { coverImageStorageId?: string; coverImageUrl?: string },
+>(
+  ctx: { storage: { getUrl: (id: any) => Promise<string | null> } },
+  item: T,
+): Promise<T> {
+  if (item.coverImageStorageId) {
+    const url = await ctx.storage.getUrl(item.coverImageStorageId);
+    if (url) {
+      return { ...item, coverImageUrl: url };
+    }
   }
-
-  return identity;
+  return item;
 }
 
 function validateContent(args: {
@@ -69,21 +68,53 @@ function validateContent(args: {
   }
 }
 
+export const generateUploadUrl = mutation({
+  args: {},
+  handler: async (ctx) => {
+    await requirePublisher(ctx);
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
+export const getById = query({
+  args: { id: v.id("educationContent") },
+  handler: async (ctx, { id }) => {
+    const doc = await ctx.db.get(id);
+    if (!doc) return null;
+    return await hydrateCoverImageUrl(ctx, doc);
+  },
+});
+
 export const listPublished = query({
   args: {},
-  handler: async (ctx) =>
-    await ctx.db
+  handler: async (ctx) => {
+    const docs = await ctx.db
       .query("educationContent")
       .withIndex("by_status", (q) => q.eq("status", "published"))
       .order("desc")
-      .take(50),
+      .take(50);
+    return await Promise.all(docs.map((doc) => hydrateCoverImageUrl(ctx, doc)));
+  },
+});
+
+export const listPublishedForOpal = internalQuery({
+  args: {},
+  handler: async (ctx) => {
+    const docs = await ctx.db
+      .query("educationContent")
+      .withIndex("by_status", (q) => q.eq("status", "published"))
+      .order("desc")
+      .take(50);
+    return await Promise.all(docs.map((doc) => hydrateCoverImageUrl(ctx, doc)));
+  },
 });
 
 export const listForAdmin = query({
   args: {},
   handler: async (ctx) => {
     await requirePublisher(ctx);
-    return await ctx.db.query("educationContent").order("desc").take(100);
+    const docs = await ctx.db.query("educationContent").order("desc").take(100);
+    return await Promise.all(docs.map((doc) => hydrateCoverImageUrl(ctx, doc)));
   },
 });
 
