@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "@packages/backend/convex/_generated/api";
+import { anyApi } from "convex/server";
 import { useMutation, useQuery } from "convex/react";
 import Image from "next/image";
 import { useState } from "react";
@@ -10,8 +10,8 @@ import NoteItem from "./NoteItem";
 const Notes = () => {
   const [search, setSearch] = useState("");
 
-  const allNotes = useQuery(api.notes.getNotes);
-  const deleteNote = useMutation(api.notes.deleteNote);
+  const allNotes = useQuery(anyApi.notes.getNotes) as any[] | undefined;
+  const deleteNote = useMutation(anyApi.notes.deleteNote);
 
   const finalNotes = search
     ? allNotes?.filter(

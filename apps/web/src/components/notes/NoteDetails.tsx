@@ -1,18 +1,17 @@
 "use client";
 
-import { api } from "@packages/backend/convex/_generated/api";
-import { Id } from "@packages/backend/convex/_generated/dataModel";
+import { anyApi } from "convex/server";
 import { useQuery } from "convex/react";
 import ComplexToggle from "../home/ComplexToggle";
 import { useState } from "react";
 
 interface NoteDetailsProps {
-  noteId: Id<"notes">;
+  noteId: string;
 }
 
 const NoteDetails = ({ noteId }: NoteDetailsProps) => {
   const [isSummary, setIsSummary] = useState(false);
-  const currentNote = useQuery(api.notes.getNote, { id: noteId });
+  const currentNote = useQuery(anyApi.notes.getNote, { id: noteId }) as any;
 
   return (
     <div className="container space-y-6 sm:space-y-9 py-20 px-[26px] sm:px-0">

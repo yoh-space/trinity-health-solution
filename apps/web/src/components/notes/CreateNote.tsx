@@ -4,7 +4,7 @@ import { Fragment, useRef, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import Image from "next/image";
 import Checkbox from "./Checkbox";
-import { api } from "@packages/backend/convex/_generated/api";
+import { anyApi } from "convex/server";
 import { useMutation, useQuery } from "convex/react";
 
 export default function CreateNote() {
@@ -15,8 +15,8 @@ export default function CreateNote() {
 
   const cancelButtonRef = useRef(null);
 
-  const createNote = useMutation(api.notes.createNote);
-  const openaiKeySet = useQuery(api.openai.openaiKeySet) ?? true;
+  const createNote = useMutation(anyApi.notes.createNote);
+  const openaiKeySet = useQuery(anyApi.openai.openaiKeySet) ?? true;
 
   const createUserNote = async () => {
     await createNote({
