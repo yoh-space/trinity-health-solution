@@ -2,6 +2,7 @@
   "name": "trinity-health-solution",
   "private": true,
   "scripts": {
+    "vercel-build": "cd packages/backend && npx convex deploy && cd ../../ && pnpm --filter apps/web... run build",
     "dev": "turbo run dev",
     "build": "turbo run build",
     "typecheck": "turbo run typecheck",
