@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - fix-more
     paths:
       - 'apps/native/**'
       - 'packages/backend/**'
