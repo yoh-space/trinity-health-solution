@@ -10,23 +10,27 @@ import { MobileAppShowcase } from "@/components/marketing/MobileAppShowcase";
 import { CommunityCta } from "@/components/marketing/CommunityCta";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import { MarketingLanguageProvider } from "@/components/marketing/MarketingLanguageContext";
+import { BackToTopButton } from "@/components/common/BackToTopButton";
 
 export default function Home() {
   return (
     <MarketingLanguageProvider>
-      <main className="min-h-screen overflow-hidden bg-[#fbfaf6] text-[#183b2d]">
+      <div className="min-h-screen bg-[#fbfaf6] text-[#183b2d]">
         <MarketingHeader />
-        <MarketingHero />
-        <CommitmentsBar />
-        <LearningTopicsSection />
-        <OpalLiveTeaser />
-        <PantryExplorerSection />
-        <ApproachSection />
-        <AudiencePathways />
-        <MobileAppShowcase />
-        <CommunityCta />
+        <main className="overflow-x-clip">
+          <MarketingHero />
+          <CommitmentsBar />
+          <LearningTopicsSection />
+          <OpalLiveTeaser />
+          <PantryExplorerSection />
+          <ApproachSection />
+          <AudiencePathways />
+          <MobileAppShowcase />
+          <CommunityCta />
+        </main>
         <MarketingFooter />
-      </main>
+        <BackToTopButton />
+      </div>
     </MarketingLanguageProvider>
   );
 }

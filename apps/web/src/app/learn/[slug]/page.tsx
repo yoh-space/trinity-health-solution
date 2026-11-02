@@ -2,6 +2,7 @@ import { EducationArticle } from "@/components/education/EducationArticle";
 import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import { MarketingLanguageProvider } from "@/components/marketing/MarketingLanguageContext";
+import { BackToTopButton } from "@/components/common/BackToTopButton";
 
 export default async function EducationArticlePage({
   params,
@@ -13,8 +14,11 @@ export default async function EducationArticlePage({
     <MarketingLanguageProvider>
       <div className="min-h-screen bg-[#fbfaf6] text-[#183b2d]">
         <MarketingHeader />
-        <EducationArticle slug={slug} />
+        <main>
+          <EducationArticle slug={slug} />
+        </main>
         <MarketingFooter />
+        <BackToTopButton />
       </div>
     </MarketingLanguageProvider>
   );

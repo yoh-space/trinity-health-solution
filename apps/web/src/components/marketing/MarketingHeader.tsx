@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowRight, Globe, Menu, X, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -11,7 +11,17 @@ import { ClientProfileMenu } from "@/components/common/ClientProfileMenu";
 export function MarketingHeader() {
   const { language, toggleLanguage, t } = useMarketingLanguage();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 15);
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const navigationItems = [
     { labelEn: "Our Approach", labelAm: "አሰራራችን", href: "/#approach" },
@@ -22,10 +32,18 @@ export function MarketingHeader() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#183b2d]/[0.08] bg-[#fbfaf6]/95 backdrop-blur-md transition-all">
+    <header
+      className={`sticky top-0 z-50 transition-all duration-200 ${
+        isScrolled
+          ? "border-b border-[#183b2d]/10 bg-[#fbfaf6]/95 backdrop-blur-md shadow-xs"
+          : "border-b border-[#183b2d]/[0.06] bg-[#fbfaf6]/90 backdrop-blur-sm"
+      }`}
+    >
       <nav
         aria-label="Main navigation"
-        className="mx-auto flex h-[76px] max-w-7xl items-center justify-between px-5 sm:px-8 lg:px-12"
+        className={`mx-auto flex max-w-7xl items-center justify-between px-5 transition-all duration-200 sm:px-8 lg:px-12 ${
+          isScrolled ? "h-[64px]" : "h-[74px]"
+        }`}
       >
         <Wordmark />
 
