@@ -11,6 +11,7 @@ import { CommunityCta } from "@/components/marketing/CommunityCta";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import { MarketingLanguageProvider } from "@/components/marketing/MarketingLanguageContext";
 import { BackToTopButton } from "@/components/common/BackToTopButton";
+import { FloatingOpalChat } from "@/components/chat/FloatingOpalChat";
 
 export default function Home() {
   return (
@@ -30,6 +31,7 @@ export default function Home() {
         </main>
         <MarketingFooter />
         <BackToTopButton />
+        <FloatingOpalChat />
       </div>
     </MarketingLanguageProvider>
   );

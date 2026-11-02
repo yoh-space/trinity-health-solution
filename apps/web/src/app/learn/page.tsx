@@ -3,6 +3,7 @@ import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import { MarketingLanguageProvider } from "@/components/marketing/MarketingLanguageContext";
 import { BackToTopButton } from "@/components/common/BackToTopButton";
+import { FloatingOpalChat } from "@/components/chat/FloatingOpalChat";
 
 export const metadata = {
   title: "Health Education Library | Trinity Health Solution",
@@ -19,6 +20,7 @@ export default function LearnPage() {
         </main>
         <MarketingFooter />
         <BackToTopButton />
+        <FloatingOpalChat />
       </div>
     </MarketingLanguageProvider>
   );

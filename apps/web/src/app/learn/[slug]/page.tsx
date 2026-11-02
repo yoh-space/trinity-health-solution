@@ -3,6 +3,7 @@ import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import { MarketingLanguageProvider } from "@/components/marketing/MarketingLanguageContext";
 import { BackToTopButton } from "@/components/common/BackToTopButton";
+import { FloatingOpalChat } from "@/components/chat/FloatingOpalChat";
 
 export default async function EducationArticlePage({
   params,
@@ -19,6 +20,7 @@ export default async function EducationArticlePage({
         </main>
         <MarketingFooter />
         <BackToTopButton />
+        <FloatingOpalChat />
       </div>
     </MarketingLanguageProvider>
   );
