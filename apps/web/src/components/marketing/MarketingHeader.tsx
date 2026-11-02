@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Wordmark } from "./Wordmark";
 import { useMarketingLanguage } from "./MarketingLanguageContext";
+import { ClientProfileMenu } from "@/components/common/ClientProfileMenu";
 
 export function MarketingHeader() {
   const { language, toggleLanguage, t } = useMarketingLanguage();
@@ -68,20 +69,15 @@ export function MarketingHeader() {
             </span>
           </button>
 
-          {/* Client Portal Link */}
-          <Link
-            href="/portal"
-            className="hidden rounded-full bg-[#1c573e] px-4 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-[#154631] md:inline-flex"
-          >
-            {t("Client Portal", "የተገልጋዮች ፖርታል")}
-          </Link>
+          {/* Client Profile Tab (Signed In: Avatar + Options Modal / Signed Out: Sign In Tab) */}
+          <ClientProfileMenu />
 
-          {/* Staff / Admin Portal Link */}
+          {/* Staff Desk Link */}
           <Link
             href="/admin"
-            className="hidden items-center gap-1.5 rounded-full border border-[#c9d2c8] bg-white/70 px-3.5 py-2 text-xs font-semibold text-[#244c39] transition hover:border-[#1c573e] hover:bg-white sm:inline-flex"
+            className="hidden items-center gap-1.5 rounded-full border border-[#c9d2c8] bg-white/70 px-3.5 py-1.5 text-xs font-semibold text-[#244c39] transition hover:border-[#1c573e] hover:bg-white sm:inline-flex"
           >
-            {t("Staff Desk", "የባለሙያ ፖርታል")}
+            <span>{t("Staff Desk", "የባለሙያ ፖርታል")}</span>
             <ArrowRight size={13} aria-hidden="true" />
           </Link>
 
