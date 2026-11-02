@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useClerk } from "@clerk/nextjs";
 import { X, Smartphone, ShieldCheck, ArrowRight, Lock } from "lucide-react";
 
@@ -19,12 +20,39 @@ export function ClientAuthModal({
   const [phoneNumber, setPhoneNumber] = useState("");
   const [countryCode, setCountryCode] = useState("+251");
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  // Prevent body scrolling when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isOpen]);
+
+  // Handle ESC key press
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose]);
+
+  if (!isOpen || !mounted) return null;
 
   const handleGoogleSignIn = () => {
     onClose();
-    // Launch Clerk sign-in modal with redirect to /portal
     openSignIn({
       fallbackRedirectUrl: "/portal",
       signUpFallbackRedirectUrl: "/portal",
@@ -40,7 +68,6 @@ export function ClientAuthModal({
     }
     setError(null);
     onClose();
-    // Launch Clerk sign-in with phone pre-filled
     const fullNumber = `${countryCode}${cleanNumber.startsWith("0") ? cleanNumber.slice(1) : cleanNumber}`;
     openSignIn({
       initialValues: {
@@ -51,14 +78,20 @@ export function ClientAuthModal({
     });
   };
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs sm:p-6"
+      className="fixed inset-0 z-[100] flex min-h-screen items-center justify-center overflow-y-auto bg-black/60 p-4 sm:p-6 backdrop-blur-sm animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-label="Client Sign In"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
     >
-      <div className="relative w-full max-w-md overflow-hidden rounded-3xl border border-[#dce6dc] bg-[#fbfaf6] text-[#163826] shadow-2xl">
+      <div
+        className="relative my-auto w-full max-w-[420px] overflow-hidden rounded-3xl border border-[#dce6dc] bg-[#fbfaf6] text-[#163826] shadow-2xl transition-all"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Close Button */}
         <button
           type="button"
@@ -70,11 +103,11 @@ export function ClientAuthModal({
         </button>
 
         {/* Modal Header */}
-        <div className="border-b border-[#e2eae1] bg-white p-6 pb-5 text-center sm:p-8 sm:pb-6">
+        <div className="border-b border-[#e2eae1] bg-white p-6 pb-5 text-center sm:p-7 sm:pb-6">
           <div className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-[#1c573e] text-white shadow-md">
             <ShieldCheck size={26} />
           </div>
-          <h2 className="mt-4 text-2xl font-bold tracking-tight text-[#163826]">
+          <h2 className="mt-3.5 text-2xl font-bold tracking-tight text-[#163826]">
             Client Care Portal
           </h2>
           <p className="mt-1 text-xs text-[#5d7364]">
@@ -83,13 +116,13 @@ export function ClientAuthModal({
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 sm:p-8 space-y-5">
+        <div className="p-5 sm:p-6 space-y-4">
           {/* PRIMARY: Google One-Click Sign In */}
           <div>
             <button
               type="button"
               onClick={handleGoogleSignIn}
-              className="flex w-full items-center justify-center gap-3 rounded-2xl border border-[#cbd8cb] bg-white py-3.5 px-4 text-sm font-bold text-[#1f3f2d] shadow-2xs transition hover:border-[#1c573e] hover:bg-[#f6faf6] hover:shadow-sm active:scale-98"
+              className="flex w-full items-center justify-center gap-3 rounded-2xl border border-[#cbd8cb] bg-white py-3 px-4 text-sm font-bold text-[#1f3f2d] shadow-2xs transition hover:border-[#1c573e] hover:bg-[#f6faf6] hover:shadow-sm active:scale-98"
             >
               {/* Google 'G' official SVG */}
               <svg className="size-5 shrink-0" viewBox="0 0 24 24">
@@ -120,13 +153,13 @@ export function ClientAuthModal({
           {/* Divider */}
           <div className="relative flex items-center justify-center">
             <div className="w-full border-t border-[#dce6dc]" />
-            <span className="absolute bg-[#fbfaf6] px-3 text-[11px] font-bold uppercase tracking-wider text-[#798e7f]">
+            <span className="absolute bg-[#fbfaf6] px-3 text-[10px] font-bold uppercase tracking-wider text-[#798e7f]">
               or with phone
             </span>
           </div>
 
           {/* SECONDARY: Phone Number Sign In */}
-          <form onSubmit={handlePhoneSignIn} className="space-y-3">
+          <form onSubmit={handlePhoneSignIn} className="space-y-2.5">
             <label className="block text-xs font-bold uppercase tracking-wider text-[#35523f]">
               Mobile Phone Number
             </label>
@@ -134,7 +167,7 @@ export function ClientAuthModal({
               <select
                 value={countryCode}
                 onChange={(e) => setCountryCode(e.target.value)}
-                className="rounded-xl border border-[#cbd8cb] bg-white px-3 py-2.5 text-xs font-semibold text-[#1f3f2d] outline-none focus:border-[#1c573e]"
+                className="rounded-xl border border-[#cbd8cb] bg-white px-2.5 py-2.5 text-xs font-semibold text-[#1f3f2d] outline-none focus:border-[#1c573e]"
               >
                 <option value="+251">🇪🇹 +251 (ET)</option>
                 <option value="+1">🇺🇸 +1 (US)</option>
@@ -148,7 +181,7 @@ export function ClientAuthModal({
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   placeholder="91 123 4567"
-                  className="w-full rounded-xl border border-[#cbd8cb] bg-white px-3.5 py-2.5 text-xs text-[#1f3f2d] placeholder:text-[#88998b] outline-none focus:border-[#1c573e] focus:ring-1 focus:ring-[#1c573e]"
+                  className="w-full rounded-xl border border-[#cbd8cb] bg-white px-3 py-2.5 text-xs text-[#1f3f2d] placeholder:text-[#88998b] outline-none focus:border-[#1c573e] focus:ring-1 focus:ring-[#1c573e]"
                 />
               </div>
             </div>
@@ -157,7 +190,7 @@ export function ClientAuthModal({
 
             <button
               type="submit"
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#1c573e] py-3 px-4 text-xs font-bold text-white shadow-2xs transition hover:bg-[#154631] active:scale-98"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-[#1c573e] py-2.5 px-4 text-xs font-bold text-white shadow-2xs transition hover:bg-[#154631] active:scale-98"
             >
               <Smartphone size={14} />
               <span>Continue with Phone Number</span>
@@ -166,17 +199,18 @@ export function ClientAuthModal({
           </form>
 
           {/* Privacy & Trust Assurance */}
-          <div className="rounded-2xl border border-[#e2ece2] bg-[#f0f6f1] p-3.5 text-center text-[11px] text-[#4d6653]">
+          <div className="rounded-2xl border border-[#e2ece2] bg-[#f0f6f1] p-3 text-center text-[11px] text-[#4d6653]">
             <div className="flex items-center justify-center gap-1.5 font-semibold text-[#1c573e]">
               <Lock size={12} />
               <span>Private & Confidential Health Learning</span>
             </div>
-            <p className="mt-1">
+            <p className="mt-0.5 text-[10px] leading-relaxed">
               Your inquiries and requests are kept strictly private between you and verified health staff.
             </p>
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
