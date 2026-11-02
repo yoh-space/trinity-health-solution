@@ -7,7 +7,10 @@ import { demoRequests, statusStyles } from "@/lib/portal";
 export function StaffDashboard() {
   const { user } = useUser();
   const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
-  const isAdmin = userEmail === "yohansdam@gmail.com" || user?.publicMetadata?.role === "admin";
+  const isAdmin =
+    userEmail === "yohansdam@gmail.com" ||
+    userEmail === "yashaknike@gmail.com" ||
+    user?.publicMetadata?.role === "admin";
   const role = isAdmin ? "admin" : String(user?.publicMetadata?.role ?? "counselor");
   return (
     <>

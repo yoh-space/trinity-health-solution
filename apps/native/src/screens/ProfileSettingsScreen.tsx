@@ -480,6 +480,8 @@ export default function ProfileSettingsScreen() {
         (!isSignedIn ||
           user?.primaryEmailAddress?.emailAddress?.toLowerCase() ===
             "yohansdam@gmail.com" ||
+          user?.primaryEmailAddress?.emailAddress?.toLowerCase() ===
+            "yashaknike@gmail.com" ||
           isStaffRoleId(user?.publicMetadata.role)) ? (
           <View style={styles.section}>
             <SectionHeading title={text.more} />

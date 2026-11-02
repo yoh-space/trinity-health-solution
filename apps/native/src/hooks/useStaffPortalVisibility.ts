@@ -5,8 +5,9 @@ export function useStaffPortalVisibility() {
   const { isLoaded: authLoaded, isSignedIn } = useAuth();
   const { isLoaded: userLoaded, user } = useUser();
   const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
-  const roleClaim =
-    userEmail === "yohansdam@gmail.com" ? "admin" : user?.publicMetadata.role;
+  const isDesignatedAdmin =
+    userEmail === "yohansdam@gmail.com" || userEmail === "yashaknike@gmail.com";
+  const roleClaim = isDesignatedAdmin ? "admin" : user?.publicMetadata.role;
   const staffRole = isStaffRoleId(roleClaim) ? roleClaim : null;
   const isReady = authLoaded && userLoaded;
 

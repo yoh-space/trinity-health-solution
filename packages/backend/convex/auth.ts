@@ -7,6 +7,7 @@ export type StaffRole = "counselor" | "clinician" | "admin";
 
 export const ADMIN_EMAILS = new Set([
   "yohansdam@gmail.com",
+  "yashaknike@gmail.com",
 ]);
 
 export function isDesignatedAdminEmail(email?: string): boolean {

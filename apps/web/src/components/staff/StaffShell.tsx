@@ -24,7 +24,10 @@ export function StaffShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
-  const isAdmin = userEmail === "yohansdam@gmail.com" || user?.publicMetadata?.role === "admin";
+  const isAdmin =
+    userEmail === "yohansdam@gmail.com" ||
+    userEmail === "yashaknike@gmail.com" ||
+    user?.publicMetadata?.role === "admin";
   const role = isAdmin ? "admin" : String(user?.publicMetadata?.role ?? "counselor");
 
   const staffNavItems = [

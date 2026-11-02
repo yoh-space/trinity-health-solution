@@ -21,8 +21,9 @@ export function useStaffAccount(role: StaffRoleId) {
     profile,
   } = useStaffAccountContext();
   const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
-  const effectiveRole =
-    userEmail === "yohansdam@gmail.com" ? "admin" : user?.publicMetadata.role;
+  const isDesignatedAdmin =
+    userEmail === "yohansdam@gmail.com" || userEmail === "yashaknike@gmail.com";
+  const effectiveRole = isDesignatedAdmin ? "admin" : user?.publicMetadata.role;
   const hasExpectedRole = effectiveRole === role;
 
   let state: StaffAccountState = "loading";
