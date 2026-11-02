@@ -98,8 +98,12 @@ android {
         applicationId 'com.unicef.trinityhealthsolution'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode (project.findProperty('versionCode') ?: 1).toInteger()
-        versionName (project.findProperty('versionName') ?: "1.0.0")
+
+        def vCode = findProperty('versionCode') ?: System.getenv('VERSION_CODE')
+        versionCode vCode ? Integer.parseInt(vCode.toString().trim()) : 1
+
+        def vName = findProperty('versionName') ?: System.getenv('VERSION')
+        versionName vName ? vName.toString().trim() : "1.0.0"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }

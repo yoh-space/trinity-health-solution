@@ -135,12 +135,12 @@ jobs:
           ANDROID_KEYSTORE_PASSWORD: ${{ env.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ env.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ env.ANDROID_KEY_PASSWORD }}
+          VERSION_CODE: ${{ steps.versioning.outputs.VERSION_CODE }}
+          VERSION: ${{ steps.versioning.outputs.VERSION }}
         run: |
           cd apps/native/android
           chmod +x gradlew
-          ./gradlew assembleRelease \
-            -PversionCode=${{ steps.versioning.outputs.VERSION_CODE }} \
-            -PversionName=${{ steps.versioning.outputs.VERSION }}
+          ./gradlew assembleRelease
 
       - name: Prepare Release Assets & Checksums
         id: artifacts
