@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { X, Clock, BookOpen, Sparkles, Layers } from "lucide-react";
+import { X, Clock, FileText, Layers } from "lucide-react";
 import { EducationItem } from "./types";
 
 const DEFAULT_COVER_IMAGE =
@@ -19,107 +19,107 @@ export function ContentPreview({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-label="Content preview"
     >
-      <div className="relative max-h-[92vh] w-full max-w-4xl overflow-hidden rounded-3xl bg-[#fbfaf6] text-[#183b2d] shadow-2xl flex flex-col">
-        {/* Top Floating Close Button */}
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label="Close Preview"
-          className="absolute right-4 top-4 z-20 grid size-9 place-items-center rounded-full bg-white/80 text-[#193a27] shadow-md backdrop-blur-sm transition hover:bg-white active:scale-95"
-        >
-          <X size={18} />
-        </button>
+      <div className="relative max-h-[92vh] w-full max-w-4xl overflow-hidden rounded-3xl bg-[#fbfaf6] text-[#183b2d] shadow-2xl flex flex-col border border-[#dce6dc]">
+        {/* Top Header Bar with Close Button */}
+        <div className="flex items-center justify-between border-b border-[#e2eae1] bg-white px-6 py-4">
+          <div className="flex items-center gap-2">
+            <Layers size={16} className="text-[#1c573e]" />
+            <span className="text-xs font-bold uppercase tracking-wider text-[#223d2e]">
+              Curriculum Preview Mode
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close Preview"
+            className="grid size-8 place-items-center rounded-full border border-[#cbd8cb] bg-[#f8faf7] text-[#193a27] shadow-xs transition hover:bg-[#eaf2ea] active:scale-95"
+          >
+            <X size={16} />
+          </button>
+        </div>
 
         {/* Scrollable Container */}
-        <div className="overflow-y-auto">
-          {/* --- HERO SECTION --- */}
-          <section className="relative w-full aspect-21/9 min-h-[260px] sm:min-h-[340px] overflow-hidden bg-slate-900">
+        <div className="overflow-y-auto p-6 sm:p-10 space-y-6">
+          {/* Metadata Header */}
+          <div className="border-b border-[#e2eae1] pb-6">
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="font-bold uppercase tracking-wider text-[#1c573e]">
+                {item.category}
+              </span>
+              <span className="text-[#cbd6cc]">•</span>
+              <span className="flex items-center gap-1 font-medium text-[#5a6e60]">
+                <Clock size={12} />
+                <span>{item.readMinutes} min read</span>
+              </span>
+              <span className="text-[#cbd6cc]">•</span>
+              <span className="rounded-full bg-[#e8f1e5] px-2.5 py-0.5 text-[11px] font-bold text-[#1c573e] capitalize">
+                {item.status}
+              </span>
+            </div>
+
+            <h1 className="mt-3 text-2xl font-extrabold text-[#163826] tracking-tight sm:text-4xl leading-tight">
+              {language === "en" ? item.title : item.titleAm}
+            </h1>
+          </div>
+
+          {/* Clean Editorial Photographic Figure */}
+          <figure className="relative w-full aspect-21/9 min-h-[200px] overflow-hidden rounded-2xl border border-[#dce6dc] bg-[#eef3eb]">
             <img
               src={heroImage}
               alt={item.title}
               className="h-full w-full object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#152e1f] via-[#152e1f]/40 to-transparent" />
+          </figure>
 
-            {/* Hero Content Overlay */}
-            <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-10">
-              <div className="flex flex-wrap items-center gap-2">
-                <span className="rounded-full bg-[#1c573e] px-3 py-1 text-xs font-bold text-white uppercase tracking-wider backdrop-blur-md shadow-xs">
-                  {item.category}
-                </span>
-                <span className="flex items-center gap-1.5 rounded-full bg-white/20 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md">
-                  <Clock size={12} />
-                  <span>{item.readMinutes} min read</span>
-                </span>
-                <span className="rounded-full bg-emerald-400/20 px-2.5 py-1 text-xs font-semibold text-emerald-200 capitalize backdrop-blur-md">
-                  {item.status}
-                </span>
-              </div>
-
-              <h1 className="mt-3 text-2xl font-black text-white tracking-tight sm:text-4xl drop-shadow-sm max-w-2xl leading-snug">
-                {language === "en" ? item.title : item.titleAm}
-              </h1>
+          {/* Language Switcher Bar */}
+          <div className="flex items-center justify-between border-b border-[#e5ece4] pb-4">
+            <span className="text-xs font-bold text-[#64796a] uppercase tracking-wider">
+              {language === "am" ? "ቋንቋ ይምረጡ:" : "Display Language:"}
+            </span>
+            <div className="flex rounded-full border border-[#bcd4bf] bg-white p-0.5 text-xs font-bold shadow-2xs">
+              <button
+                type="button"
+                onClick={() => setLanguage("en")}
+                className={`rounded-full px-4 py-1.5 transition ${
+                  language === "en"
+                    ? "bg-[#1c573e] text-white shadow-2xs"
+                    : "text-[#5e7564] hover:text-[#183925]"
+                }`}
+              >
+                English
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage("am")}
+                className={`rounded-full px-4 py-1.5 transition ${
+                  language === "am"
+                    ? "bg-[#1c573e] text-white shadow-2xs"
+                    : "text-[#5e7564] hover:text-[#183925]"
+                }`}
+              >
+                አማርኛ
+              </button>
             </div>
-          </section>
-
-          {/* Body Content Container */}
-          <div className="p-6 sm:p-10 space-y-6">
-            {/* Language Switcher Bar */}
-            <div className="flex items-center justify-between border-b border-[#e5ece4] pb-4">
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-[#64796a] uppercase tracking-wider">
-                  Select Language:
-                </span>
-                <div className="flex rounded-full border border-[#bcd4bf] bg-white p-1 text-xs font-bold">
-                  <button
-                    type="button"
-                    onClick={() => setLanguage("en")}
-                    className={`rounded-full px-4 py-1.5 transition ${
-                      language === "en"
-                        ? "bg-[#1c573e] text-white shadow-xs"
-                        : "text-[#5e7564] hover:text-[#183925]"
-                    }`}
-                  >
-                    English
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setLanguage("am")}
-                    className={`rounded-full px-4 py-1.5 transition ${
-                      language === "am"
-                        ? "bg-[#1c573e] text-white shadow-xs"
-                        : "text-[#5e7564] hover:text-[#183925]"
-                    }`}
-                  >
-                    አማርኛ (Amharic)
-                  </button>
-                </div>
-              </div>
-
-              <span className="text-xs text-[#718576] font-medium hidden sm:inline">
-                Curriculum Preview Mode
-              </span>
-            </div>
-
-            {/* Summary Highlight Box */}
-            <div className="rounded-2xl border border-[#d3e2d3] bg-[#edf6ee] p-5 text-sm sm:text-base leading-relaxed text-[#234630] font-medium">
-              <div className="flex items-center gap-2 text-xs font-bold text-[#1c573e] uppercase tracking-wider mb-2">
-                <Sparkles size={14} />
-                <span>Executive Summary</span>
-              </div>
-              {language === "en" ? item.summary : item.summaryAm}
-            </div>
-
-            {/* Article Body */}
-            <article className="prose prose-emerald max-w-none whitespace-pre-line text-sm sm:text-base leading-relaxed text-[#3b4e41]">
-              {language === "en" ? item.content : item.contentAm}
-            </article>
           </div>
+
+          {/* Key Clinical Takeaway Summary */}
+          <div className="rounded-2xl border border-[#cbe0ce] bg-[#f0f7f1] p-5 text-sm sm:text-base leading-relaxed text-[#234630]">
+            <div className="flex items-center gap-2 text-xs font-bold text-[#1c573e] uppercase tracking-wider mb-2">
+              <FileText size={15} />
+              <span>{language === "am" ? "ዋና የትምህርት ማጠቃለያ" : "Core Curriculum Summary"}</span>
+            </div>
+            {language === "en" ? item.summary : item.summaryAm}
+          </div>
+
+          {/* Article Body */}
+          <article className="prose prose-emerald max-w-none whitespace-pre-line text-sm sm:text-base leading-relaxed text-[#2c4033]">
+            {language === "en" ? item.content : item.contentAm}
+          </article>
         </div>
       </div>
     </div>

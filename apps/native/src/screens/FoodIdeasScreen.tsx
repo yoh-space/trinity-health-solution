@@ -63,7 +63,7 @@ export default function FoodIdeasScreen() {
           {hasGenerated ? <View style={styles.results}><Text style={styles.resultsTitle}>{am ? "የሚስማሙ ሀሳቦች" : "Ideas matching your selections"}</Text>{matches.length ? matches.map((recipe) => <View key={recipe.id} style={styles.recipe}><Ionicons name="restaurant-outline" size={20} color="#367A49" /><Text style={styles.recipeText}>{am ? recipe.am : recipe.en}</Text></View>) : <Text style={styles.hint}>{am ? "ምንም ሀሳብ የለም።" : "No sample ideas match those selections."}</Text>}</View> : null}
           <View style={styles.bottomSpace} />
         </ScrollView>
-        <Pressable accessibilityLabel="Ask Opal" onPress={() => router.push(opalRoute as Href)} style={styles.opal}><Ionicons name="sparkles-outline" size={17} color="#FFFFFF" /><Text style={styles.opalText}>Ask Opal</Text></Pressable>
+        <Pressable accessibilityLabel="Ask Opal" onPress={() => router.push(opalRoute as Href)} style={styles.opal}><Ionicons name="chatbubble-ellipses-outline" size={17} color="#FFFFFF" /><Text style={styles.opalText}>Ask Opal</Text></Pressable>
       </View>
     </SafeAreaView>
   );

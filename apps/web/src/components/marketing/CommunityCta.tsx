@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight, Sparkles, BookOpen } from "lucide-react";
+import { ArrowRight, Heart, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useMarketingLanguage } from "./MarketingLanguageContext";
 
@@ -19,7 +19,7 @@ export function CommunityCta() {
         <div className="relative flex flex-col justify-between gap-8 md:flex-row md:items-end">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#e6d8b5]">
-              <Sparkles size={13} />
+              <Heart size={13} />
               {t("For Families & Health Workers", "ለቤተሰቦችና ለጤና ሰራተኞች")}
             </div>
 

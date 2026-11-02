@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Utensils, Sparkles, Check, ArrowRight, Lightbulb } from "lucide-react";
+import { Utensils, Check, ArrowRight, Lightbulb } from "lucide-react";
 import {
   pantryIngredients,
   pantryRecipes,
@@ -152,8 +152,7 @@ export function PantryExplorerSection() {
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent lg:bg-gradient-to-r lg:from-white/10 lg:to-transparent" />
-              <div className="absolute bottom-5 left-5 rounded-2xl bg-white/90 px-4 py-2.5 backdrop-blur-md">
+              <div className="absolute bottom-4 left-4 rounded-xl border border-[#d6dfd2] bg-white p-3 shadow-sm">
                 <p className="text-[10px] font-bold uppercase tracking-wider text-[#6e7e72]">
                   {t("Recommended Plate", "የተመከረ ሚዛናዊ ምግብ")}
                 </p>

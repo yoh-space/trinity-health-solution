@@ -7,7 +7,8 @@ import {
   ArrowRight,
   Download,
   ShieldCheck,
-  Sparkles,
+  Globe,
+  MessageSquare,
   Smartphone,
   BookOpen,
   Heart,
@@ -36,9 +37,9 @@ export function MarketingHero() {
         {/* Left Column: Headline, Value Proposition, Action CTAs */}
         <div className="relative z-10">
           {/* Eyebrow badge */}
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#d6dfd2] bg-white/80 px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.14em] text-[#3b5e45] shadow-xs backdrop-blur">
-            <span className="size-2 rounded-full bg-[#c78157] animate-pulse" />
-            {t("የጤና ትምህርት · Practical Health Learning", "የጤና ትምህርት · Practical Health Learning")}
+          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#d6dfd2] bg-white px-3.5 py-1 text-xs font-bold uppercase tracking-[0.16em] text-[#294d3a] shadow-xs">
+            <span className="size-2 rounded-full bg-[#287343]" />
+            {t("የተረጋገጠ የጤና ትምህርት · Practical Health Learning", "የተረጋገጠ የጤና ትምህርት · Practical Health Learning")}
           </div>
 
           {/* Main Title */}
@@ -106,7 +107,7 @@ export function MarketingHero() {
             </div>
             <span className="text-[#cbd4c8]">•</span>
             <div className="flex items-center gap-2">
-              <Sparkles size={16} className="text-[#c78157]" />
+              <Globe size={16} className="text-[#287343]" />
               <span>{t("Bilingual Amharic + English", "በአማርኛ እና በእንግሊዝኛ")}</span>
             </div>
           </div>
@@ -170,8 +171,8 @@ export function MarketingHero() {
             </div>
           </div>
 
-          {/* Floating Trust Badge */}
-          <div className="absolute -bottom-4 -left-4 z-20 flex items-center gap-3 rounded-2xl border border-white/90 bg-white/95 p-3.5 shadow-[0_16px_36px_rgba(28,50,35,0.12)] backdrop-blur-md sm:-bottom-5 sm:-left-8 sm:p-4">
+          {/* Offline Trust Badge */}
+          <div className="absolute -bottom-4 -left-4 z-20 flex items-center gap-3 rounded-2xl border border-[#d6dfd2] bg-white p-3.5 shadow-md sm:-bottom-5 sm:-left-8 sm:p-4">
             <div className="grid size-10 place-items-center rounded-xl bg-[#e5eddf] text-[#1c573e]">
               <Smartphone size={20} />
             </div>
@@ -185,11 +186,11 @@ export function MarketingHero() {
             </div>
           </div>
 
-          {/* Floating Opal AI Badge */}
-          <div className="absolute -right-4 top-24 z-20 hidden rounded-2xl border border-white/90 bg-[#1c573e] p-3 text-white shadow-[0_16px_36px_rgba(28,50,35,0.18)] sm:block">
+          {/* Floating Opal Guidance Badge */}
+          <div className="absolute -right-4 top-24 z-20 hidden rounded-2xl border border-[#164933] bg-[#1c573e] p-3 text-white shadow-md sm:block">
             <div className="flex items-center gap-2 text-xs font-semibold">
-              <Sparkles size={14} className="text-[#f1dfba]" />
-              <span>{t("Ask Opal AI Assistant", "ኦፓል የጤና ረዳት")}</span>
+              <MessageSquare size={14} className="text-[#f1dfba]" />
+              <span>{t("Ask Opal Guidance", "ኦፓል የጤና መመሪያ")}</span>
             </div>
             <p className="mt-1 text-[11px] text-[#d6e5d8]">
               {t("Verified maternal & nutrition answers", "የተረጋገጡ የጤና እና አመጋገብ መልሶች")}

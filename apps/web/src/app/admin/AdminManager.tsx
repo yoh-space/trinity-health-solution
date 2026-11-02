@@ -11,7 +11,7 @@ import {
   Calendar,
   Plus,
   RefreshCw,
-  Sparkles,
+  CheckCircle2,
   ShieldAlert,
 } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
@@ -541,7 +541,7 @@ export default function AdminManager() {
               : "border border-emerald-200 bg-[#f2f9f3] text-[#1e613b]"
           }`}
         >
-          {error ? <ShieldAlert size={16} /> : <Sparkles size={16} />}
+          {error ? <ShieldAlert size={16} /> : <CheckCircle2 size={16} />}
           <span>{error || message}</span>
         </div>
       )}

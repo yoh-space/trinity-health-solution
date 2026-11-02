@@ -70,29 +70,25 @@ export function LearningTopicsSection() {
                     className="object-cover transition-transform duration-500 group-hover:scale-105"
                   />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-white">
-                  <span className="flex items-center gap-1.5 rounded-full bg-black/40 px-2.5 py-1 text-[11px] font-semibold backdrop-blur-md">
-                    <Clock size={12} />
-                    {t("3 min read", "የ3 ደቂቃ ንባብ")}
-                  </span>
-                  <span className="text-xs font-bold tracking-widest opacity-80">
-                    {topic.number}
-                  </span>
-                </div>
               </div>
 
               {/* Card Body */}
               <div className="flex flex-1 flex-col justify-between p-6">
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span
-                      className={`grid size-8 place-items-center rounded-lg ${topic.tint}`}
-                    >
-                      <Icon size={16} strokeWidth={2} aria-hidden="true" />
-                    </span>
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#79887d]">
-                      {t("Lesson Module", "የትምህርት ክፍል")}
+                  <div className="flex items-center justify-between text-xs text-[#5e7464]">
+                    <div className="flex items-center gap-2">
+                      <span
+                        className={`grid size-7 place-items-center rounded-lg ${topic.tint}`}
+                      >
+                        <Icon size={14} strokeWidth={2} aria-hidden="true" />
+                      </span>
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-[#79887d]">
+                        {t("Lesson Module", "የትምህርት ክፍል")} {topic.number}
+                      </span>
+                    </div>
+                    <span className="flex items-center gap-1 text-[11px] font-semibold text-[#6f8475]">
+                      <Clock size={12} />
+                      {t("3 min read", "የ3 ደቂቃ ንባብ")}
                     </span>
                   </div>
 

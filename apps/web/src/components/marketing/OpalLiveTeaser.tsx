@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Sparkles, ArrowRight, MessageSquare, BookOpen, Send } from "lucide-react";
+import { ArrowRight, MessageSquare, BookOpen, Send, ShieldCheck, HelpCircle } from "lucide-react";
 import { opalSampleQuestions } from "./marketingContent";
 import { useMarketingLanguage } from "./MarketingLanguageContext";
 
@@ -22,9 +22,9 @@ export function OpalLiveTeaser() {
         <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
           {/* Left Column: Context & Explanations */}
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#cbd8c6] bg-white/80 px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#2d563d] backdrop-blur-xs">
-              <Sparkles size={14} className="text-[#c78157]" />
-              {t("AI Guidance, Culturally Grounded", "በአርቴፊሻል ኢንተለጀንስ የታገዘ የጤና ረዳት")}
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#cbd8c6] bg-white px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#2d563d] shadow-2xs">
+              <ShieldCheck size={14} className="text-[#1c573e]" />
+              {t("Evidence-Grounded Health Reference", "በህክምና ባለሙያዎች የተረጋገጠ የጤና መመሪያ")}
             </div>
 
             <h2 className="mt-4 text-3xl font-medium leading-[1.08] tracking-tight text-[#193b2d] sm:text-5xl">
@@ -89,7 +89,7 @@ export function OpalLiveTeaser() {
             <div className="flex items-center justify-between border-b border-[#eef2ea] pb-4">
               <div className="flex items-center gap-3">
                 <div className="grid size-10 place-items-center rounded-2xl bg-[#1c573e] text-white">
-                  <Sparkles size={18} />
+                  <MessageSquare size={18} />
                 </div>
                 <div>
                   <h3 className="text-sm font-bold text-[#1a3828]">
@@ -101,7 +101,7 @@ export function OpalLiveTeaser() {
                 </div>
               </div>
               <span className="rounded-full bg-[#e8f1e5] px-2.5 py-1 text-[10px] font-bold text-[#2d5c3f]">
-                {t("Bilingual AI", "የሁለት ቋንቋ ረዳት")}
+                {t("Curated Health Knowledge", "የተረጋገጠ የጤና እውቀት")}
               </span>
             </div>
 
@@ -119,7 +119,7 @@ export function OpalLiveTeaser() {
               {/* Opal Response */}
               <div className="flex items-start gap-3">
                 <div className="grid size-7 shrink-0 place-items-center rounded-xl bg-[#e5eddf] text-[#1c573e]">
-                  <Sparkles size={13} />
+                  <BookOpen size={13} />
                 </div>
                 <div className="max-w-[90%] rounded-[1.25rem] rounded-tl-xs border border-[#e2e8dc] bg-[#f8fbf6] p-4 text-xs leading-relaxed text-[#2a4535] shadow-xs">
                   <p>

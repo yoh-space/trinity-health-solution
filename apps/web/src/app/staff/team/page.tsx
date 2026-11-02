@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
 import { AdminStaffRoster, TeamMemberItem } from "@/components/admin/AdminStaffRoster";
-import { ShieldCheck, Sparkles } from "lucide-react";
+import { ShieldCheck } from "lucide-react";
 
 export default function StaffTeamPage() {
   const teamPaginationArgs = useMemo(
