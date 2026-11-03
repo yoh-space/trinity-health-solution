@@ -1,5 +1,9 @@
 import type { OpalLanguage, OpalSource } from "./opalContext";
-import { buildOpalSystemInstruction, buildOpalUserPrompt } from "./opalPrompt";
+import {
+  buildOpalSystemInstruction,
+  buildOpalUserPrompt,
+  type OpalProfileContext,
+} from "./opalPrompt";
 
 const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
@@ -29,6 +33,7 @@ export async function generateOpalAnswer(
   question: string,
   language: OpalLanguage,
   sources: OpalSource[],
+  profileContext?: OpalProfileContext,
 ): Promise<{ answer: string; sourceIds: string[] }> {
   const model = process.env.GEMINI_MODEL || DEFAULT_MODEL;
   let response: Response;
@@ -47,7 +52,11 @@ export async function generateOpalAnswer(
         contents: [
           {
             role: "user",
-            parts: [{ text: buildOpalUserPrompt(question, sources) }],
+            parts: [
+              {
+                text: buildOpalUserPrompt(question, sources, profileContext),
+              },
+            ],
           },
         ],
         generationConfig: {

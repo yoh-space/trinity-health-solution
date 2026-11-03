@@ -15,6 +15,48 @@ const mealIdeaPreferenceValidator = v.union(
   v.literal("healthyEating"),
   v.literal("familyMeals"),
 );
+const opalAudienceValidator = v.union(
+  v.literal("myself"),
+  v.literal("child"),
+  v.literal("family"),
+  v.literal("caregiver"),
+);
+const opalAgeBandValidator = v.union(
+  v.literal("under5"),
+  v.literal("age5to17"),
+  v.literal("age18to39"),
+  v.literal("age40to59"),
+  v.literal("age60plus"),
+);
+const opalGoalValidator = v.union(
+  v.literal("healthyEating"),
+  v.literal("familyMeals"),
+);
+
+function getOpalAudience(value: string) {
+  switch (value) {
+    case "myself":
+    case "child":
+    case "family":
+    case "caregiver":
+      return value;
+    default:
+      return undefined;
+  }
+}
+
+function getOpalAgeBand(value: string) {
+  switch (value) {
+    case "under5":
+    case "age5to17":
+    case "age18to39":
+    case "age40to59":
+    case "age60plus":
+      return value;
+    default:
+      return undefined;
+  }
+}
 
 async function requireUserId({ auth }: { auth: Auth }) {
   const identity = await auth.getUserIdentity();
@@ -72,6 +114,38 @@ export const getMealIdeaPreferences = internalQuery({
     );
 
     return { hasProfile: true, preferences };
+  },
+});
+
+export const getOpalProfileContext = internalQuery({
+  args: { userId: v.string() },
+  returns: v.union(
+    v.null(),
+    v.object({
+      audience: v.optional(opalAudienceValidator),
+      ageBand: v.optional(opalAgeBandValidator),
+      goals: v.array(opalGoalValidator),
+    }),
+  ),
+  handler: async (ctx, { userId }) => {
+    const profile = await ctx.db
+      .query("onboardingProfiles")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!profile) return null;
+
+    const audience = getOpalAudience(profile.audience);
+    const ageBand = getOpalAgeBand(profile.age);
+    const selectedGoals = new Set(profile.goals);
+    const goals = (["healthyEating", "familyMeals"] as const).filter((goal) =>
+      selectedGoals.has(goal),
+    );
+
+    return {
+      ...(audience ? { audience } : {}),
+      ...(ageBand ? { ageBand } : {}),
+      goals,
+    };
   },
 });
 

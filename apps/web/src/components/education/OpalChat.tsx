@@ -1,6 +1,6 @@
 "use client";
 
-import { useAction } from "convex/react";
+import { useAction, useQuery } from "convex/react";
 import { anyApi } from "convex/server";
 import Link from "next/link";
 import { useState } from "react";
@@ -41,18 +41,48 @@ const PROMPT_SUGGESTIONS: PromptItem[] = [
 
 export function OpalChat() {
   const askOpal = useAction(anyApi.opal.ask);
+  const hasSavedProfile = useQuery(anyApi.onboarding.hasProfile);
   const { language, setLanguage } = useMarketingLanguage();
   const [draft, setDraft] = useState("");
   const [consented, setConsented] = useState(false);
+  const [profileConsented, setProfileConsented] = useState(false);
+  const [audience, setAudience] = useState<
+    "myself" | "child" | "family" | "caregiver" | ""
+  >("");
+  const [ageBand, setAgeBand] = useState<
+    "under5" | "age5to17" | "age18to39" | "age40to59" | "age60plus" | ""
+  >("");
+  const [goals, setGoals] = useState<Array<"healthyEating" | "familyMeals">>(
+    [],
+  );
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState("");
   const [messages, setMessages] = useState<
-    Array<{ role: "user" | "opal"; text: string; sources?: OpalSource[] }>
+    Array<{
+      role: "user" | "opal";
+      text: string;
+      sources?: OpalSource[];
+      redFlag?: "none" | "clinical" | "urgent";
+    }>
   >([]);
 
   const ask = async (question: string) => {
     const text = question.trim();
     if (!text || !consented || isSending) return;
+    if (
+      profileConsented &&
+      hasSavedProfile !== true &&
+      !audience &&
+      !ageBand &&
+      goals.length === 0
+    ) {
+      setError(
+        language === "am"
+          ? "ቢያንስ አንድ አጠቃላይ የመገለጫ ምርጫ ይምረጡ ወይም የመገለጫ መጋራትን ያጥፉ።"
+          : "Choose at least one general profile option or turn off profile sharing.",
+      );
+      return;
+    }
 
     setError("");
     setIsSending(true);
@@ -63,6 +93,21 @@ export function OpalChat() {
         consented: true,
         language,
         question: text,
+        ...(profileConsented
+          ? {
+              includeProfileContext: true,
+              profileConsented: true,
+              ...(hasSavedProfile === true
+                ? {}
+                : {
+                    guestProfileContext: {
+                      ...(audience ? { audience } : {}),
+                      ...(ageBand ? { ageBand } : {}),
+                      goals,
+                    },
+                  }),
+            }
+          : {}),
       });
       setMessages((current) => [
         ...current,
@@ -70,10 +115,19 @@ export function OpalChat() {
           role: "opal",
           text: response.answer,
           sources: response.sources,
+          redFlag: response.redFlag,
         },
       ]);
     } catch (requestError) {
-      setError(getOpalErrorMessage(requestError, language));
+      const code =
+        requestError instanceof Error ? requestError.message : "";
+      setError(
+        code.includes("OPAL_PROFILE_CONTEXT_REQUIRED")
+          ? language === "am"
+            ? "የመገለጫ መረጃዎን ለGemini ከመላክዎ በፊት የአጠቃላይ ምርጫዎችን ይሙሉ።"
+            : "Complete at least one general profile option before sharing it with Gemini."
+          : getOpalErrorMessage(requestError, language),
+      );
     } finally {
       setIsSending(false);
     }
@@ -159,6 +213,124 @@ export function OpalChat() {
           </span>
         </label>
 
+        <div className="mb-6 rounded-2xl border border-[#dce8de] bg-[#f8faf7] p-4">
+          <label className="flex items-start gap-2 text-xs leading-5 text-[#52685a]">
+            <input
+              type="checkbox"
+              checked={profileConsented}
+              onChange={(event) =>
+                setProfileConsented(event.target.checked)
+              }
+              className="mt-1 accent-[#1c573e]"
+            />
+            <span>
+              {language === "am"
+                ? "አጠቃላይ የመገለጫ መረጃዬን ከጥያቄዬ ጋር ለGemini እንዲላክ በተለየ ፈቃድ እስማማለሁ። የሚላኩት የተመረጠ ተመልካች፣ የዕድሜ ክልልና አጠቃላይ የመማር ግቦች ብቻ ናቸው። ስም፣ የጤና ሁኔታ፣ እርግዝና፣ አለርጂ፣ መለኪያዎች፣ የመገናኛ መረጃ ወይም ነፃ ጽሑፍ አይላክም።"
+                : "I separately agree to send minimal general profile context to Gemini with my question. Only audience, age band, and general learning goals are shared. Names, health conditions, pregnancy, allergies, measurements, contact details, and free-text profile answers are excluded."}
+            </span>
+          </label>
+
+          {profileConsented && hasSavedProfile === true && (
+            <p className="mt-3 rounded-xl border border-[#dce8de] bg-white px-3 py-2 text-xs leading-5 text-[#496551]">
+              {language === "am"
+                ? "የተቀመጠው የመጀመሪያ መገለጫዎ ይጠቀማል፤ ከላይ የተጠቀሱት የተፈቀዱ መረጃዎች ብቻ ይካተታሉ።"
+                : "Your saved onboarding profile will be used, but only the allowed fields listed above are included."}
+            </p>
+          )}
+
+          {profileConsented && hasSavedProfile !== true && (
+            <div className="mt-4 space-y-4">
+              <p className="text-xs leading-5 text-[#68796d]">
+                {language === "am"
+                  ? "ከታች የሚመርጡት በዚህ ክፍለ ጊዜ ብቻ ይቆያል፤ ወደ መለያዎ አይቀመጥም።"
+                  : "These optional choices stay in this page session and are not saved to your account."}
+              </p>
+              <ProfileChoiceGroup
+                label={language === "am" ? "ይህ ለማን ነው?" : "Who is this for?"}
+                value={audience}
+                options={[
+                  { value: "myself", en: "Myself", am: "ለራሴ" },
+                  { value: "child", en: "My child", am: "ለልጄ" },
+                  { value: "family", en: "My family", am: "ለቤተሰቤ" },
+                  { value: "caregiver", en: "Someone I care for", am: "ለምከባከበው ሰው" },
+                ]}
+                language={language}
+                onChange={(value) =>
+                  setAudience(
+                    value as "myself" | "child" | "family" | "caregiver",
+                  )
+                }
+              />
+              <ProfileChoiceGroup
+                label={language === "am" ? "የዕድሜ ክልል (አማራጭ)" : "Age band (optional)"}
+                value={ageBand}
+                options={[
+                  { value: "under5", en: "Under 5", am: "ከ5 በታች" },
+                  { value: "age5to17", en: "5–17", am: "5–17" },
+                  { value: "age18to39", en: "18–39", am: "18–39" },
+                  { value: "age40to59", en: "40–59", am: "40–59" },
+                  { value: "age60plus", en: "60+", am: "60+" },
+                ]}
+                language={language}
+                onChange={(value) =>
+                  setAgeBand(
+                    value as
+                      | "under5"
+                      | "age5to17"
+                      | "age18to39"
+                      | "age40to59"
+                      | "age60plus",
+                  )
+                }
+              />
+              <div>
+                <p className="mb-2 text-xs font-semibold text-[#405647]">
+                  {language === "am"
+                    ? "አጠቃላይ ግቦች (አማራጭ)"
+                    : "General goals (optional)"}
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    {
+                      value: "healthyEating" as const,
+                      en: "Learn healthy eating",
+                      am: "ጤናማ አመጋገብን መማር",
+                    },
+                    {
+                      value: "familyMeals" as const,
+                      en: "Plan family meals",
+                      am: "የቤተሰብ ምግብ ማቀድ",
+                    },
+                  ].map((goal) => {
+                    const selected = goals.includes(goal.value);
+                    return (
+                      <button
+                        key={goal.value}
+                        type="button"
+                        aria-pressed={selected}
+                        onClick={() =>
+                          setGoals((current) =>
+                            selected
+                              ? current.filter((value) => value !== goal.value)
+                              : [...current, goal.value],
+                          )
+                        }
+                        className={`rounded-full border px-3 py-2 text-xs font-semibold transition ${
+                          selected
+                            ? "border-[#1c573e] bg-[#eaf2e9] text-[#1c573e]"
+                            : "border-[#d0ded0] bg-white text-[#52685a] hover:border-[#1c573e]"
+                        }`}
+                      >
+                        {language === "am" ? goal.am : goal.en}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Suggestion Chips */}
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
@@ -228,6 +400,28 @@ export function OpalChat() {
                       </Link>
                     </div>
                   ))}
+                  {message.role === "opal" &&
+                    message.redFlag === "clinical" && (
+                      <div className="mt-3 border-t border-[#e6eee5] pt-3">
+                        <Link
+                          href="/portal/consultations/new"
+                          className="inline-flex items-center gap-1.5 rounded-full bg-[#1c573e] px-3.5 py-2 text-xs font-bold text-white hover:bg-[#154631]"
+                        >
+                          <ShieldCheck size={14} aria-hidden="true" />
+                          <span>
+                            {language === "am"
+                              ? "ከጤና ባለሙያ ጋር ይነጋገሩ"
+                              : "Request help from a health professional"}
+                          </span>
+                          <ArrowRight size={13} aria-hidden="true" />
+                        </Link>
+                        <p className="mt-2 text-[11px] leading-4 text-[#718276]">
+                          {language === "am"
+                            ? "ይህ የግል ጥያቄዎን ወይም የመገለጫ መረጃዎን አይልክም። አስቸኳይ ከሆነ ወዲያውኑ በአቅራቢያዎ ያለ ጤና ተቋም ያነጋግሩ።"
+                            : "This will not send your chat or profile. For an emergency, contact local emergency services or a health facility immediately."}
+                        </p>
+                      </div>
+                    )}
                 </div>
               ))}
             </div>
@@ -285,6 +479,46 @@ export function OpalChat() {
           </p>
         </div>
       </section>
+    </div>
+  );
+}
+
+function ProfileChoiceGroup<T extends string>({
+  label,
+  value,
+  options,
+  language,
+  onChange,
+}: {
+  label: string;
+  value: T | "";
+  options: Array<{ value: T; en: string; am: string }>;
+  language: "en" | "am";
+  onChange: (value: T) => void;
+}) {
+  return (
+    <div>
+      <p className="mb-2 text-xs font-semibold text-[#405647]">{label}</p>
+      <div className="flex flex-wrap gap-2">
+        {options.map((option) => {
+          const selected = value === option.value;
+          return (
+            <button
+              key={option.value}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => onChange(option.value)}
+              className={`rounded-full border px-3 py-2 text-xs font-semibold transition ${
+                selected
+                  ? "border-[#1c573e] bg-[#eaf2e9] text-[#1c573e]"
+                  : "border-[#d0ded0] bg-white text-[#52685a] hover:border-[#1c573e]"
+              }`}
+            >
+              {language === "am" ? option.am : option.en}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

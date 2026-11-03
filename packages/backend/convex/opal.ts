@@ -11,6 +11,26 @@ import { generateOpalAnswer } from "./ai/gemini";
 import { selectRelevantOpalSources } from "./ai/opalContext";
 
 const languageValidator = v.union(v.literal("am"), v.literal("en"));
+const profileContextValidator = v.object({
+  audience: v.optional(
+    v.union(
+      v.literal("myself"),
+      v.literal("child"),
+      v.literal("family"),
+      v.literal("caregiver"),
+    ),
+  ),
+  ageBand: v.optional(
+    v.union(
+      v.literal("under5"),
+      v.literal("age5to17"),
+      v.literal("age18to39"),
+      v.literal("age40to59"),
+      v.literal("age60plus"),
+    ),
+  ),
+  goals: v.array(v.union(v.literal("healthyEating"), v.literal("familyMeals"))),
+});
 const sourceValidator = v.object({
   id: v.string(),
   title: v.string(),
@@ -22,34 +42,82 @@ export const ask = action({
     consented: v.literal(true),
     language: languageValidator,
     question: v.string(),
+    includeProfileContext: v.optional(v.boolean()),
+    profileConsented: v.optional(v.literal(true)),
+    guestProfileContext: v.optional(profileContextValidator),
   },
   returns: v.object({
     answer: v.string(),
     safety: v.boolean(),
+    redFlag: v.union(
+      v.literal("none"),
+      v.literal("clinical"),
+      v.literal("urgent"),
+    ),
     sources: v.array(sourceValidator),
   }),
-  handler: async (ctx, { consented, language, question }) => {
+  handler: async (ctx, args) => {
+    const { consented, language, question } = args;
     if (!consented) throw new Error("OPAL_CONSENT_REQUIRED");
 
     const cleanQuestion = question.trim();
     if (!cleanQuestion) throw new Error("OPAL_EMPTY_QUESTION");
     if (cleanQuestion.length > 1000) throw new Error("OPAL_QUESTION_TOO_LONG");
 
-    if (containsLikelyPersonalDetails(cleanQuestion)) {
+    const safetyIntent = classifyOpalQuestion(cleanQuestion);
+    if (safetyIntent === "urgent") {
       return {
-        answer: getOpalPrivacyResponse(language),
+        answer: getOpalSafetyResponse("urgent", language),
         safety: true,
+        redFlag: "urgent" as const,
         sources: [],
       };
     }
 
-    const safetyIntent = classifyOpalQuestion(cleanQuestion);
-    if (safetyIntent !== "safe") {
+    if (safetyIntent === "clinical") {
       return {
-        answer: getOpalSafetyResponse(safetyIntent, language),
+        answer: getOpalSafetyResponse("clinical", language),
         safety: true,
+        redFlag: "clinical" as const,
         sources: [],
       };
+    }
+
+    if (containsLikelyPersonalDetails(cleanQuestion)) {
+      return {
+        answer: getOpalPrivacyResponse(language),
+        safety: true,
+        redFlag: "none" as const,
+        sources: [],
+      };
+    }
+
+    let profileContext:
+      | {
+          audience?: "myself" | "child" | "family" | "caregiver";
+          ageBand?: "under5" | "age5to17" | "age18to39" | "age40to59" | "age60plus";
+          goals: Array<"healthyEating" | "familyMeals">;
+        }
+      | undefined;
+    if (args.includeProfileContext) {
+      if (args.profileConsented !== true) {
+        throw new Error("OPAL_PROFILE_CONSENT_REQUIRED");
+      }
+
+      const identity = await ctx.auth.getUserIdentity();
+      if (identity?.subject) {
+        profileContext =
+          (await ctx.runQuery(internal.onboarding.getOpalProfileContext, {
+            userId: identity.subject,
+          })) ??
+          args.guestProfileContext ??
+          undefined;
+      } else {
+        profileContext = args.guestProfileContext;
+      }
+      if (!profileContext) {
+        throw new Error("OPAL_PROFILE_CONTEXT_REQUIRED");
+      }
     }
 
     const apiKey = process.env.GEMINI_API_KEY;
@@ -66,6 +134,7 @@ export const ask = action({
       cleanQuestion,
       language,
       relevantSources,
+      profileContext,
     );
 
     const allowedSources = new Map(relevantSources.map((source) => [source.id, source]));
@@ -74,6 +143,11 @@ export const ask = action({
       .filter((source): source is NonNullable<typeof source> => Boolean(source))
       .map(({ id, title, titleAm }) => ({ id, title, titleAm }));
 
-    return { answer: result.answer, safety: false, sources };
+    return {
+      answer: result.answer,
+      safety: false,
+      redFlag: "none" as const,
+      sources,
+    };
   },
 });

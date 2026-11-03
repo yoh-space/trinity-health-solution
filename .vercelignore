@@ -1,0 +1,16 @@
+.vercel/
+.env
+.env.*
+!.env.example
+apps/web/.vercel/
+apps/native/.agents/
+apps/native/.claude/
+apps/native/.expo/
+apps/native/.turbo/
+apps/native/node_modules/
+apps/native/android/.cxx/
+apps/native/android/.gradle/
+apps/native/android/.idea/
+apps/native/android/app/build/
+apps/native/android/local.properties
+apps/native/android/app/debug.keystore
