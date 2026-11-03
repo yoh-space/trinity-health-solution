@@ -16,7 +16,7 @@ const styles = StyleSheet.create({
   chip: { alignItems: "center", backgroundColor: "#FFFFFF", borderColor: "#DCE7DD", borderRadius: 13, borderWidth: 1, flexDirection: "row", gap: 6, minHeight: 44, paddingHorizontal: 14, paddingVertical: 10 },
   compactChip: { borderRadius: 10, flexBasis: "30%", flexGrow: 1, minHeight: 40, paddingHorizontal: 7, paddingVertical: 6 },
   selectedChip: { backgroundColor: "#EAF4EB", borderColor: "#238047" },
-  label: { color: "#526357", fontFamily: "Righteous_400Regular", fontSize: 13, lineHeight: 18 },
-  compactLabel: { fontSize: 11, lineHeight: 14, flexShrink: 1 },
+  label: { color: "#526357", fontFamily: "Righteous_400Regular", fontSize: 16, lineHeight: 18 },
+  compactLabel: { fontSize: 14, lineHeight: 18, flexShrink: 1 },
   selectedLabel: { color: "#206B3B", fontFamily: "Righteous_400Regular" },
 });

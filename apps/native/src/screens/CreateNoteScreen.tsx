@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   title: {
-    fontSize: RFValue(17.5),
+    fontSize: RFValue(20),
     fontFamily: "Righteous_400Regular",
     color: "#2D2D2D",
   },
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     marginTop: 43,
   },
   inputLabel: {
-    fontSize: RFValue(15),
+    fontSize: RFValue(17),
     fontFamily: "Righteous_400Regular",
     color: "#000",
     marginBottom: 6,
@@ -241,7 +241,7 @@ const styles = StyleSheet.create({
   inputField: {
     backgroundColor: "#FFF",
     marginBottom: 30,
-    fontSize: RFValue(15),
+    fontSize: RFValue(17),
     fontFamily: "Righteous_400Regular",
     color: "#000",
     borderRadius: 8,
@@ -287,12 +287,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#F9F5FF",
   },
   advancedSummarizationText: {
-    fontSize: RFValue(15),
+    fontSize: RFValue(17),
     fontFamily: "Righteous_400Regular",
     color: "#000",
   },
   advancedSummarizationSubtext: {
-    fontSize: RFValue(12.5),
+    fontSize: RFValue(15),
     fontFamily: "Righteous_400Regular",
     color: "#A9A9A9",
     paddingHorizontal: 30,
@@ -319,7 +319,7 @@ const styles = StyleSheet.create({
   },
   newNoteButtonText: {
     color: "white",
-    fontSize: RFValue(15),
+    fontSize: RFValue(17),
     fontFamily: "Righteous_400Regular",
     marginLeft: 10,
   },

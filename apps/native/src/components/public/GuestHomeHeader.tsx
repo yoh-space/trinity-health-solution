@@ -32,12 +32,12 @@ export function GuestHomeHeader({ language, onHomePress, onSavedPress, onSetting
 }
 
 const styles = StyleSheet.create({
-  header: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginBottom: 21 },
+  header: { alignItems: "center", flexDirection: "row", justifyContent: "space-between", marginBottom: 20 },
   brand: { alignItems: "center", flex: 1, flexDirection: "row", gap: 8 },
-  symbol: { height: 34, width: 34 },
+  symbol: { height: 38, width: 38 },
   brandCopy: { flex: 1, gap: 3 },
-  brandName: { color: "#23472E", fontFamily: "Righteous_400Regular", fontSize: 12 },
-  tagline: { color: "#77867A", fontFamily: "Righteous_400Regular", fontSize: 9 },
+  brandName: { color: "#23472E", fontFamily: "Righteous_400Regular", fontSize: 16 },
+  tagline: { color: "#77867A", fontFamily: "Righteous_400Regular", fontSize: 13 },
   actions: { flexDirection: "row", gap: 8 },
-  iconButton: { alignItems: "center", backgroundColor: "#FFFFFF", borderColor: "#E2EAE3", borderRadius: 13, borderWidth: 1, height: 36, justifyContent: "center", width: 36 },
+  iconButton: { alignItems: "center", backgroundColor: "#FFFFFF", borderColor: "#E2EAE3", borderRadius: 14, borderWidth: 1, height: 40, justifyContent: "center", width: 40 },
 });

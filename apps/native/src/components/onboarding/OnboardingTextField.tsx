@@ -38,7 +38,7 @@ export function OnboardingTextField({
 
 const styles = StyleSheet.create({
   wrapper: { marginTop: 13 },
-  label: { color: "#304334", fontFamily: "Righteous_400Regular", fontSize: 11 },
+  label: { color: "#304334", fontFamily: "Righteous_400Regular", fontSize: 14 },
   input: {
     backgroundColor: "#FFFFFF",
     borderColor: "#DFE8DF",
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     color: "#263A2D",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
+    fontSize: 15,
     marginTop: 7,
     minHeight: 43,
     paddingHorizontal: 12,
@@ -56,8 +56,8 @@ const styles = StyleSheet.create({
   hint: {
     color: "#879489",
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
-    lineHeight: 13,
+    fontSize: 13,
+    lineHeight: 18,
     marginTop: 5,
   },
 });

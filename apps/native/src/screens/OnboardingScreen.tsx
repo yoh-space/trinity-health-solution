@@ -916,12 +916,12 @@ const styles = StyleSheet.create({
   brandName: {
     color: "#1C5132",
     fontFamily: "Righteous_400Regular",
-    fontSize: 11,
+    fontSize: 14,
   },
   brandTagline: {
     color: "#788A7B",
     fontFamily: "Righteous_400Regular",
-    fontSize: 8,
+    fontSize: 13,
     marginTop: 2,
   },
   headerSpacer: { width: 32 },
@@ -942,40 +942,40 @@ const styles = StyleSheet.create({
   progressText: {
     color: "#617266",
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
+    fontSize: 13,
   },
   scrollContent: { paddingBottom: 14 },
   headingBlock: { marginBottom: 16, marginTop: 7 },
   eyebrow: {
     color: "#39834F",
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
+    fontSize: 13,
     letterSpacing: 0.6,
   },
   title: {
     color: "#18291D",
     fontFamily: "Righteous_400Regular",
-    fontSize: 23,
+    fontSize: 26,
     lineHeight: 29,
     marginTop: 6,
   },
   subtitle: {
     color: "#657369",
     fontFamily: "Righteous_400Regular",
-    fontSize: 11,
-    lineHeight: 16,
+    fontSize: 14,
+    lineHeight: 19,
     marginTop: 5,
   },
   sectionLabel: {
     color: "#35483A",
     fontFamily: "Righteous_400Regular",
-    fontSize: 11,
+    fontSize: 14,
     marginBottom: 8,
   },
   sectionHint: {
     color: "#77867A",
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
+    fontSize: 13,
     marginBottom: 8,
     marginTop: -4,
   },
@@ -989,7 +989,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     color: "#263A2D",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
+    fontSize: 15,
     minHeight: 45,
     paddingHorizontal: 12,
     flex: 1,
@@ -1012,7 +1012,7 @@ const styles = StyleSheet.create({
   unitToggleText: {
     color: "#55705D",
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
+    fontSize: 13,
   },
   unitToggleTextActive: { color: "#29804A" },
   bmiCard: {
@@ -1026,14 +1026,14 @@ const styles = StyleSheet.create({
   bmiValue: {
     color: "#1C5132",
     fontFamily: "Righteous_400Regular",
-    fontSize: 20,
+    fontSize: 23,
     marginTop: 5,
   },
   measurementNotice: {
     color: "#657369",
     fontFamily: "Righteous_400Regular",
-    fontSize: 10,
-    lineHeight: 15,
+    fontSize: 14,
+    lineHeight: 18,
   },
   sectionSpacing: { marginTop: 15 },
   generalOption: {
@@ -1056,7 +1056,7 @@ const styles = StyleSheet.create({
     color: "#2D5239",
     flex: 1,
     fontFamily: "Righteous_400Regular",
-    fontSize: 10,
+    fontSize: 14,
   },
   privacyNote: {
     alignItems: "flex-start",
@@ -1068,14 +1068,14 @@ const styles = StyleSheet.create({
     color: "#62806A",
     flex: 1,
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
-    lineHeight: 13,
+    fontSize: 13,
+    lineHeight: 18,
   },
   localPrivacy: {
     color: "#728076",
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
-    lineHeight: 13,
+    fontSize: 13,
+    lineHeight: 18,
     marginTop: 7,
   },
   footer: {
@@ -1098,7 +1098,7 @@ const styles = StyleSheet.create({
   skipText: {
     color: "#55705D",
     fontFamily: "Righteous_400Regular",
-    fontSize: 10,
+    fontSize: 14,
   },
   primaryButton: {
     alignItems: "center",
@@ -1116,7 +1116,7 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: "#FFFFFF",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
+    fontSize: 15,
   },
   showAllButton: {
     alignItems: "center",
@@ -1128,14 +1128,14 @@ const styles = StyleSheet.create({
   showAllText: {
     color: "#66776A",
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
+    fontSize: 13,
     textDecorationLine: "underline",
     textDecorationColor: "#AAB8AC",
   },
   canChange: {
     color: "#718075",
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
+    fontSize: 13,
     marginTop: 7,
     textAlign: "center",
   },
@@ -1156,12 +1156,12 @@ const styles = StyleSheet.create({
   summaryLabel: {
     color: "#738176",
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
+    fontSize: 13,
   },
   summaryValue: {
     color: "#2A4131",
     fontFamily: "Righteous_400Regular",
-    fontSize: 11,
+    fontSize: 14,
   },
   rememberRow: {
     alignItems: "center",
@@ -1173,12 +1173,12 @@ const styles = StyleSheet.create({
   rememberTitle: {
     color: "#324838",
     fontFamily: "Righteous_400Regular",
-    fontSize: 10,
+    fontSize: 14,
   },
   rememberHint: {
     color: "#78877C",
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
+    fontSize: 13,
     marginTop: 2,
   },
 });

@@ -52,8 +52,8 @@ const styles = StyleSheet.create({
   card: { alignItems: "center", backgroundColor: "#FFFFFF", borderColor: "#E0E9E1", borderRadius: 14, borderWidth: 1, flexDirection: "row", gap: 10, marginTop: 13, padding: 12 },
   iconWrap: { alignItems: "center", backgroundColor: "#EEF7F0", borderRadius: 11, height: 38, justifyContent: "center", width: 38 },
   copy: { flex: 1, gap: 3 },
-  eyebrow: { color: "#438451", fontFamily: "Righteous_400Regular", fontSize: 8, letterSpacing: 0.7 },
-  date: { color: "#304936", fontFamily: "Righteous_400Regular", fontSize: 10, marginTop: 2 },
-  detail: { color: "#718077", fontFamily: "Righteous_400Regular", fontSize: 8, lineHeight: 12 },
-  more: { color: "#438451", fontFamily: "Righteous_400Regular", fontSize: 8, marginTop: 2 },
+  eyebrow: { color: "#438451", fontFamily: "Righteous_400Regular", fontSize: 13, letterSpacing: 0.7 },
+  date: { color: "#304936", fontFamily: "Righteous_400Regular", fontSize: 14, marginTop: 2 },
+  detail: { color: "#718077", fontFamily: "Righteous_400Regular", fontSize: 13, lineHeight: 18 },
+  more: { color: "#438451", fontFamily: "Righteous_400Regular", fontSize: 13, marginTop: 2 },
 });

@@ -14,12 +14,12 @@ export function HomeLessonCard({ category, title, minutes, image, saved, onPress
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: "#FFFFFF", borderColor: "#E3EBE4", borderRadius: 15, borderWidth: 1, flexDirection: "row", gap: 10, marginBottom: 9, minHeight: 84, overflow: "hidden", padding: 8, position: "relative" },
-  pressed: { opacity: 0.82 },
-  image: { borderRadius: 10, height: 68, width: 68 },
-  copy: { flex: 1, gap: 3, paddingRight: 22 },
-  category: { color: "#39804E", fontFamily: "Righteous_400Regular", fontSize: 8, letterSpacing: 0.4 },
-  title: { color: "#2D4132", fontFamily: "Righteous_400Regular", fontSize: 10, lineHeight: 14 },
-  time: { color: "#849187", fontFamily: "Righteous_400Regular", fontSize: 8 },
+  card: { backgroundColor: "#FFFFFF", borderColor: "#E3EBE4", borderRadius: 17, borderWidth: 1, flexDirection: "row", gap: 12, marginBottom: 10, minHeight: 100, overflow: "hidden", padding: 10, position: "relative" },
+  pressed: { opacity: 0.82, transform: [{ scale: 0.99 }] },
+  image: { borderRadius: 12, height: 78, width: 78 },
+  copy: { flex: 1, gap: 4, paddingRight: 24, paddingVertical: 2 },
+  category: { color: "#39804E", fontFamily: "Righteous_400Regular", fontSize: 13, letterSpacing: 0.45 },
+  title: { color: "#2D4132", fontFamily: "Righteous_400Regular", fontSize: 15, lineHeight: 20 },
+  time: { color: "#849187", fontFamily: "Righteous_400Regular", fontSize: 13 },
   save: { alignItems: "center", height: 25, justifyContent: "center", position: "absolute", right: 7, top: 5, width: 25 },
 });

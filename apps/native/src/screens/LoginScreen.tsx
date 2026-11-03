@@ -113,12 +113,12 @@ const styles = StyleSheet.create({
   },
   title: {
     marginTop: 49,
-    fontSize: RFValue(21),
+    fontSize: RFValue(24),
     fontFamily: "Righteous_400Regular",
   },
   subtitle: {
     marginTop: 8,
-    fontSize: RFValue(14),
+    fontSize: RFValue(16),
     color: "#000",
     fontFamily: "Righteous_400Regular",
     marginBottom: 32,
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     padding: 14,
     marginBottom: 16,
     fontFamily: "Righteous_400Regular",
-    fontSize: RFValue(14),
+    fontSize: RFValue(16),
   },
   buttonEmail: {
     backgroundColor: "#0D87E1",
@@ -146,7 +146,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#FFF",
     fontFamily: "Righteous_400Regular",
-    fontSize: RFValue(14),
+    fontSize: RFValue(16),
   },
   buttonTextWithIcon: {
     marginLeft: 10,
@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     fontFamily: "Righteous_400Regular",
   },
   errorText: {
-    fontSize: RFValue(14),
+    fontSize: RFValue(16),
     color: "tomato",
     fontFamily: "Righteous_400Regular",
     alignSelf: "flex-start",

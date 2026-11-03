@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
   tabletPhoneContent: { paddingHorizontal: 17, paddingTop: 2 },
   brand: { alignItems: "center", flexDirection: "row", gap: 10, height: 48 },
   brandSymbol: { height: 38, width: 43 },
-  brandName: { color: "#1B492C", fontFamily: "Righteous_400Regular", fontSize: 14 },
+  brandName: { color: "#1B492C", fontFamily: "Righteous_400Regular", fontSize: 17 },
   heroImageFrame: {
     borderRadius: 18,
     height: 176,
@@ -229,7 +229,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     color: "#FFFFFF",
     fontFamily: "Righteous_400Regular",
-    fontSize: 10,
+    fontSize: 14,
     margin: 10,
     overflow: "hidden",
     paddingHorizontal: 11,
@@ -239,13 +239,13 @@ const styles = StyleSheet.create({
   eyebrow: {
     color: "#39834F",
     fontFamily: "Righteous_400Regular",
-    fontSize: 10,
+    fontSize: 14,
     letterSpacing: 0.4,
   },
   title: {
     color: "#14251A",
     fontFamily: "Righteous_400Regular",
-    fontSize: 27,
+    fontSize: 30,
     lineHeight: 33,
     marginTop: 8,
   },
@@ -253,21 +253,21 @@ const styles = StyleSheet.create({
   description: {
     color: "#35453A",
     fontFamily: "Righteous_400Regular",
-    fontSize: 13,
+    fontSize: 16,
     lineHeight: 19,
     marginTop: 10,
   },
   sdgText: {
     color: "#35453A",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
+    fontSize: 15,
     lineHeight: 18,
     marginTop: 8,
   },
   closingText: {
     color: "#267842",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
+    fontSize: 15,
     lineHeight: 18,
     marginTop: 4,
   },
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 11,
     paddingVertical: 8,
   },
-  categoryText: { color: "#365F42", fontFamily: "Righteous_400Regular", fontSize: 10 },
+  categoryText: { color: "#365F42", fontFamily: "Righteous_400Regular", fontSize: 14 },
   languageSection: {
     borderTopColor: "#A7CBA9",
     borderTopWidth: 1,
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
   languagePrompt: {
     color: "#26382C",
     fontFamily: "Righteous_400Regular",
-    fontSize: 13,
+    fontSize: 16,
   },
   primaryButton: {
     alignSelf: "stretch",
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
   primaryButtonText: {
     color: "#FFFFFF",
     fontFamily: "Righteous_400Regular",
-    fontSize: 15,
+    fontSize: 18,
   },
   exploreButton: {
     alignItems: "center",
@@ -336,7 +336,7 @@ const styles = StyleSheet.create({
   exploreText: {
     color: "#586D5D",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
+    fontSize: 15,
     textDecorationLine: "underline",
     textDecorationColor: "#A6B7A9",
     textDecorationStyle: "solid",
@@ -353,7 +353,7 @@ const styles = StyleSheet.create({
     color: "#558262",
     flexShrink: 1,
     fontFamily: "Righteous_400Regular",
-    fontSize: 11,
+    fontSize: 14,
     textAlign: "center",
   },
   tabletLayout: {

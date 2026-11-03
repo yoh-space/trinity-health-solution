@@ -126,14 +126,14 @@ const styles = StyleSheet.create({
   optionText: {
     color: "#293B2E",
     fontFamily: "Righteous_400Regular",
-    fontSize: 11,
-    lineHeight: 15,
+    fontSize: 14,
+    lineHeight: 18,
   },
   selectedText: { color: "#246B3D" },
   detailText: {
     color: "#78877C",
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
-    lineHeight: 12,
+    fontSize: 13,
+    lineHeight: 18,
   },
 });

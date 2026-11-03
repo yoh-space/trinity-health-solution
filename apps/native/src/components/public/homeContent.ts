@@ -16,6 +16,7 @@ export const homeCopy = {
     recipeSub: "ቀላል የምግብ ሀሳቦች",
     notesAction: "የእኔ ማስታወሻዎች",
     notesSub: "ለሌላ ጊዜ ያስቀምጡ",
+    exploreTitle: "የሚረዳዎትን ያስሱ",
     growTitle: "አንድ ላይ እናድግ",
     seeAll: "ሁሉንም እይ",
     pregnancy: "የእርግዝና አመጋገብ",
@@ -46,6 +47,7 @@ export const homeCopy = {
     recipeSub: "Find a little meal inspiration",
     notesAction: "Your saved notes",
     notesSub: "Keep a good thought close",
+    exploreTitle: "A little help for today",
     growTitle: "Grow a little every day",
     seeAll: "View all",
     pregnancy: "PREGNANCY NUTRITION",
@@ -65,7 +67,7 @@ export const homeCopy = {
   eyebrow: string; welcome: string; subtitle: string; todaysLesson: string;
   lessonNumber: string; foodSafety: string; lessonTitle: string; lessonSummary: string;
   learnTogether: string; minutes: string; recipeAction: string; recipeSub: string;
-  notesAction: string; notesSub: string; growTitle: string; seeAll: string;
+  notesAction: string; notesSub: string; exploreTitle: string; growTitle: string; seeAll: string;
   pregnancy: string; pregnancyTitle: string; childNutrition: string; childNutritionTitle: string;
   readTime: (minutes: number) => string; askOpal: string; askOpalSub: string; footer: string;
   settingsTitle: string; english: string; amharic: string; cancel: string;

@@ -76,13 +76,13 @@ const styles = StyleSheet.create({
   languageName: {
     color: "#203127",
     fontFamily: "Righteous_400Regular",
-    fontSize: 16,
+    fontSize: 19,
   },
   selectedText: { color: "#1F7540" },
   translation: {
     color: "#65756A",
     fontFamily: "Righteous_400Regular",
-    fontSize: 11,
+    fontSize: 14,
     marginTop: 3,
   },
 });

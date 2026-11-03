@@ -101,19 +101,19 @@ const styles = StyleSheet.create({
   eyebrow: {
     color: "#438451",
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
+    fontSize: 13,
     letterSpacing: 1,
   },
   title: {
     color: "#1C3524",
     fontFamily: "Righteous_400Regular",
-    fontSize: 24,
+    fontSize: 27,
     marginTop: 7,
   },
   subtitle: {
     color: "#6D7B70",
     fontFamily: "Righteous_400Regular",
-    fontSize: 11,
+    fontSize: 14,
     marginTop: 5,
   },
   card: {
@@ -127,27 +127,27 @@ const styles = StyleSheet.create({
   category: {
     color: "#41804E",
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
+    fontSize: 13,
     letterSpacing: 0.6,
   },
   cardTitle: {
     color: "#2D4132",
     fontFamily: "Righteous_400Regular",
-    fontSize: 13,
+    fontSize: 16,
     lineHeight: 18,
     marginTop: 8,
   },
   summary: {
     color: "#68776C",
     fontFamily: "Righteous_400Regular",
-    fontSize: 10,
-    lineHeight: 15,
+    fontSize: 14,
+    lineHeight: 18,
     marginTop: 5,
   },
   readTime: {
     color: "#89968C",
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
+    fontSize: 13,
     marginTop: 8,
   },
   empty: {
@@ -160,14 +160,14 @@ const styles = StyleSheet.create({
   emptyTitle: {
     color: "#314938",
     fontFamily: "Righteous_400Regular",
-    fontSize: 13,
+    fontSize: 16,
     marginTop: 9,
   },
   emptyCopy: {
     color: "#738176",
     fontFamily: "Righteous_400Regular",
-    fontSize: 10,
-    lineHeight: 15,
+    fontSize: 14,
+    lineHeight: 18,
     marginTop: 5,
     textAlign: "center",
   },

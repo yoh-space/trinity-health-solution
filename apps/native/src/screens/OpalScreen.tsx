@@ -438,21 +438,21 @@ const styles = StyleSheet.create({
   eyebrow: {
     color: "#438451",
     fontFamily: "Righteous_400Regular",
-    fontSize: 8,
+    fontSize: 13,
     letterSpacing: 1.2,
   },
   title: {
     color: "#203A28",
     fontFamily: "Righteous_400Regular",
-    fontSize: 24,
+    fontSize: 27,
     lineHeight: 29,
     marginTop: 4,
   },
   subtitle: {
     color: "#718075",
     fontFamily: "Righteous_400Regular",
-    fontSize: 10,
-    lineHeight: 15,
+    fontSize: 14,
+    lineHeight: 18,
     marginTop: 2,
   },
   welcomeRow: {
@@ -480,12 +480,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  welcomeTitle: { color: "#203A28", fontFamily: "Righteous_400Regular", fontSize: 11 },
+  welcomeTitle: { color: "#203A28", fontFamily: "Righteous_400Regular", fontSize: 14 },
   welcomeText: {
     color: "#657568",
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
-    lineHeight: 13,
+    fontSize: 13,
+    lineHeight: 18,
     marginTop: 5,
   },
   messageList: { marginTop: 17 },
@@ -527,8 +527,8 @@ const styles = StyleSheet.create({
   messageText: {
     color: "#435649",
     fontFamily: "Righteous_400Regular",
-    fontSize: 11,
-    lineHeight: 16,
+    fontSize: 14,
+    lineHeight: 19,
   },
   userMessageText: { color: "#FFFFFF" },
   sourceLink: {
@@ -545,8 +545,8 @@ const styles = StyleSheet.create({
     color: "#087A3D",
     flex: 1,
     fontFamily: "Righteous_400Regular",
-    fontSize: 8,
-    lineHeight: 11,
+    fontSize: 13,
+    lineHeight: 18,
   },
   resetButton: {
     alignItems: "center",
@@ -556,7 +556,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
     padding: 7,
   },
-  resetText: { color: "#438451", fontFamily: "Righteous_400Regular", fontSize: 9 },
+  resetText: { color: "#438451", fontFamily: "Righteous_400Regular", fontSize: 13 },
   quickQuestions: { flexDirection: "row", gap: 7, marginTop: 15 },
   quickQuestion: {
     backgroundColor: "#FFFFFF",
@@ -572,7 +572,7 @@ const styles = StyleSheet.create({
   quickQuestionText: {
     color: "#4B6751",
     fontFamily: "Righteous_400Regular",
-    fontSize: 8,
+    fontSize: 13,
     textAlign: "center",
   },
   composerSection: {
@@ -591,7 +591,7 @@ const styles = StyleSheet.create({
     color: "#2A4431",
     flex: 1,
     fontFamily: "Righteous_400Regular",
-    fontSize: 10,
+    fontSize: 14,
     height: 38,
     paddingHorizontal: 12,
   },
@@ -607,8 +607,8 @@ const styles = StyleSheet.create({
   disclaimer: {
     color: "#829087",
     fontFamily: "Righteous_400Regular",
-    fontSize: 7,
-    lineHeight: 10,
+    fontSize: 13,
+    lineHeight: 18,
     marginHorizontal: 4,
     marginTop: 5,
     textAlign: "center",

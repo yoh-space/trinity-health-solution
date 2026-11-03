@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   title: {
-    fontSize: RFValue(17.5),
+    fontSize: RFValue(20),
     fontFamily: "Righteous_400Regular",
     color: "#2D2D2D",
   },
@@ -160,14 +160,14 @@ const styles = StyleSheet.create({
     // Add styles for contentContainer if needed
   },
   contentTitle: {
-    fontSize: RFValue(17.5),
+    fontSize: RFValue(20),
     fontFamily: "Righteous_400Regular",
     color: "#000",
     textAlign: "center",
     marginTop: 28,
   },
   contentDescription: {
-    fontSize: RFValue(17.5),
+    fontSize: RFValue(20),
     fontFamily: "Righteous_400Regular",
     alignSelf: "center",
     textAlign: "justify",
@@ -206,7 +206,7 @@ const styles = StyleSheet.create({
     tintColor: "#000",
   },
   footerText: {
-    fontSize: RFValue(12.5),
+    fontSize: RFValue(15),
     fontFamily: "Righteous_400Regular",
   },
   activeTabText: {

@@ -66,7 +66,6 @@ const copy = {
     cleared: "Device data cleared.",
     clearFailed: "Could not remove the remembered profile. Please try again.",
     more: "More",
-    askOpal: "Ask Opal",
     staffPortal: "Staff portal",
     staffPortalHint: "For Trinity team members.",
     signOut: "Sign out",
@@ -124,7 +123,6 @@ const copy = {
     cleared: "የመሣሪያ ውሂብ ተጸድቷል።",
     clearFailed: "የታወሰውን መገለጫ ማስወገድ አልተቻለም። እንደገና ይሞክሩ።",
     more: "ተጨማሪ",
-    askOpal: "ኦፓልን ይጠይቁ",
     staffPortal: "የሠራተኛ መግቢያ",
     staffPortalHint: "ለትሪኒቲ ቡድን አባላት።",
     signOut: "ውጣ",
@@ -281,21 +279,26 @@ export default function ProfileSettingsScreen() {
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.brandRow}>
-          <Image
-            source={require("../assets/images/trinity-symbol.png")}
-            resizeMode="contain"
-            style={styles.brandMark}
-          />
-          <View style={styles.brandCopy}>
-            <Text style={styles.brandName}>Trinity Health Solution</Text>
-            <Text style={styles.brandTag}>{text.brandTag}</Text>
+        <View style={styles.settingsHero}>
+          <View pointerEvents="none" style={styles.heroOrbLarge} />
+          <View pointerEvents="none" style={styles.heroOrbSmall} />
+          <View style={styles.brandRow}>
+            <View style={styles.brandMarkWrap}>
+              <Image
+                source={require("../assets/images/trinity-symbol.png")}
+                resizeMode="contain"
+                style={styles.brandMark}
+              />
+            </View>
+            <View style={styles.brandCopy}>
+              <Text style={styles.brandName}>Trinity Health Solution</Text>
+              <Text style={styles.brandTag}>{text.brandTag}</Text>
+            </View>
           </View>
+          <Text style={styles.eyebrow}>{text.eyebrow}</Text>
+          <Text style={styles.title}>{text.title}</Text>
+          <Text style={styles.subtitle}>{text.subtitle}</Text>
         </View>
-
-        <Text style={styles.eyebrow}>{text.eyebrow}</Text>
-        <Text style={styles.title}>{text.title}</Text>
-        <Text style={styles.subtitle}>{text.subtitle}</Text>
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>{text.account}</Text>
@@ -506,20 +509,6 @@ export default function ProfileSettingsScreen() {
         <View style={styles.bottomSpace} />
       </ScrollView>
 
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel={text.askOpal}
-        onPress={() =>
-          router.push(
-            (isSignedIn ? "/(app)/(tabs)/opal" : "/public/opal") as Href,
-          )
-        }
-        style={({ pressed }) => [styles.opalFab, pressed && styles.pressed]}
-      >
-        <Ionicons name="chatbubble-outline" size={21} color="#FFFFFF" />
-        <Text style={styles.opalFabText}>{text.askOpal}</Text>
-      </Pressable>
-
       <Modal
         transparent
         visible={confirmAction !== null}
@@ -673,61 +662,96 @@ const styles = StyleSheet.create({
   content: {
     alignSelf: "center",
     maxWidth: 560,
-    paddingHorizontal: 18,
-    paddingTop: 18,
+    paddingHorizontal: 16,
+    paddingTop: 8,
     paddingBottom: 88,
     width: "100%",
+  },
+  settingsHero: {
+    backgroundColor: "#155C32",
+    borderRadius: 26,
+    marginBottom: 9,
+    minHeight: 236,
+    overflow: "hidden",
+    padding: 20,
+  },
+  heroOrbLarge: {
+    borderColor: "#FFFFFF24",
+    borderRadius: 110,
+    borderWidth: 1,
+    height: 220,
+    position: "absolute",
+    right: -70,
+    top: 30,
+    width: 220,
+  },
+  heroOrbSmall: {
+    backgroundColor: "#FFFFFF0D",
+    borderRadius: 80,
+    height: 160,
+    position: "absolute",
+    right: 12,
+    top: 64,
+    width: 160,
   },
   brandRow: {
     alignItems: "center",
     flexDirection: "row",
     gap: 10,
-    marginBottom: 22,
+    marginBottom: 21,
   },
-  brandMark: { width: 36, height: 36 },
+  brandMarkWrap: {
+    alignItems: "center",
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    height: 44,
+    justifyContent: "center",
+    width: 44,
+  },
+  brandMark: { width: 34, height: 34 },
   brandCopy: { gap: 3 },
   brandName: {
-    color: "#0E7A33",
+    color: "#FFFFFF",
     fontFamily: "Righteous_400Regular",
-    fontSize: 14,
+    fontSize: 17,
   },
   brandTag: {
-    color: "#4B5C51",
-    fontFamily: "Righteous_400Regular",
-    fontSize: 9,
-  },
-  eyebrow: {
-    color: "#0E7A33",
-    fontFamily: "Righteous_400Regular",
-    fontSize: 10,
-    letterSpacing: 1.2,
-  },
-  title: {
-    color: "#14221A",
-    fontFamily: "Righteous_400Regular",
-    fontSize: 28,
-    lineHeight: 36,
-    marginTop: 5,
-  },
-  subtitle: {
-    color: "#4B5C51",
+    color: "#D8E9DB",
     fontFamily: "Righteous_400Regular",
     fontSize: 13,
-    lineHeight: 20,
-    marginTop: 6,
   },
-  section: { marginTop: 21 },
+  eyebrow: {
+    color: "#C9E8C8",
+    fontFamily: "Righteous_400Regular",
+    fontSize: 14,
+    letterSpacing: 0.7,
+  },
+  title: {
+    color: "#FFFFFF",
+    fontFamily: "Righteous_400Regular",
+    fontSize: 29,
+    lineHeight: 36,
+    marginTop: 4,
+  },
+  subtitle: {
+    color: "#E1EEE3",
+    fontFamily: "Righteous_400Regular",
+    fontSize: 15,
+    lineHeight: 22,
+    marginTop: 5,
+  },
+  section: { marginTop: 23 },
   sectionTitle: {
     color: "#14221A",
     fontFamily: "Righteous_400Regular",
-    fontSize: 17,
+    fontSize: 20,
     lineHeight: 24,
     marginBottom: 10,
   },
   sectionHint: {
     color: "#4B5C51",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
+    fontSize: 15,
     lineHeight: 18,
     marginTop: -3,
     marginBottom: 10,
@@ -753,19 +777,19 @@ const styles = StyleSheet.create({
   avatarText: {
     color: "#0E7A33",
     fontFamily: "Righteous_400Regular",
-    fontSize: 20,
+    fontSize: 23,
   },
   accountCopy: { flex: 1, gap: 4, minWidth: 0 },
   accountName: {
     color: "#14221A",
     fontFamily: "Righteous_400Regular",
-    fontSize: 15,
+    fontSize: 18,
   },
   accountDetail: {
     color: "#4B5C51",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
-    lineHeight: 17,
+    fontSize: 15,
+    lineHeight: 20,
   },
   statusPill: {
     alignItems: "center",
@@ -781,7 +805,7 @@ const styles = StyleSheet.create({
   statusPillText: {
     color: "#0A5C26",
     fontFamily: "Righteous_400Regular",
-    fontSize: 11,
+    fontSize: 14,
   },
   signInButton: {
     alignItems: "center",
@@ -797,7 +821,7 @@ const styles = StyleSheet.create({
   signInButtonText: {
     color: "#FFFFFF",
     fontFamily: "Righteous_400Regular",
-    fontSize: 13,
+    fontSize: 16,
     textAlign: "center",
   },
   card: {
@@ -848,13 +872,13 @@ const styles = StyleSheet.create({
   cardTitle: {
     color: "#14221A",
     fontFamily: "Righteous_400Regular",
-    fontSize: 15,
+    fontSize: 18,
     lineHeight: 21,
   },
   cardSummary: {
     color: "#4B5C51",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
+    fontSize: 15,
     lineHeight: 18,
     marginTop: 5,
   },
@@ -869,7 +893,7 @@ const styles = StyleSheet.create({
   profileStatusText: {
     color: "#4B5C51",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
+    fontSize: 15,
     lineHeight: 19,
   },
   secondaryButton: {
@@ -893,7 +917,7 @@ const styles = StyleSheet.create({
     color: "#0A5C26",
     flexShrink: 1,
     fontFamily: "Righteous_400Regular",
-    fontSize: 14,
+    fontSize: 17,
     textAlign: "center",
   },
   languageRow: { flexDirection: "row", gap: 10 },
@@ -919,13 +943,13 @@ const styles = StyleSheet.create({
   languageOptionText: {
     color: "#14221A",
     fontFamily: "Righteous_400Regular",
-    fontSize: 14,
+    fontSize: 17,
   },
   languageOptionTextSelected: { color: "#0E7A33" },
   languageOptionDetail: {
     color: "#4B5C51",
     fontFamily: "Righteous_400Regular",
-    fontSize: 11,
+    fontSize: 14,
   },
   savedCard: {
     alignItems: "center",
@@ -941,7 +965,7 @@ const styles = StyleSheet.create({
   bodyCopy: {
     color: "#4B5C51",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
+    fontSize: 15,
     lineHeight: 19,
     marginTop: 0,
   },
@@ -965,7 +989,7 @@ const styles = StyleSheet.create({
     color: "#0A5C26",
     flex: 1,
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
+    fontSize: 15,
     lineHeight: 18,
   },
   dangerButton: {
@@ -984,7 +1008,7 @@ const styles = StyleSheet.create({
   dangerButtonText: {
     color: "#B3261E",
     fontFamily: "Righteous_400Regular",
-    fontSize: 14,
+    fontSize: 17,
   },
   actionRow: {
     alignItems: "center",
@@ -1015,7 +1039,7 @@ const styles = StyleSheet.create({
   signOutText: {
     color: "#4B5C51",
     fontFamily: "Righteous_400Regular",
-    fontSize: 13,
+    fontSize: 16,
   },
   footer: {
     alignItems: "center",
@@ -1028,39 +1052,14 @@ const styles = StyleSheet.create({
   footerName: {
     color: "#0E7A33",
     fontFamily: "Righteous_400Regular",
-    fontSize: 17,
+    fontSize: 20,
     marginTop: 5,
   },
   footerTag: {
     color: "#4B5C51",
     fontFamily: "Righteous_400Regular",
-    fontSize: 11,
-    marginTop: 4,
-  },
-  opalFab: {
-    alignItems: "center",
-    backgroundColor: "#0E7A33",
-    borderColor: "#7DC21E",
-    borderRadius: 999,
-    borderWidth: 2,
-    bottom: 14,
-    elevation: 8,
-    flexDirection: "row",
-    gap: 8,
-    height: 52,
-    paddingHorizontal: 16,
-    position: "absolute",
-    right: 16,
-    shadowColor: "#0E7A33",
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.35,
-    shadowRadius: 12,
-    zIndex: 15,
-  },
-  opalFabText: {
-    color: "#FFFFFF",
-    fontFamily: "Righteous_400Regular",
     fontSize: 14,
+    marginTop: 4,
   },
   bottomSpace: { height: 16 },
   pressed: { opacity: 0.78 },
@@ -1092,21 +1091,21 @@ const styles = StyleSheet.create({
   confirmTitle: {
     color: "#14221A",
     fontFamily: "Righteous_400Regular",
-    fontSize: 19,
+    fontSize: 22,
     lineHeight: 26,
     marginTop: 14,
   },
   confirmCopy: {
     color: "#4B5C51",
     fontFamily: "Righteous_400Regular",
-    fontSize: 13,
+    fontSize: 16,
     lineHeight: 20,
     marginTop: 8,
   },
   errorText: {
     color: "#B3261E",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
+    fontSize: 15,
     lineHeight: 18,
     marginTop: 10,
   },
@@ -1121,7 +1120,7 @@ const styles = StyleSheet.create({
   confirmDangerText: {
     color: "#FFFFFF",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
+    fontSize: 15,
   },
   confirmPrimaryButton: {
     alignItems: "center",
@@ -1134,12 +1133,12 @@ const styles = StyleSheet.create({
   confirmPrimaryText: {
     color: "#FFFFFF",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
+    fontSize: 15,
   },
   cancelButton: { alignItems: "center", marginTop: 5, padding: 13 },
   cancelButtonText: {
     color: "#4B5C51",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
+    fontSize: 15,
   },
 });

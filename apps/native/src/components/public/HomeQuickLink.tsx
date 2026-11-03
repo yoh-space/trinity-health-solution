@@ -27,11 +27,11 @@ export function HomeQuickLink({ title, subtitle, icon, image, onPress }: HomeQui
 }
 
 const styles = StyleSheet.create({
-  card: { backgroundColor: "#FFFFFF", borderColor: "#E4EBE4", borderRadius: 15, borderWidth: 1, flex: 1, minHeight: 126, overflow: "hidden", paddingBottom: 10 },
-  pressed: { opacity: 0.82 },
-  image: { height: 58, marginBottom: 8, width: "100%" },
-  iconWrap: { alignItems: "center", backgroundColor: "#EAF4EB", borderRadius: 11, height: 38, justifyContent: "center", margin: 10, width: 38 },
-  copy: { flex: 1, paddingHorizontal: 10 },
-  title: { color: "#294433", fontFamily: "Righteous_400Regular", fontSize: 10, lineHeight: 14 },
-  subtitle: { color: "#7A887D", fontFamily: "Righteous_400Regular", fontSize: 8, lineHeight: 11, marginTop: 4 },
+  card: { backgroundColor: "#FFFFFF", borderColor: "#E1EAE2", borderRadius: 18, borderWidth: 1, elevation: 2, flex: 1, minHeight: 145, overflow: "hidden", paddingBottom: 12, shadowColor: "#294433", shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.06, shadowRadius: 7 },
+  pressed: { opacity: 0.82, transform: [{ scale: 0.985 }] },
+  image: { height: 70, marginBottom: 10, width: "100%" },
+  iconWrap: { alignItems: "center", backgroundColor: "#EAF4EB", borderRadius: 13, height: 42, justifyContent: "center", margin: 12, width: 42 },
+  copy: { flex: 1, paddingHorizontal: 12 },
+  title: { color: "#294433", fontFamily: "Righteous_400Regular", fontSize: 15, lineHeight: 19 },
+  subtitle: { color: "#7A887D", fontFamily: "Righteous_400Regular", fontSize: 13, lineHeight: 18, marginTop: 5 },
 });

@@ -1,10 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useAuth } from "@clerk/expo";
 import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
 import { useRouter, type Href } from "expo-router";
 import { useMemo, useState } from "react";
 import {
+  ImageBackground,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -30,7 +30,6 @@ const topics = [
 
 export default function LearningScreen() {
   const router = useRouter();
-  const { isSignedIn } = useAuth();
   const [search, setSearch] = useState("");
   const [activeTopic, setActiveTopic] = useState("all");
   const published = useQuery(anyApi.education.listPublished) as
@@ -63,10 +62,6 @@ export default function LearningScreen() {
 
   const openArticle = (id: string) =>
     router.push(`/public/article/${encodeURIComponent(id)}` as Href);
-  const openOpal = () =>
-    router.push(
-      (isSignedIn ? "/(app)/(tabs)/opal" : "/public/opal") as Href,
-    );
 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
@@ -87,21 +82,34 @@ export default function LearningScreen() {
           </View>
         </View>
 
-        <View style={styles.hero}>
-          <Text style={styles.heroKicker}>
-            {am ? "ዛሬ ትንሽ ይማሩ" : "LEARN A LITTLE TODAY"}
-          </Text>
-          <Text style={styles.heroTitle}>
-            {am
-              ? "ቀላል መረጃ፣ ጤናማ ምርጫዎች"
-              : "Clear information. Confident choices."}
-          </Text>
-          <Text style={styles.heroBody}>
-            {am
-              ? "በቤትዎ ውስጥ የሚሰሩ ትንሽ እርምጃዎችን ያግኙ።"
-              : "Discover small, practical actions that fit your home."}
-          </Text>
-        </View>
+        <ImageBackground
+          source={require("../assets/images/health-worker-consultation.jpg")}
+          imageStyle={styles.heroImage}
+          style={styles.hero}
+        >
+          <View pointerEvents="none" style={styles.heroShade} />
+          <View pointerEvents="none" style={styles.heroOrb} />
+          <View style={styles.heroContent}>
+            <View style={styles.heroKickerRow}>
+              <View style={styles.heroSparkle}>
+                <Ionicons name="sparkles" size={15} color="#E4F2BF" />
+              </View>
+              <Text style={styles.heroKicker}>
+                {am ? "ዛሬ ትንሽ ይማሩ" : "LEARN A LITTLE TODAY"}
+              </Text>
+            </View>
+            <Text style={styles.heroTitle}>
+              {am
+                ? "ቀላል መረጃ፣ ጤናማ ምርጫዎች"
+                : "Clear information. Confident choices."}
+            </Text>
+            <Text style={styles.heroBody}>
+              {am
+                ? "በቤትዎ ውስጥ የሚሰሩ ትንሽ እርምጃዎችን ያግኙ።"
+                : "Discover small, practical actions that fit your home."}
+            </Text>
+          </View>
+        </ImageBackground>
 
         <View style={styles.searchBox}>
           <Ionicons name="search-outline" size={19} color="#738278" />
@@ -152,12 +160,19 @@ export default function LearningScreen() {
         </ScrollView>
 
         <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>
-            {am ? "ለእርስዎ የተመረጠ" : "Picked for you"}
-          </Text>
-          <Text style={styles.sectionMeta}>
-            {filteredContent.length} {am ? "ትምህርቶች" : "lessons"}
-          </Text>
+          <View style={styles.sectionHeadingGroup}>
+            <View style={styles.sectionIcon}>
+              <Ionicons name="library-outline" size={18} color="#287544" />
+            </View>
+            <Text style={styles.sectionTitle}>
+              {am ? "ለእርስዎ የተመረጠ" : "Picked for you"}
+            </Text>
+          </View>
+          <View style={styles.sectionCount}>
+            <Text style={styles.sectionMeta}>
+              {filteredContent.length} {am ? "ትምህርቶች" : "lessons"}
+            </Text>
+          </View>
         </View>
 
         {filteredContent.length ? (
@@ -171,9 +186,12 @@ export default function LearningScreen() {
                 style={[styles.card, index === 0 && styles.featuredCard]}
               >
                 <View style={styles.cardTop}>
-                  <Text style={styles.category}>
-                    {item.category.toUpperCase()}
-                  </Text>
+                  <View style={styles.categoryPill}>
+                    <View style={styles.categoryDot} />
+                    <Text style={styles.category}>
+                      {item.category}
+                    </Text>
+                  </View>
                   <Pressable
                     accessibilityRole="button"
                     accessibilityLabel={
@@ -191,11 +209,13 @@ export default function LearningScreen() {
                       toggleSaved(item._id);
                     }}
                   >
-                    <Ionicons
-                      color={saved ? "#087A3D" : "#6C7D70"}
-                      name={saved ? "bookmark" : "bookmark-outline"}
-                      size={21}
-                    />
+                    <View style={styles.saveButton}>
+                      <Ionicons
+                        color={saved ? "#087A3D" : "#6C7D70"}
+                        name={saved ? "bookmark" : "bookmark-outline"}
+                        size={19}
+                      />
+                    </View>
                   </Pressable>
                 </View>
                 <Text style={styles.cardTitle}>
@@ -204,9 +224,23 @@ export default function LearningScreen() {
                 <Text numberOfLines={2} style={styles.cardBody}>
                   {am ? item.summaryAm : item.summary}
                 </Text>
-                <Text style={styles.readTime}>
-                  {item.readMinutes} {am ? "ደቂቃ ንባብ" : "min read"}
-                </Text>
+                <View style={styles.cardFooter}>
+                  <View style={styles.readTimePill}>
+                    <Ionicons
+                      name="time-outline"
+                      size={15}
+                      color="#5F8066"
+                    />
+                    <Text style={styles.readTime}>
+                      {item.readMinutes} {am ? "ደቂቃ ንባብ" : "min read"}
+                    </Text>
+                  </View>
+                  <Ionicons
+                    name="arrow-forward-circle"
+                    size={25}
+                    color="#438451"
+                  />
+                </View>
               </Pressable>
             );
           })
@@ -224,31 +258,6 @@ export default function LearningScreen() {
           </View>
         )}
 
-        <Pressable
-          accessibilityRole="button"
-          onPress={openOpal}
-          style={styles.opalCard}
-        >
-          <View style={styles.opalIcon}>
-            <Ionicons
-              name="chatbubble-ellipses-outline"
-              size={18}
-              color="#FFFFFF"
-            />
-          </View>
-          <View style={styles.opalCopy}>
-            <Text style={styles.opalTitle}>
-              {am ? "ኦፓልን ይጠይቁ" : "Ask Opal"}
-            </Text>
-            <Text style={styles.opalSubtitle}>
-              {am
-                ? "ከትምህርት ማስታወሻዎች የተዘጋጁ መልሶችን ያግኙ።"
-                : "Get prepared answers from learning notes."}
-            </Text>
-          </View>
-          <Ionicons name="chevron-forward" size={16} color="#FFFFFF" />
-        </Pressable>
-
         <Text style={styles.safeNote}>
           {am
             ? "ትሪኒቲ የጤና ትምህርት ብቻ ይሰጣል።"
@@ -261,139 +270,234 @@ export default function LearningScreen() {
 
 const styles = StyleSheet.create({
   safeArea: { backgroundColor: "#F7FAF6", flex: 1 },
-  content: { padding: 18, paddingBottom: 100 },
+  content: { paddingHorizontal: 18, paddingTop: 10, paddingBottom: 112 },
   header: {
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-between",
-    marginTop: 12,
+    marginTop: 4,
   },
   brand: {
     color: "#087A3D",
     fontFamily: "Righteous_400Regular",
-    fontSize: 13,
+    fontSize: 16,
     letterSpacing: 2.3,
   },
   greeting: {
     color: "#183A25",
     fontFamily: "Righteous_400Regular",
-    fontSize: 20,
+    fontSize: 23,
     marginTop: 5,
   },
   languageBadge: {
     alignItems: "center",
-    backgroundColor: "#DDEEE0",
-    borderRadius: 16,
+    backgroundColor: "#E8F2E9",
+    borderRadius: 14,
     justifyContent: "center",
-    minHeight: 38,
-    minWidth: 44,
+    minHeight: 42,
+    minWidth: 48,
   },
-  languageText: { color: "#087A3D", fontFamily: "Righteous_400Regular", fontSize: 12 },
+  languageText: { color: "#087A3D", fontFamily: "Righteous_400Regular", fontSize: 15 },
   hero: {
-    backgroundColor: "#087A3D",
+    backgroundColor: "#173B27",
     borderRadius: 24,
     marginTop: 22,
-    padding: 21,
+    minHeight: 238,
+    overflow: "hidden",
+  },
+  heroImage: { borderRadius: 24 },
+  heroShade: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "#102C1FBA",
+  },
+  heroOrb: {
+    borderColor: "#FFFFFF26",
+    borderRadius: 90,
+    borderWidth: 1,
+    height: 180,
+    position: "absolute",
+    right: -54,
+    top: 31,
+    width: 180,
+  },
+  heroContent: { justifyContent: "center", minHeight: 238, padding: 21 },
+  heroKickerRow: { alignItems: "center", flexDirection: "row", gap: 8 },
+  heroSparkle: {
+    alignItems: "center",
+    backgroundColor: "#FFFFFF28",
+    borderRadius: 12,
+    height: 30,
+    justifyContent: "center",
+    width: 30,
   },
   heroKicker: {
-    color: "#BBE5BE",
+    color: "#E2F0D8",
     fontFamily: "Righteous_400Regular",
-    fontSize: 10,
-    letterSpacing: 1.2,
+    fontSize: 14,
+    letterSpacing: 0.6,
   },
   heroTitle: {
     color: "#FFFFFF",
     fontFamily: "Righteous_400Regular",
-    fontSize: 27,
+    fontSize: 30,
     lineHeight: 34,
     marginTop: 11,
   },
   heroBody: {
-    color: "#D8EFDA",
+    color: "#F1F6EC",
     fontFamily: "Righteous_400Regular",
-    fontSize: 13,
-    lineHeight: 19,
-    marginTop: 9,
+    fontSize: 16,
+    lineHeight: 23,
+    marginTop: 11,
   },
   searchBox: {
     alignItems: "center",
     backgroundColor: "#FFFFFF",
     borderColor: "#E0E9E1",
-    borderRadius: 14,
+    borderRadius: 16,
     borderWidth: 1,
     flexDirection: "row",
     gap: 9,
     marginTop: 18,
     paddingHorizontal: 13,
-    height: 48,
+    height: 54,
+    shadowColor: "#294433",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.06,
+    shadowRadius: 8,
+    elevation: 2,
   },
   searchInput: {
     color: "#24392A",
     flex: 1,
     fontFamily: "Righteous_400Regular",
-    fontSize: 13,
+    fontSize: 16,
     height: "100%",
   },
-  topicList: { gap: 8, paddingVertical: 14 },
+  topicList: { gap: 9, paddingVertical: 16 },
   topicChip: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#E1EAE2",
+    borderRadius: 22,
+    borderWidth: 1,
+    paddingHorizontal: 13,
+    paddingVertical: 11,
+  },
+  topicChipActive: { backgroundColor: "#087A3D", borderColor: "#087A3D" },
+  topicText: { color: "#59695E", fontFamily: "Righteous_400Regular", fontSize: 14 },
+  topicTextActive: { color: "#FFFFFF", fontFamily: "Righteous_400Regular" },
+  sectionHeader: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 7,
+    marginBottom: 13,
+  },
+  sectionHeadingGroup: {
+    alignItems: "center",
+    flex: 1,
+    flexDirection: "row",
+    gap: 9,
+  },
+  sectionIcon: {
+    alignItems: "center",
+    backgroundColor: "#E5F0E6",
+    borderRadius: 12,
+    height: 36,
+    justifyContent: "center",
+    width: 36,
+  },
+  sectionTitle: {
+    color: "#183A25",
+    flexShrink: 1,
+    fontFamily: "Righteous_400Regular",
+    fontSize: 21,
+  },
+  sectionCount: {
+    backgroundColor: "#EAF3EA",
+    borderRadius: 999,
+    paddingHorizontal: 11,
+    paddingVertical: 7,
+  },
+  sectionMeta: { color: "#438451", fontFamily: "Righteous_400Regular", fontSize: 13 },
+  card: {
     backgroundColor: "#FFFFFF",
     borderColor: "#E1EAE2",
     borderRadius: 20,
     borderWidth: 1,
-    paddingHorizontal: 13,
-    paddingVertical: 9,
-  },
-  topicChipActive: { backgroundColor: "#087A3D", borderColor: "#087A3D" },
-  topicText: { color: "#59695E", fontFamily: "Righteous_400Regular", fontSize: 11 },
-  topicTextActive: { color: "#FFFFFF", fontFamily: "Righteous_400Regular" },
-  sectionHeader: {
-    alignItems: "baseline",
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginTop: 6,
     marginBottom: 11,
+    padding: 17,
+    shadowColor: "#294433",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.05,
+    shadowRadius: 9,
+    elevation: 2,
   },
-  sectionTitle: { color: "#183A25", fontFamily: "Righteous_400Regular", fontSize: 18 },
-  sectionMeta: { color: "#738278", fontFamily: "Righteous_400Regular", fontSize: 12 },
-  card: {
-    backgroundColor: "#FFFFFF",
-    borderColor: "#E1EAE2",
-    borderRadius: 19,
-    borderWidth: 1,
-    marginBottom: 11,
-    padding: 16,
-  },
-  featuredCard: { borderColor: "#B9DBBF", borderWidth: 1.5 },
+  featuredCard: { borderColor: "#B9DBBF", borderWidth: 1.5, backgroundColor: "#FCFEFC" },
   cardTop: {
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  categoryPill: {
+    alignItems: "center",
+    backgroundColor: "#EAF4EB",
+    borderRadius: 999,
+    flexDirection: "row",
+    gap: 7,
+    maxWidth: "82%",
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  categoryDot: { backgroundColor: "#438451", borderRadius: 4, height: 7, width: 7 },
   category: {
-    color: "#087A3D",
+    color: "#287544",
+    flexShrink: 1,
     fontFamily: "Righteous_400Regular",
-    fontSize: 9,
-    letterSpacing: 0.9,
+    fontSize: 13,
+    letterSpacing: 0.2,
+  },
+  saveButton: {
+    alignItems: "center",
+    backgroundColor: "#F1F6F1",
+    borderRadius: 14,
+    height: 38,
+    justifyContent: "center",
+    width: 38,
   },
   cardTitle: {
     color: "#183A25",
     fontFamily: "Righteous_400Regular",
-    fontSize: 17,
-    lineHeight: 23,
-    marginTop: 10,
+    fontSize: 20,
+    lineHeight: 28,
+    marginTop: 12,
   },
   cardBody: {
     color: "#627267",
     fontFamily: "Righteous_400Regular",
-    fontSize: 12,
-    lineHeight: 18,
-    marginTop: 6,
+    fontSize: 15,
+    lineHeight: 23,
+    marginTop: 8,
+  },
+  cardFooter: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 14,
+  },
+  readTimePill: {
+    alignItems: "center",
+    backgroundColor: "#F1F6F1",
+    borderRadius: 999,
+    flexDirection: "row",
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
   },
   readTime: {
-    color: "#809084",
+    color: "#5F8066",
     fontFamily: "Righteous_400Regular",
-    fontSize: 10,
-    marginTop: 12,
+    fontSize: 13,
   },
   empty: {
     alignItems: "center",
@@ -406,42 +510,22 @@ const styles = StyleSheet.create({
   emptyTitle: {
     color: "#314938",
     fontFamily: "Righteous_400Regular",
-    fontSize: 14,
+    fontSize: 17,
     marginTop: 9,
   },
   emptyCopy: {
     color: "#738176",
     fontFamily: "Righteous_400Regular",
-    fontSize: 11,
-    lineHeight: 17,
+    fontSize: 14,
+    lineHeight: 20,
     marginTop: 5,
     textAlign: "center",
   },
-  opalCard: {
-    alignItems: "center",
-    backgroundColor: "#315F3E",
-    borderRadius: 16,
-    flexDirection: "row",
-    gap: 10,
-    marginTop: 7,
-    padding: 13,
-  },
-  opalIcon: {
-    alignItems: "center",
-    backgroundColor: "#FFFFFF26",
-    borderRadius: 12,
-    height: 36,
-    justifyContent: "center",
-    width: 36,
-  },
-  opalCopy: { flex: 1, gap: 4 },
-  opalTitle: { color: "#FFFFFF", fontFamily: "Righteous_400Regular", fontSize: 12 },
-  opalSubtitle: { color: "#DBE9DD", fontFamily: "Righteous_400Regular", fontSize: 10 },
   safeNote: {
     color: "#728177",
     fontFamily: "Righteous_400Regular",
-    fontSize: 11,
-    lineHeight: 17,
+    fontSize: 14,
+    lineHeight: 20,
     marginTop: 16,
     textAlign: "center",
   },

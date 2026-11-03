@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
   title: {
-    fontSize: RFValue(17.5),
+    fontSize: RFValue(20),
     fontFamily: "Righteous_400Regular",
     alignSelf: "center",
   },
@@ -162,7 +162,7 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: RFValue(15),
+    fontSize: RFValue(17),
     fontFamily: "Righteous_400Regular",
     color: "#2D2D2D",
   },
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#F9FAFB",
   },
   noteText: {
-    fontSize: 16,
+    fontSize: 19,
     fontFamily: "Righteous_400Regular",
     color: "#2D2D2D",
   },
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
   },
   newNoteButtonText: {
     color: "white",
-    fontSize: RFValue(15),
+    fontSize: RFValue(17),
     fontFamily: "Righteous_400Regular",
     marginLeft: 10,
   },
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
   emptyStateText: {
     textAlign: "center",
     alignSelf: "center",
-    fontSize: RFValue(15),
+    fontSize: RFValue(17),
     color: "grey",
     fontFamily: "Righteous_400Regular",
   },
