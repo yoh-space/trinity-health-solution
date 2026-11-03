@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { useQuery } from "convex/react";
+import { useAction } from "convex/react";
 import { anyApi } from "convex/server";
 import {
   MessageCircle,
@@ -12,24 +12,16 @@ import {
   ExternalLink,
   BookOpen,
   RotateCcw,
-  Sparkles,
-  ShieldCheck,
   ChevronDown,
 } from "lucide-react";
-import {
-  fallbackEducation,
-  matchEducation,
-  displayContent,
-  displayTitle,
-  type EducationItem,
-} from "@/lib/education";
+import { getOpalErrorMessage, type OpalSource } from "@/lib/opalChat";
 import { useMarketingLanguage } from "@/components/marketing/MarketingLanguageContext";
 
 interface ChatMessage {
   id: string;
   role: "user" | "opal";
   text: string;
-  sourceItem?: EducationItem;
+  sources?: OpalSource[];
   timestamp: string;
 }
 
@@ -64,62 +56,19 @@ const QUICK_PROMPTS = [
   },
 ];
 
-function generateOpalResponse(
-  question: string,
-  language: "en" | "am",
-  items: EducationItem[],
-): { text: string; matchedItem?: EducationItem } {
-  const lower = question.toLocaleLowerCase();
-
-  if (/emergency|urgent|can't breathe|heavy bleeding|አስቸኳይ/.test(lower)) {
-    return {
-      text:
-        language === "am"
-          ? "ይህ አስቸኳይ ሊሆን የሚችል ጥያቄ ነው። ኦፓል አስቸኳይ ሁኔታን ሊገመግም አይችልም። እባክዎ ወዲያውኑ የአካባቢዎን የአስቸኳይ አገልግሎት ወይም ጤና ጣቢያ ያነጋግሩ።"
-          : "This may be urgent. Opal cannot assess emergencies. Please contact your local emergency service or a qualified health facility immediately.",
-    };
-  }
-
-  if (/diagnos|medicine|dose|treatment|symptom|pain|fever|መድሃኒት|ህመም/.test(lower)) {
-    return {
-      text:
-        language === "am"
-          ? "ኦፓል ምርመራ፣ የመድሃኒት ምክር ወይም የግል ሕክምና ሊሰጥ አይችልም። ከብቁ የጤና ባለሙያ ጋር በአካል ይነጋገሩ።"
-          : "Opal cannot diagnose, recommend medicine, or provide individual medical treatment. Please speak with a qualified health professional.",
-    };
-  }
-
-  const matched = matchEducation(question, items);
-  if (!matched) {
-    return {
-      text:
-        language === "am"
-          ? "በተገመገሙ አጠቃላይ የጤና ትምህርቶቻችን ብቻ ልረዳ እችላለሁ። ስለ ንጹህ ውሃ፣ የእናቶች አመጋገብ፣ የህፃናት ምግብ፣ ወይም የምግብ አያያዝ ይጠይቁ።"
-          : "I can help with reviewed educational curriculum topics regarding clean water, maternal nutrition, infant feeding, and safe food storage. Try asking about one of those topics.",
-    };
-  }
-
-  const mainContent = displayContent(matched, language);
-  return {
-    text: mainContent,
-    matchedItem: matched,
-  };
-}
-
 export function FloatingOpalChat() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [consented, setConsented] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const { language, setLanguage, t } = useMarketingLanguage();
-
-  const remote = useQuery(anyApi.education.listPublished) as
-    | EducationItem[]
-    | undefined;
-  const items = remote?.length ? remote : fallbackEducation;
+  const askOpal = useAction(anyApi.opal.ask);
 
   // Don't render floating chat button if user is already on the dedicated /ask-opal page
   const isDedicatedPage = pathname === "/ask-opal";
@@ -150,37 +99,51 @@ export function FloatingOpalChat() {
     return null;
   }
 
-  const handleSend = (textToSend?: string) => {
+  const handleSend = async (textToSend?: string) => {
     const query = (textToSend || input).trim();
-    if (!query) return;
+    if (!query || !consented || isSending) return;
 
+    const messageId = messages.length;
     const userMsg: ChatMessage = {
-      id: `user-${Date.now()}`,
+      id: `user-${messageId}`,
       role: "user",
       text: query,
       timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
     };
 
-    const { text: responseText, matchedItem } = generateOpalResponse(
-      query,
-      language,
-      items
-    );
-
-    const opalMsg: ChatMessage = {
-      id: `opal-${Date.now() + 1}`,
-      role: "opal",
-      text: responseText,
-      sourceItem: matchedItem,
-      timestamp: new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-    };
-
-    setMessages((prev) => [...prev, userMsg, opalMsg]);
+    setError("");
+    setIsSending(true);
+    setMessages((prev) => [...prev, userMsg]);
     setInput("");
+    try {
+      const response = await askOpal({
+        consented: true,
+        language,
+        question: query,
+      });
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: `opal-${messageId + 1}`,
+          role: "opal",
+          text: response.answer,
+          sources: response.sources,
+          timestamp: new Date().toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          }),
+        },
+      ]);
+    } catch (requestError) {
+      setError(getOpalErrorMessage(requestError, language));
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleClear = () => {
     setMessages([]);
+    setError("");
   };
 
   return (
@@ -313,8 +276,9 @@ export function FloatingOpalChat() {
                     <button
                       key={index}
                       type="button"
-                      onClick={() => handleSend(language === "am" ? prompt.am : prompt.en)}
-                      className="group flex items-center justify-between rounded-xl border border-[#dde7df] bg-white px-3 py-2 text-left text-xs text-[#204933] shadow-2xs transition hover:border-[#287343] hover:bg-[#f3f9f4]"
+                      onClick={() => void handleSend(language === "am" ? prompt.am : prompt.en)}
+                      disabled={!consented || isSending}
+                      className="group flex items-center justify-between rounded-xl border border-[#dde7df] bg-white px-3 py-2 text-left text-xs text-[#204933] shadow-2xs transition hover:border-[#287343] hover:bg-[#f3f9f4] disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       <span className="flex items-center gap-2">
                         <span>{prompt.icon}</span>
@@ -360,17 +324,20 @@ export function FloatingOpalChat() {
                       </div>
 
                       {/* Attached curriculum lesson citation */}
-                      {msg.sourceItem && (
-                        <div className="rounded-xl border border-[#d6e5d8] bg-[#f0f6f1] p-2.5 text-xs text-[#1e4832]">
+                      {msg.sources?.map((source) => (
+                        <div
+                          key={source.id}
+                          className="rounded-xl border border-[#d6e5d8] bg-[#f0f6f1] p-2.5 text-xs text-[#1e4832]"
+                        >
                           <div className="flex items-center gap-1.5 font-semibold text-[11px] text-[#1a442c]">
                             <BookOpen size={13} className="text-[#287343]" />
                             <span>{t("Verified Trinity Lesson", "የተረጋገጠ የትሪኒቲ ትምህርት")}</span>
                           </div>
                           <p className="mt-1 text-[11px] font-medium text-[#2d583e] line-clamp-1">
-                            {displayTitle(msg.sourceItem, language)}
+                            {language === "am" ? source.titleAm : source.title}
                           </p>
                           <Link
-                            href="/learn"
+                            href={`/learn/${source.id}`}
                             onClick={() => setIsOpen(false)}
                             className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-[#1b5030] hover:underline"
                           >
@@ -378,7 +345,7 @@ export function FloatingOpalChat() {
                             <span>→</span>
                           </Link>
                         </div>
-                      )}
+                      ))}
                     </div>
                   </div>
                 )}
@@ -390,14 +357,26 @@ export function FloatingOpalChat() {
 
           {/* Footer Input Area */}
           <div className="border-t border-[#e5ece4] bg-white p-3">
+            {error && (
+              <p role="alert" className="mb-2 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-800">
+                {error}
+              </p>
+            )}
+            {isSending && (
+              <p role="status" className="mb-2 px-1 text-xs text-[#668872]">
+                {t("Opal is preparing a response...", "ኦፓል መልስ እያዘጋጀ ነው...")}
+              </p>
+            )}
             {messages.length > 0 && (
               <div className="flex items-center justify-between pb-2 px-1">
                 <span className="text-[10px] text-[#789684]">
-                  {messages.length / 2} {t("exchanges", "ጥያቄዎች")}
+                  {messages.filter((message) => message.role === "user").length}{" "}
+                  {t("exchanges", "ጥያቄዎች")}
                 </span>
                 <button
                   type="button"
                   onClick={handleClear}
+                  disabled={isSending}
                   className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#668872] hover:text-[#18452e]"
                 >
                   <RotateCcw size={11} />
@@ -406,10 +385,25 @@ export function FloatingOpalChat() {
               </div>
             )}
 
+            <label className="mb-3 flex items-start gap-2 text-[11px] leading-4 text-[#52685a]">
+              <input
+                type="checkbox"
+                checked={consented}
+                onChange={(event) => setConsented(event.target.checked)}
+                className="mt-0.5 accent-[#1c573e]"
+              />
+              <span>
+                {t(
+                  "I agree to send my question and relevant published lesson text to Google Gemini. Do not include names or personal health details.",
+                  "ጥያቄዬን እና ከእሱ ጋር የተያያዙ ትምህርቶችን ወደ Google Gemini እንዲላኩ እስማማለሁ። ስም ወይም የግል የጤና መረጃ አያካትቱ።"
+                )}
+              </span>
+            </label>
+
             <form
               onSubmit={(e) => {
                 e.preventDefault();
-                handleSend();
+                void handleSend();
               }}
               className="flex items-center gap-2"
             >
@@ -418,6 +412,8 @@ export function FloatingOpalChat() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
+                maxLength={1000}
+                disabled={isSending}
                 placeholder={
                   language === "am"
                     ? "የጤና ጥያቄዎን እዚህ ይጻፉ..."
@@ -428,7 +424,7 @@ export function FloatingOpalChat() {
 
               <button
                 type="submit"
-                disabled={!input.trim()}
+                disabled={!input.trim() || !consented || isSending}
                 aria-label="Send message to Opal"
                 className="flex size-8 shrink-0 items-center justify-center rounded-full bg-[#1c573e] text-white shadow-xs transition hover:bg-[#14442f] disabled:cursor-not-allowed disabled:opacity-40 active:scale-95"
               >

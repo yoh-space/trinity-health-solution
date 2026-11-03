@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "convex/react";
+import { useAction } from "convex/react";
 import { anyApi } from "convex/server";
 import Link from "next/link";
 import { useState } from "react";
@@ -12,13 +12,7 @@ import {
   Send,
   BookOpen,
 } from "lucide-react";
-import {
-  fallbackEducation,
-  matchEducation,
-  displayContent,
-  displayTitle,
-  type EducationItem,
-} from "@/lib/education";
+import { getOpalErrorMessage, type OpalSource } from "@/lib/opalChat";
 import { useMarketingLanguage } from "@/components/marketing/MarketingLanguageContext";
 
 interface PromptItem {
@@ -45,55 +39,44 @@ const PROMPT_SUGGESTIONS: PromptItem[] = [
   },
 ];
 
-function responseFor(
-  question: string,
-  language: "en" | "am",
-  items: EducationItem[],
-) {
-  const lower = question.toLocaleLowerCase();
-  if (/emergency|urgent|can't breathe|heavy bleeding|አስቸኳይ/.test(lower))
-    return language === "am"
-      ? "ይህ አስቸኳይ ሊሆን የሚችል ጥያቄ ነው። ኦፓል አስቸኳይ ሁኔታን ሊገመግም አይችልም። እባክዎ ወዲያውኑ የአካባቢዎን የአስቸኳይ አገልግሎት ወይም ጤና ጣቢያ ያነጋግሩ።"
-      : "This may be urgent. Opal cannot assess emergencies. Please contact your local emergency service or a qualified health facility now.";
-  if (
-    /diagnos|medicine|dose|treatment|symptom|pain|fever|መድሃኒት|ህመም/.test(lower)
-  )
-    return language === "am"
-      ? "ኦፓል ምርመራ፣ የመድሃኒት ምክር ወይም የግል ሕክምና ሊሰጥ አይችልም። ከብቁ የጤና ባለሙያ ጋር በአካል ይነጋገሩ።"
-      : "Opal cannot diagnose, recommend medicine, or provide individual medical treatment. Please speak with a qualified health professional.";
-  const item = matchEducation(question, items);
-  if (!item)
-    return language === "am"
-      ? "በተዘጋጁ አጠቃላይ የጤና ትምህርቶች ብቻ ልረዳ እችላለሁ። የምግብ ንጽህና፣ አስተማማኝ ውሃ፣ ወይም የቤተሰብ አመጋገብ ጥያቄ ይሞክሩ።"
-      : "I can help with verified curriculum topics regarding clean water, maternal nutrition, infant feeding, and safe food storage. Try asking about one of those topics.";
-  return `${displayContent(item, language)}\n\n${displayTitle(item, language)}`;
-}
-
 export function OpalChat() {
-  const remote = useQuery(anyApi.education.listPublished) as
-    | EducationItem[]
-    | undefined;
-  const items = remote?.length ? remote : fallbackEducation;
+  const askOpal = useAction(anyApi.opal.ask);
   const { language, setLanguage } = useMarketingLanguage();
   const [draft, setDraft] = useState("");
+  const [consented, setConsented] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState("");
   const [messages, setMessages] = useState<
-    Array<{ role: "user" | "opal"; text: string; source?: string }>
+    Array<{ role: "user" | "opal"; text: string; sources?: OpalSource[] }>
   >([]);
 
-  const ask = (question: string) => {
+  const ask = async (question: string) => {
     const text = question.trim();
-    if (!text) return;
-    const item = matchEducation(text, items);
-    setMessages((current) => [
-      ...current,
-      { role: "user", text },
-      {
-        role: "opal",
-        text: responseFor(text, language, items),
-        source: item?._id,
-      },
-    ]);
+    if (!text || !consented || isSending) return;
+
+    setError("");
+    setIsSending(true);
+    setMessages((current) => [...current, { role: "user", text }]);
     setDraft("");
+    try {
+      const response = await askOpal({
+        consented: true,
+        language,
+        question: text,
+      });
+      setMessages((current) => [
+        ...current,
+        {
+          role: "opal",
+          text: response.answer,
+          sources: response.sources,
+        },
+      ]);
+    } catch (requestError) {
+      setError(getOpalErrorMessage(requestError, language));
+    } finally {
+      setIsSending(false);
+    }
   };
 
   return (
@@ -162,6 +145,20 @@ export function OpalChat() {
           </div>
         </div>
 
+        <label className="mb-5 flex items-start gap-2 text-xs leading-5 text-[#52685a]">
+          <input
+            type="checkbox"
+            checked={consented}
+            onChange={(event) => setConsented(event.target.checked)}
+            className="mt-1 accent-[#1c573e]"
+          />
+          <span>
+            {language === "am"
+              ? "ጥያቄዬን እና ከእሱ ጋር የተያያዙ የታተሙ ትምህርቶችን መልስ ለማዘጋጀት ወደ Google Gemini እንዲላኩ እስማማለሁ። ስም፣ የጤና መረጃ ወይም ሌላ የግል መረጃ አያካትቱ።"
+              : "I agree to send my question and relevant published lesson text to Google Gemini to generate an answer. Do not include names or personal health details."}
+          </span>
+        </label>
+
         {/* Suggestion Chips */}
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-3">
@@ -179,8 +176,9 @@ export function OpalChat() {
                 <button
                   key={idx}
                   type="button"
-                  onClick={() => ask(text)}
-                  className="rounded-full border border-[#d0ded0] bg-white px-3.5 py-2 text-left text-xs font-semibold text-[#2f4d38] shadow-2xs hover:border-[#1c573e] hover:bg-[#f1f7f1] transition active:scale-98"
+                  onClick={() => void ask(text)}
+                  disabled={!consented || isSending}
+                  className="rounded-full border border-[#d0ded0] bg-white px-3.5 py-2 text-left text-xs font-semibold text-[#2f4d38] shadow-2xs hover:border-[#1c573e] hover:bg-[#f1f7f1] transition active:scale-98 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {text}
                 </button>
@@ -214,25 +212,36 @@ export function OpalChat() {
                   }`}
                 >
                   <p className="whitespace-pre-line">{message.text}</p>
-                  {message.source && (
-                    <div className="mt-3 pt-2.5 border-t border-[#e6eee5]">
+                  {message.sources?.map((source) => (
+                    <div key={source.id} className="mt-3 pt-2.5 border-t border-[#e6eee5]">
                       <Link
-                        href={`/learn/${message.source}`}
+                        href={`/learn/${source.id}`}
                         className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1c573e] hover:underline"
                       >
                         <BookOpen size={13} aria-hidden="true" />
                         <span>
                           {language === "am"
-                            ? "ሙሉውን የትምህርት ማስታወሻ ያንብቡ"
-                            : "Read the full reviewed lesson note"}
+                            ? `የትምህርት ማስታወሻውን ያንብቡ፦ ${source.titleAm}`
+                            : `Read the reviewed lesson: ${source.title}`}
                         </span>
                         <ArrowRight size={13} aria-hidden="true" />
                       </Link>
                     </div>
-                  )}
+                  ))}
                 </div>
               ))}
             </div>
+          )}
+
+          {isSending && (
+            <p role="status" className="mb-3 text-sm text-[#668872]">
+              {language === "am" ? "ኦፓል መልስ እያዘጋጀ ነው..." : "Opal is preparing a response..."}
+            </p>
+          )}
+          {error && (
+            <p role="alert" className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-800">
+              {error}
+            </p>
           )}
 
           {/* Input field */}
@@ -240,7 +249,9 @@ export function OpalChat() {
             <input
               value={draft}
               onChange={(event) => setDraft(event.target.value)}
-              onKeyDown={(event) => event.key === "Enter" && ask(draft)}
+              onKeyDown={(event) => event.key === "Enter" && void ask(draft)}
+              maxLength={1000}
+              disabled={isSending}
               placeholder={
                 language === "am"
                   ? "ስለ ምግብ፣ ውሃ ወይም የእርግዝና አመጋገብ ይጠይቁ..."
@@ -250,18 +261,27 @@ export function OpalChat() {
             />
             <button
               type="button"
-              onClick={() => ask(draft)}
-              className="rounded-xl bg-[#1c573e] px-5 py-3 text-sm font-bold text-white shadow-xs hover:bg-[#154631] transition shrink-0 flex items-center gap-1.5"
+              onClick={() => void ask(draft)}
+              disabled={!draft.trim() || !consented || isSending}
+              className="rounded-xl bg-[#1c573e] px-5 py-3 text-sm font-bold text-white shadow-xs hover:bg-[#154631] transition shrink-0 flex items-center gap-1.5 disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <span>{language === "am" ? "ላክ" : "Send"}</span>
+              <span>
+                {isSending
+                  ? language === "am"
+                    ? "በመላክ ላይ..."
+                    : "Thinking..."
+                  : language === "am"
+                    ? "ላክ"
+                    : "Send"}
+              </span>
               <Send size={14} />
             </button>
           </div>
 
           <p className="mt-3 text-center text-[11px] leading-4 text-[#788a7d]">
             {language === "am"
-              ? "እባክዎ የግል መረጃዎችን (ስም፣ ስልክ) አያጋሩ። ኦፓል አጠቃላይ የትምህርት መረጃ ብቻ ይሰጣል።"
-              : "Please do not share personal identifiers or medical records. Opal provides general educational guidance."}
+              ? "ኦፓል አጠቃላይ የትምህርት መረጃ ብቻ ይሰጣል። ለግል የሕክምና ምክር ብቁ የጤና ባለሙያን ያነጋግሩ።"
+              : "Opal provides general educational guidance only, not personal medical advice."}
           </p>
         </div>
       </section>
