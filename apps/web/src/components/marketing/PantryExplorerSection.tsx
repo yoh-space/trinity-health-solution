@@ -3,7 +3,16 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Utensils, Check, ArrowRight, Lightbulb } from "lucide-react";
+import { useAction, useQuery } from "convex/react";
+import { anyApi } from "convex/server";
+import {
+  ArrowRight,
+  Check,
+  Lightbulb,
+  LoaderCircle,
+  Sparkles,
+  Utensils,
+} from "lucide-react";
 import {
   pantryIngredients,
   pantryRecipes,
@@ -13,11 +22,24 @@ import { useMarketingLanguage } from "./MarketingLanguageContext";
 
 export function PantryExplorerSection() {
   const { language, t } = useMarketingLanguage();
+  const hasSavedProfile = useQuery(anyApi.onboarding.hasProfile);
+  const generateMealIdea = useAction(anyApi.pantry.generateMealIdea);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([
     "misir",
     "gomen",
     "teff",
   ]);
+  const [customIngredients, setCustomIngredients] = useState("");
+  const [consented, setConsented] = useState(false);
+  const [profileConsent, setProfileConsent] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState("");
+  const [mealIdea, setMealIdea] = useState<{
+    title: string;
+    summary: string;
+    steps: string[];
+    tip: string;
+  } | null>(null);
 
   const toggleIngredient = (id: string) => {
     setSelectedIngredients((prev) =>
@@ -25,6 +47,75 @@ export function PantryExplorerSection() {
         ? prev.filter((item) => item !== id)
         : [...prev, id]
     );
+  };
+
+  const requestMealIdea = async () => {
+    if (!consented || isGenerating) return;
+
+    const ingredients = [
+      ...pantryIngredients
+        .filter((ingredient) => selectedIngredients.includes(ingredient.id))
+        .map((ingredient) =>
+          language === "am" ? ingredient.nameAm : ingredient.nameEn
+        ),
+      ...customIngredients
+        .split(/[,\n]/)
+        .map((ingredient) => ingredient.trim())
+        .filter(Boolean),
+    ];
+
+    setGenerationError("");
+    setMealIdea(null);
+    setIsGenerating(true);
+    try {
+      const result = await generateMealIdea({
+        consented: true,
+        includeProfilePreferences: profileConsent && Boolean(hasSavedProfile),
+        ingredients,
+        language,
+      });
+      setMealIdea(result);
+    } catch (error) {
+      const code = error instanceof Error ? error.message : "";
+      if (code.includes("PANTRY_INVALID_INGREDIENTS")) {
+        setGenerationError(
+          t(
+            "Enter 1–12 ingredients, with each name under 50 characters.",
+            "ከ1–12 ግብዓቶች ያስገቡ፤ እያንዳንዱ ስም ከ50 ቁምፊ በታች ይሁን።"
+          )
+        );
+      } else if (code.includes("PANTRY_INGREDIENTS_ONLY")) {
+        setGenerationError(
+          t(
+            "Please enter ingredient names only. Do not include personal or health details.",
+            "የግብዓት ስሞችን ብቻ ያስገቡ፤ የግል ወይም የጤና መረጃ አያካትቱ።"
+          )
+        );
+      } else if (code.includes("PANTRY_SIGN_IN_REQUIRED")) {
+        setGenerationError(
+          t(
+            "Sign in again to use saved food preferences.",
+            "የተቀመጡ የምግብ ምርጫዎችን ለመጠቀም እንደገና ይግቡ።"
+          )
+        );
+      } else if (code.includes("PANTRY_PROFILE_NOT_FOUND")) {
+        setGenerationError(
+          t(
+            "No saved onboarding profile was found. Turn off profile personalization and try again.",
+            "የተቀመጠ የመጀመሪያ መገለጫ አልተገኘም። የመገለጫ ግላዊ ማድረግን ያጥፉና እንደገና ይሞክሩ።"
+          )
+        );
+      } else {
+        setGenerationError(
+          t(
+            "We couldn't create a meal idea right now. Please try again.",
+            "አሁን የምግብ ሀሳብ ማዘጋጀት አልቻልንም። እባክዎ እንደገና ይሞክሩ።"
+          )
+        );
+      }
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   // Find recipes matching any selected ingredients, sorted by number of matched ingredients
@@ -83,6 +174,134 @@ export function PantryExplorerSection() {
               </button>
             );
           })}
+        </div>
+
+        <div className="mx-auto mt-10 max-w-4xl rounded-[2rem] border border-[#dce3d8] bg-[#f2f7f0] p-6 shadow-[0_16px_40px_rgba(28,60,40,0.06)] sm:p-8">
+          <div className="flex items-start gap-3">
+            <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-[#1c573e] text-white">
+              <Sparkles size={20} />
+            </span>
+            <div>
+              <h3 className="text-xl font-bold tracking-tight text-[#1b3a2a]">
+                {t("Create a meal with AI", "በAI የምግብ ሀሳብ ያዘጋጁ")}
+              </h3>
+              <p className="mt-1 text-sm leading-6 text-[#5a6c5f]">
+                {t(
+                  "Choose what you have, add anything else, and get a simple meal idea.",
+                  "ያሉዎትን ይምረጡ፣ ሌሎች ግብዓቶችንም ይጨምሩና ቀላል የምግብ ሀሳብ ያግኙ።"
+                )}
+              </p>
+            </div>
+          </div>
+
+          <label
+            htmlFor="pantry-custom-ingredients"
+            className="mt-6 block text-sm font-semibold text-[#294a35]"
+          >
+            {t("Add ingredients (separate with commas)", "ግብዓቶችን ያክሉ (በኮማ ይለዩ)")}
+          </label>
+          <input
+            id="pantry-custom-ingredients"
+            type="text"
+            value={customIngredients}
+            onChange={(event) => setCustomIngredients(event.target.value)}
+            placeholder={t(
+              "e.g. tomatoes, onions, garlic",
+              "ለምሳሌ፦ ቲማቲም፣ ሽንኩርት፣ ነጭ ሽንኩርት"
+            )}
+            className="mt-2 w-full rounded-xl border border-[#cfdacf] bg-white px-4 py-3 text-sm text-[#183b2d] outline-none transition placeholder:text-[#89968b] focus:border-[#1c573e] focus:ring-2 focus:ring-[#1c573e]/15"
+          />
+
+          <div className="mt-5 space-y-3">
+            <label className="flex items-start gap-3 text-xs leading-5 text-[#52685a]">
+              <input
+                type="checkbox"
+                checked={consented}
+                onChange={(event) => setConsented(event.target.checked)}
+                className="mt-1 accent-[#1c573e]"
+              />
+              <span>
+                {t(
+                  "I agree to send my ingredient list to Google Gemini to create this meal idea. I will enter ingredients only—not names, diagnoses, or other private details. This feature does not save my list.",
+                  "ይህን የምግብ ሀሳብ ለማዘጋጀት የግብዓት ዝርዝሬ ወደ Google Gemini እንዲላክ እስማማለሁ። የግብዓት ስሞችን ብቻ አስገባለሁ፤ ስም፣ ምርመራ ወይም ሌላ የግል መረጃ አላካትትም። ዝርዝሬ በዚህ ባህሪ አይቀመጥም።"
+                )}
+              </span>
+            </label>
+            {hasSavedProfile && (
+              <label className="flex items-start gap-3 text-xs leading-5 text-[#52685a]">
+                <input
+                  type="checkbox"
+                  checked={profileConsent}
+                  onChange={(event) =>
+                    setProfileConsent(event.target.checked)
+                  }
+                  className="mt-1 accent-[#1c573e]"
+                />
+                <span>
+                  {t(
+                    "Also use my saved non-clinical food preferences (plant-based, budget-minded, healthy-eating learning, or family meal planning). Only these selected preferences will be shared—not my name, age, health conditions, allergy information, measurements, or other profile details.",
+                    "የተቀመጡትን ክሊኒካዊ ያልሆኑ የምግብ ምርጫዎቼንም ይጠቀሙ (ከዕፅዋት የተዘጋጀ፣ በበጀት የተመጣጠነ፣ ጤናማ አመጋገብን መማር ወይም የቤተሰብ ምግብ ማቀድ)። የተመረጡት ምርጫዎች ብቻ ይላካሉ፤ ስም፣ ዕድሜ፣ የጤና ሁኔታ፣ የአለርጂ መረጃ፣ መለኪያዎች ወይም ሌላ የመገለጫ መረጃ አይላክም።"
+                  )}
+                </span>
+              </label>
+            )}
+          </div>
+
+          <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <button
+              type="button"
+              onClick={() => void requestMealIdea()}
+              disabled={!consented || isGenerating}
+              className="inline-flex items-center justify-center gap-2 rounded-full bg-[#1c573e] px-5 py-3 text-sm font-bold text-white transition hover:bg-[#164531] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {isGenerating ? (
+                <LoaderCircle size={17} className="animate-spin" />
+              ) : (
+                <Utensils size={17} />
+              )}
+              {isGenerating
+                ? t("Creating your idea…", "የምግብ ሀሳብ በማዘጋጀት ላይ…")
+                : t("Suggest a meal", "የምግብ ሀሳብ ያግኙ")}
+            </button>
+            <p className="text-xs leading-5 text-[#718276]">
+              {t(
+                "For everyday inspiration only—not medical or allergy advice.",
+                "ለዕለታዊ ሀሳብ ብቻ ነው፤ የሕክምና ወይም የአለርጂ ምክር አይደለም።"
+              )}
+            </p>
+          </div>
+
+          {generationError && (
+            <p
+              role="alert"
+              className="mt-4 rounded-xl border border-[#e7c9bd] bg-white px-4 py-3 text-sm text-[#8b3f2a]"
+            >
+              {generationError}
+            </p>
+          )}
+
+          {mealIdea && (
+            <article className="mt-6 rounded-2xl border border-[#dce3d8] bg-white p-5 sm:p-6">
+              <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#8a7550]">
+                {t("Your meal idea", "የምግብ ሀሳብዎ")}
+              </p>
+              <h4 className="mt-2 text-xl font-bold text-[#1b3a2a]">
+                {mealIdea.title}
+              </h4>
+              <p className="mt-2 text-sm leading-6 text-[#5a6c5f]">
+                {mealIdea.summary}
+              </p>
+              <ol className="mt-4 list-decimal space-y-2 pl-5 text-sm leading-6 text-[#294a35]">
+                {mealIdea.steps.map((step, index) => (
+                  <li key={`${index}-${step}`}>{step}</li>
+                ))}
+              </ol>
+              <p className="mt-4 rounded-xl bg-[#f2f7f0] px-4 py-3 text-xs leading-5 text-[#52685a]">
+                <span className="font-bold">{t("Tip: ", "ማስታወሻ፡ ")}</span>
+                {mealIdea.tip}
+              </p>
+            </article>
+          )}
         </div>
 
         {/* Featured Matching Recipe Card */}

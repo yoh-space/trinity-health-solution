@@ -1,6 +1,20 @@
 import { v } from "convex/values";
 import { type Auth } from "convex/server";
-import { mutation, query } from "./_generated/server";
+import { internalQuery, mutation, query } from "./_generated/server";
+
+const mealIdeaPreferenceIds = [
+  "plantBased",
+  "budget",
+  "healthyEating",
+  "familyMeals",
+] as const;
+
+const mealIdeaPreferenceValidator = v.union(
+  v.literal("plantBased"),
+  v.literal("budget"),
+  v.literal("healthyEating"),
+  v.literal("familyMeals"),
+);
 
 async function requireUserId({ auth }: { auth: Auth }) {
   const identity = await auth.getUserIdentity();
@@ -18,6 +32,46 @@ export const getProfile = query({
       .query("onboardingProfiles")
       .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
       .unique();
+  },
+});
+
+export const hasProfile = query({
+  args: {},
+  returns: v.boolean(),
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity?.subject) return false;
+
+    const profile = await ctx.db
+      .query("onboardingProfiles")
+      .withIndex("by_userId", (q) => q.eq("userId", identity.subject))
+      .unique();
+    return profile !== null;
+  },
+});
+
+export const getMealIdeaPreferences = internalQuery({
+  args: { userId: v.string() },
+  returns: v.object({
+    hasProfile: v.boolean(),
+    preferences: v.array(mealIdeaPreferenceValidator),
+  }),
+  handler: async (ctx, { userId }) => {
+    const profile = await ctx.db
+      .query("onboardingProfiles")
+      .withIndex("by_userId", (q) => q.eq("userId", userId))
+      .unique();
+    if (!profile) return { hasProfile: false, preferences: [] };
+
+    const allowedPreferences = new Set([
+      ...profile.eatingPatterns,
+      ...profile.goals,
+    ]);
+    const preferences = mealIdeaPreferenceIds.filter((preference) =>
+      allowedPreferences.has(preference),
+    );
+
+    return { hasProfile: true, preferences };
   },
 });
 
