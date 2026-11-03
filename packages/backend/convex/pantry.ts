@@ -11,7 +11,12 @@ const mealIdeaPreferenceValidator = v.union(
   v.literal("healthyEating"),
   v.literal("familyMeals"),
 );
-const audienceValidator = v.union(v.literal("family"), v.literal("child"));
+const audienceValidator = v.union(
+  v.literal("family"),
+  v.literal("child"),
+  v.literal("adolescent"),
+  v.literal("pregnantAdult"),
+);
 const allergenValidator = v.union(
   v.literal("egg"),
   v.literal("nuts"),

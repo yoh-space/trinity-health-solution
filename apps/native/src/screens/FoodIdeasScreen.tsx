@@ -51,7 +51,9 @@ export default function FoodIdeasScreen() {
   const generateMealIdea = useAction(anyApi.pantry.generateMealIdea);
   const [selectedIngredients, setSelectedIngredients] = useState<string[]>([]);
   const [customIngredients, setCustomIngredients] = useState("");
-  const [audience, setAudience] = useState<"family" | "child">("family");
+  const [audience, setAudience] = useState<
+    "family" | "child" | "adolescent" | "pregnantAdult"
+  >("family");
   const [selectedAllergies, setSelectedAllergies] = useState<string[]>([]);
   const [noKnownAllergies, setNoKnownAllergies] = useState(false);
   const [hasGenerated, setHasGenerated] = useState(false);
@@ -218,7 +220,59 @@ export default function FoodIdeasScreen() {
               maxLength={300}
             />
           </View>
-          <View style={styles.section}><Text style={styles.sectionTitle}><Text style={styles.step}>02</Text> {am ? "ማን ነው የሚመገበው?" : "Who’s gathering at the table?"}</Text><View style={styles.audienceStack}><GuestChoiceChip role="radio" label={am ? "ቤተሰብ" : "The family"} selected={audience === "family"} onPress={() => { resetIdea(); setAudience("family"); }} /><GuestChoiceChip role="radio" label={am ? "ታዳጊ ህፃን · ከ6 ወር በላይ" : "A young child · 6 months or older"} selected={audience === "child"} onPress={() => { resetIdea(); setAudience("child"); }} /></View></View>
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              <Text style={styles.step}>02</Text>{" "}
+              {am ? "ማን ነው የሚመገበው?" : "Who’s gathering at the table?"}
+            </Text>
+            <View style={styles.audienceStack}>
+              <GuestChoiceChip
+                role="radio"
+                label={am ? "ቤተሰብ" : "The family"}
+                selected={audience === "family"}
+                onPress={() => {
+                  resetIdea();
+                  setAudience("family");
+                }}
+              />
+              <GuestChoiceChip
+                role="radio"
+                label={
+                  am ? "ታዳጊ ህፃን · ከ6 ወር በላይ" : "A young child · 6 months or older"
+                }
+                selected={audience === "child"}
+                onPress={() => {
+                  resetIdea();
+                  setAudience("child");
+                }}
+              />
+              <GuestChoiceChip
+                role="radio"
+                label={am ? "ታዳጊ ወጣት" : "Adolescent"}
+                selected={audience === "adolescent"}
+                onPress={() => {
+                  resetIdea();
+                  setAudience("adolescent");
+                }}
+              />
+              <GuestChoiceChip
+                role="radio"
+                label={am ? "ነፍሰ ጡር አዋቂ" : "Pregnant adult"}
+                selected={audience === "pregnantAdult"}
+                onPress={() => {
+                  resetIdea();
+                  setAudience("pregnantAdult");
+                }}
+              />
+            </View>
+            {audience === "adolescent" || audience === "pregnantAdult" ? (
+              <Text style={styles.hint}>
+                {am
+                  ? "አጠቃላይ የምግብ ሀሳቦች ብቻ ናቸው፤ የግል የሕክምና ወይም የአመጋገብ ምክር አይደሉም።"
+                  : "General meal ideas only—not personalized clinical or nutrition advice."}
+              </Text>
+            ) : null}
+          </View>
           <View style={styles.section}><Text style={styles.sectionTitle}><Text style={styles.step}>03</Text> {am ? "ምን እንዳይካተት?" : "Anything to leave out?"}</Text><Text style={styles.hint}>{am ? "ለዚህ ሀሳብ ብቻ ምረጥ። የምግብ ደህንነትን ያረጋግጡ።" : "Choose exclusions for this idea. Always verify food safety."}</Text><View style={styles.ingredientGrid}><GuestChoiceChip compact label={am ? "ምንም የታወቀ የለም" : "None known"} selected={noKnownAllergies} onPress={confirmNoAllergies} />{allergies.map((item) => <GuestChoiceChip compact key={item.id} label={am ? item.am : item.en} selected={selectedAllergies.includes(item.id)} onPress={() => toggleAllergy(item.id)} />)}</View></View>
           <View style={styles.consentSection}>
             <Pressable

@@ -13,6 +13,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { getOpalErrorMessage, type OpalSource } from "@/lib/opalChat";
+import { OpalNutritionCalculator } from "@/components/education/OpalNutritionCalculator";
 import { useMarketingLanguage } from "@/components/marketing/MarketingLanguageContext";
 
 interface PromptItem {
@@ -37,6 +38,10 @@ const PROMPT_SUGGESTIONS: PromptItem[] = [
     en: "What should I feed my 6-month-old infant?",
     am: "ለ 6 ወር ህጻን ምን አይነት ተጨማሪ ምግብ መስጠት አለብኝ?",
   },
+  {
+    en: "Can Opal calculate or diagnose diabetes for me?",
+    am: "ኦፓል የስኳር በሽታን ሊያሰላ ወይም ሊመረምርልኝ ይችላል?",
+  },
 ];
 
 export function OpalChat() {
@@ -47,7 +52,7 @@ export function OpalChat() {
   const [consented, setConsented] = useState(false);
   const [profileConsented, setProfileConsented] = useState(false);
   const [audience, setAudience] = useState<
-    "myself" | "child" | "family" | "caregiver" | ""
+    "myself" | "child" | "caregiver" | ""
   >("");
   const [ageBand, setAgeBand] = useState<
     "under5" | "age5to17" | "age18to39" | "age40to59" | "age60plus" | ""
@@ -199,6 +204,11 @@ export function OpalChat() {
           </div>
         </div>
 
+        <OpalNutritionCalculator
+          language={language}
+          hasSavedProfile={hasSavedProfile === true}
+        />
+
         <label className="mb-5 flex items-start gap-2 text-xs leading-5 text-[#52685a]">
           <input
             type="checkbox"
@@ -251,15 +261,10 @@ export function OpalChat() {
                 options={[
                   { value: "myself", en: "Myself", am: "ለራሴ" },
                   { value: "child", en: "My child", am: "ለልጄ" },
-                  { value: "family", en: "My family", am: "ለቤተሰቤ" },
                   { value: "caregiver", en: "Someone I care for", am: "ለምከባከበው ሰው" },
                 ]}
                 language={language}
-                onChange={(value) =>
-                  setAudience(
-                    value as "myself" | "child" | "family" | "caregiver",
-                  )
-                }
+                onChange={(value) => setAudience(value as "myself" | "child" | "caregiver")}
               />
               <ProfileChoiceGroup
                 label={language === "am" ? "የዕድሜ ክልል (አማራጭ)" : "Age band (optional)"}
@@ -403,25 +408,33 @@ export function OpalChat() {
                   {message.role === "opal" &&
                     message.redFlag === "clinical" && (
                       <div className="mt-3 border-t border-[#e6eee5] pt-3">
-                        <Link
-                          href="/portal/consultations/new"
-                          className="inline-flex items-center gap-1.5 rounded-full bg-[#1c573e] px-3.5 py-2 text-xs font-bold text-white hover:bg-[#154631]"
-                        >
-                          <ShieldCheck size={14} aria-hidden="true" />
-                          <span>
-                            {language === "am"
-                              ? "ከጤና ባለሙያ ጋር ይነጋገሩ"
-                              : "Request help from a health professional"}
-                          </span>
-                          <ArrowRight size={13} aria-hidden="true" />
-                        </Link>
-                        <p className="mt-2 text-[11px] leading-4 text-[#718276]">
-                          {language === "am"
-                            ? "ይህ የግል ጥያቄዎን ወይም የመገለጫ መረጃዎን አይልክም። አስቸኳይ ከሆነ ወዲያውኑ በአቅራቢያዎ ያለ ጤና ተቋም ያነጋግሩ።"
-                            : "This will not send your chat or profile. For an emergency, contact local emergency services or a health facility immediately."}
-                        </p>
-                      </div>
-                    )}
+                                <div className="flex flex-wrap gap-2">
+                                  <Link
+                                    href="/portal/consultations/new"
+                                    className="inline-flex items-center gap-1.5 rounded-full bg-[#1c573e] px-3.5 py-2 text-xs font-bold text-white hover:bg-[#154631]"
+                                  >
+                                    <ShieldCheck size={14} aria-hidden="true" />
+                                    <span>
+                                      {language === "am"
+                                        ? "ከጤና ባለሙያ ጋር ይነጋገሩ"
+                                        : "Request care-team support"}
+                                    </span>
+                                    <ArrowRight size={13} aria-hidden="true" />
+                                  </Link>
+                                  <a
+                                    href="tel:+251988720194"
+                                    className="inline-flex items-center rounded-full border border-[#cbd8cb] px-3.5 py-2 text-xs font-bold text-[#1c573e] hover:bg-[#f4f8f3]"
+                                  >
+                                    +251 98 872 0194
+                                  </a>
+                                </div>
+                                <p className="mt-2 text-[11px] leading-4 text-[#718276]">
+                                  {language === "am"
+                                    ? "እርስዎ ካልደወሉ ወይም የእገዛ ጥያቄ ካላስገቡ በስተቀር የውይይትዎ ወይም የመገለጫዎ መረጃ አይላክም። አስቸኳይ ከሆነ የአካባቢዎን አስቸኳይ አገልግሎት ያነጋግሩ።"
+                                    : "Your chat and profile aren’t shared unless you call or submit a care request. For emergencies, contact local emergency services immediately."}
+                                </p>
+                              </div>
+                            )}
                 </div>
               ))}
             </div>

@@ -32,6 +32,9 @@ export function PantryExplorerSection() {
   const [customIngredients, setCustomIngredients] = useState("");
   const [consented, setConsented] = useState(false);
   const [profileConsent, setProfileConsent] = useState(false);
+  const [audience, setAudience] = useState<
+    "family" | "child" | "adolescent" | "pregnantAdult"
+  >("family");
   const [isGenerating, setIsGenerating] = useState(false);
   const [generationError, setGenerationError] = useState("");
   const [mealIdea, setMealIdea] = useState<{
@@ -72,7 +75,7 @@ export function PantryExplorerSection() {
         consented: true,
         includeProfilePreferences: profileConsent && Boolean(hasSavedProfile),
         ingredients,
-        audience: "family",
+        audience,
         excludedAllergens: [],
         language,
       });
@@ -196,6 +199,42 @@ export function PantryExplorerSection() {
             </div>
           </div>
 
+          <fieldset className="mt-6">
+            <legend className="text-sm font-semibold text-[#294a35]">
+              {t("Who is this meal for?", "ይህ ምግብ ለማን ነው?")}
+            </legend>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {([
+                ["family", "Family", "ቤተሰብ"],
+                ["child", "Young child", "ታዳጊ ህፃን"],
+                ["adolescent", "Adolescent", "ታዳጊ"],
+                ["pregnantAdult", "Pregnant adult", "ነፍሰ ጡር አዋቂ"],
+              ] as const).map(([value, en, am]) => (
+                <button
+                  key={value}
+                  type="button"
+                  aria-pressed={audience === value}
+                  onClick={() => setAudience(value)}
+                  className={`rounded-full border px-3 py-2 text-xs font-semibold transition ${
+                    audience === value
+                      ? "border-[#1c573e] bg-[#1c573e] text-white"
+                      : "border-[#cfdacf] bg-white text-[#52685a]"
+                  }`}
+                >
+                  {t(en, am)}
+                </button>
+              ))}
+            </div>
+            {(audience === "adolescent" || audience === "pregnantAdult") && (
+              <p className="mt-2 text-xs leading-5 text-[#718276]">
+                {t(
+                  "These are general meal ideas only, not personalized clinical or nutrition advice.",
+                  "እነዚህ አጠቃላይ የምግብ ሀሳቦች ብቻ ናቸው፤ የግል የሕክምና ወይም የአመጋገብ ምክር አይደሉም።",
+                )}
+              </p>
+            )}
+          </fieldset>
+
           <label
             htmlFor="pantry-custom-ingredients"
             className="mt-6 block text-sm font-semibold text-[#294a35]"
@@ -224,8 +263,8 @@ export function PantryExplorerSection() {
               />
               <span>
                 {t(
-                  "I agree to send my ingredient list to Google Gemini to create this meal idea. I will enter ingredients only—not names, diagnoses, or other private details. This feature does not save my list.",
-                  "ይህን የምግብ ሀሳብ ለማዘጋጀት የግብዓት ዝርዝሬ ወደ Google Gemini እንዲላክ እስማማለሁ። የግብዓት ስሞችን ብቻ አስገባለሁ፤ ስም፣ ምርመራ ወይም ሌላ የግል መረጃ አላካትትም። ዝርዝሬ በዚህ ባህሪ አይቀመጥም።"
+                  "I agree to send my ingredient list and selected meal audience to Google Gemini to create this meal idea. I will enter ingredients only—not names, diagnoses, or other private details. This feature does not save my list. Audience selection gives general meal context only, not individualized clinical advice.",
+                  "ይህን የምግብ ሀሳብ ለማዘጋጀት የግብዓት ዝርዝሬና የመመገቢያ ምርጫዬ ወደ Google Gemini እንዲላኩ እስማማለሁ። የግብዓት ስሞችን ብቻ አስገባለሁ፤ ስም፣ ምርመራ ወይም ሌላ የግል መረጃ አላካትትም። ዝርዝሬ አይቀመጥም። የመመገቢያ ምርጫው አጠቃላይ የምግብ አውድ ብቻ ይሰጣል፤ የግል የሕክምና ምክር አይደለም።"
                 )}
               </span>
             </label>

@@ -60,6 +60,8 @@ export default defineSchema({
     heightCm: v.optional(v.number()),
     weightKg: v.optional(v.number()),
     bmi: v.optional(v.number()),
+    ageYears: v.optional(v.number()),
+    formulaSex: v.optional(v.union(v.literal("male"), v.literal("female"))),
     consentedAt: v.number(),
     updatedAt: v.number(),
   }).index("by_userId", ["userId"]),

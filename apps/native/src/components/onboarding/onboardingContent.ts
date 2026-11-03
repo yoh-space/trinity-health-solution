@@ -26,6 +26,10 @@ export const onboardingCopy: Record<
     otherSupportPlaceholder: string;
     meals: string;
     activity: string;
+    activityHint: string;
+    exactAge: string;
+    formulaSex: string;
+    formulaSexHint: string;
     eatingPattern: string;
     goals: string;
     goalsHint: string;
@@ -88,6 +92,10 @@ export const onboardingCopy: Record<
     otherSupportPlaceholder: "ለምሳሌ፦ ለቤተሰብ ጤናማ ምግብ ማዘጋጀት",
     meals: "በቀን የሚመገቡት ምግብ",
     activity: "እንቅስቃሴ",
+    activityHint: "ለአጠቃላይ የኃይል ግምት የሚቀርበውን ደረጃ ይምረጡ።",
+    exactAge: "ትክክለኛ ዕድሜ (አማራጭ)",
+    formulaSex: "ለኃይል ቀመሩ የሚመረጠው (አማራጭ)",
+    formulaSexHint: "ይህ የMifflin–St Jeor ቀመር ምርጫ ብቻ ነው፤ የፆታ ማንነትን አይገልጽም።",
     eatingPattern: "የአመጋገብ ልምድ (አማራጭ)",
     goals: "ግቦችዎ ምንድን ናቸው?",
     goalsHint: "እስከ ሶስት ይምረጡ።",
@@ -114,7 +122,7 @@ export const onboardingCopy: Record<
     localPrivacy:
       "በመጨረሻው ገጽ ፈቃድ ካልሰጡ በስተቀር ወደ መለያዎ ምንም አይላክም። BMI የጤና ምርመራ ወይም የሕክምና ምክር አይደለም።",
     cloudConsent: "የመገለጫዬን መልሶች ወደ መለያዬ አስቀምጥ",
-    cloudConsentHint: "ቁመትን፣ ክብደትንና BMIን ጨምሮ። ወደ መለያዎ የሚሄደው እርስዎ ሲመርጡ ብቻ ነው።",
+    cloudConsentHint: "ቁመት፣ ክብደት፣ የእንቅስቃሴ ደረጃ፣ አማራጭ ትክክለኛ ዕድሜና የቀመር ምርጫን ጨምሮ። ወደ መለያዎ የሚሄደው እርስዎ ሲመርጡ ብቻ ነው።",
     accountRequired: "ወደ መለያዎ ለማስቀመጥ መጀመሪያ መግባት ያስፈልጋል። ሳይላኩ መቀጠል ይችላሉ።",
     continueWithoutCloud: "ሳያስቀምጡ ይቀጥሉ",
     stayOnScreen: "እዚህ ይቆዩ",
@@ -145,6 +153,16 @@ export const onboardingCopy: Record<
       meals4: "4 ወይም ከዚያ በላይ",
       seated: "ብዙ ጊዜ ተቀምጬ",
       seatedDetail: "በቀን ትንሽ እንቅስቃሴ",
+      sedentaryConfined: "ተቀምጦ / ተገድቦ · 1.2",
+      verySedentary: "እጅግ ተቀምጦ · 1.4",
+      sedentaryActivity: "ተቀምጦ፣ አንዳንድ ጊዜ መራመድ · 1.5",
+      lightActivity: "ቀላል፣ በእግር መቆም / መራመድ · 1.6",
+      lightModerate: "ቀላል-መካከለኛ · 1.7",
+      moderateActivity: "መካከለኛ · 1.8",
+      heavy: "ከባድ · 2.0",
+      veryHeavy: "እጅግ ከባድ · 2.2",
+      femaleEquation: "የሴት ቀመር",
+      maleEquation: "የወንድ ቀመር",
       moderate: "መካከለኛ እንቅስቃሴ",
       moderateDetail: "መደበኛ መራመድ ወይም የቤት ሥራ",
       active: "በጣም ንቁ",
@@ -192,6 +210,12 @@ export const onboardingCopy: Record<
     otherSupportPlaceholder: "For example: planning healthier family meals",
     meals: "Meals per day",
     activity: "Physical activity",
+    activityHint:
+      "Choose the closest level for a general energy estimate. These factors are approximate.",
+    exactAge: "Exact age (optional)",
+    formulaSex: "Equation option for energy estimate (optional)",
+    formulaSexHint:
+      "This selects the Mifflin–St Jeor equation only; it does not describe gender identity.",
     eatingPattern: "Eating pattern (optional)",
     goals: "What are your goals?",
     goalsHint: "Pick up to three.",
@@ -222,7 +246,7 @@ export const onboardingCopy: Record<
       "Nothing is sent to your account unless you opt in on the final review step. BMI is not a diagnosis or medical advice.",
     cloudConsent: "Save my profile answers to my account",
     cloudConsentHint:
-      "This includes height, weight, and BMI. It is sent only if you select this option.",
+      "This can include height, weight, activity level, optional exact age, and equation choice. Saved only if you select this option.",
     accountRequired:
       "Sign in is required to save to your account. You can continue without sending these answers.",
     continueWithoutCloud: "Continue without saving",
@@ -254,6 +278,16 @@ export const onboardingCopy: Record<
       meals4: "4 or more",
       seated: "Mostly seated",
       seatedDetail: "Little daily movement",
+      sedentaryConfined: "Sedentary / confined · 1.2",
+      verySedentary: "Very sedentary · 1.4",
+      sedentaryActivity: "Seated work, occasional walking · 1.5",
+      lightActivity: "Standing / walking work · 1.6",
+      lightModerate: "Light-moderate · 1.7",
+      moderateActivity: "Moderate · 1.8",
+      heavy: "Heavy · 2.0",
+      veryHeavy: "Very heavy · 2.2",
+      femaleEquation: "Female equation",
+      maleEquation: "Male equation",
       moderate: "Moderately active",
       moderateDetail: "Regular walking or chores",
       active: "Very active",
@@ -314,25 +348,54 @@ export const mealOptions: LocalizedOption[] = [
 
 export const activityOptions: LocalizedOption[] = [
   {
-    id: "seated",
-    en: "Mostly seated",
-    am: "ብዙ ጊዜ ተቀምጬ",
-    detailEn: "Little daily movement",
-    detailAm: "በቀን ትንሽ እንቅስቃሴ",
+    id: "sedentaryConfined",
+    en: "Sedentary / confined · 1.2",
+    am: "ተቀምጦ / ተገድቦ · 1.2",
   },
   {
-    id: "moderate",
-    en: "Moderately active",
-    am: "መካከለኛ እንቅስቃሴ",
-    detailEn: "Regular walking or chores",
+    id: "verySedentary",
+    en: "Very sedentary · 1.4",
+    am: "እጅግ ተቀምጦ · 1.4",
+  },
+  {
+    id: "sedentaryActivity",
+    en: "Sedentary · 1.5",
+    am: "ተቀምጦ፣ አንዳንድ ጊዜ መራመድ · 1.5",
+    detailEn: "Seated work with occasional walking",
+    detailAm: "ተቀምጦ ሥራ እና አንዳንድ ጊዜ መራመድ",
+  },
+  {
+    id: "lightActivity",
+    en: "Light · 1.6",
+    am: "ቀላል · 1.6",
+    detailEn: "Standing or walking work",
+    detailAm: "በእግር መቆም ወይም መራመድ የሚጠይቅ ሥራ",
+  },
+  {
+    id: "lightModerate",
+    en: "Light-moderate · 1.7",
+    am: "ቀላል-መካከለኛ · 1.7",
+  },
+  {
+    id: "moderateActivity",
+    en: "Moderate · 1.8",
+    am: "መካከለኛ · 1.8",
+    detailEn: "Regular walking or household chores",
     detailAm: "መደበኛ መራመድ ወይም የቤት ሥራ",
   },
   {
-    id: "active",
-    en: "Very active",
-    am: "በጣም ንቁ",
-    detailEn: "Physical work or exercise",
-    detailAm: "አካላዊ ሥራ ወይም ስፖርት",
+    id: "heavy",
+    en: "Heavy · 2.0",
+    am: "ከባድ · 2.0",
+    detailEn: "Heavy physical work or training",
+    detailAm: "ከባድ አካላዊ ሥራ ወይም ልምምድ",
+  },
+  {
+    id: "veryHeavy",
+    en: "Very heavy · 2.2",
+    am: "እጅግ ከባድ · 2.2",
+    detailEn: "Very strenuous work or training",
+    detailAm: "እጅግ ከባድ ሥራ ወይም ልምምድ",
   },
 ];
 

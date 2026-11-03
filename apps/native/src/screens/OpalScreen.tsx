@@ -7,6 +7,7 @@ import { useRef, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
+  Linking,
   Platform,
   Pressable,
   ScrollView,
@@ -38,11 +39,13 @@ type Message = {
   text: string;
   sources?: OpalSource[];
   safety?: boolean;
+  redFlag?: "none" | "clinical" | "urgent";
   error?: boolean;
 };
 type AskOpalResult = {
   answer: string;
   safety: boolean;
+  redFlag: "none" | "clinical" | "urgent";
   sources: OpalSource[];
 };
 
@@ -71,6 +74,11 @@ const questions: Question[] = [
     id: "safe-water",
     question: "How do I make drinking water safe?",
     questionAm: "የመጠጥ ውሃን እንዴት ደህንነቱን መጠበቅ እችላለሁ?",
+  },
+  {
+    id: "diabetes",
+    question: "Can Opal calculate or diagnose diabetes for me?",
+    questionAm: "ኦፓል የስኳር በሽታን ሊያሰላ ወይም ሊመረምርልኝ ይችላል?",
   },
 ];
 
@@ -112,6 +120,7 @@ export default function OpalScreen() {
           role: "opal",
           text: result.answer,
           safety: result.safety,
+          redFlag: result.redFlag,
           sources: result.sources,
         },
       ]);
@@ -189,6 +198,7 @@ export default function OpalScreen() {
           role: "opal",
           text: getOpalSafetyResponse(safetyIntent, language),
           safety: true,
+          redFlag: safetyIntent,
         },
       ]);
       setDraft("");
@@ -220,6 +230,17 @@ export default function OpalScreen() {
 
   const submitDraft = () => {
     requestAnswer(draft);
+  };
+
+  const callCareTeam = async () => {
+    try {
+      await Linking.openURL("tel:+251988720194");
+    } catch {
+      Alert.alert(
+        am ? "ጥሪ ማድረግ አልተቻለም" : "Unable to place call",
+        am ? "እባክዎ በእጅ ወደ +251 98 872 0194 ይደውሉ።" : "Please call +251 98 872 0194 manually.",
+      );
+    }
   };
 
   return (
@@ -327,6 +348,18 @@ export default function OpalScreen() {
                           </Text>
                         </Pressable>
                       ))}
+                      {message.redFlag === "clinical" && (
+                        <Pressable
+                          accessibilityRole="button"
+                          onPress={() => void callCareTeam()}
+                          style={styles.careTeamCall}
+                        >
+                          <Ionicons name="call-outline" size={15} color="#1C573E" />
+                          <Text style={styles.careTeamCallText}>
+                            {am ? "የጤና ቡድኑን ይደውሉ · +251 98 872 0194" : "Call the care team · +251 98 872 0194"}
+                          </Text>
+                        </Pressable>
+                      )}
                     </View>
                   </View>
                 );
@@ -356,7 +389,7 @@ export default function OpalScreen() {
             </View>
           )}
           <View style={styles.quickQuestions}>
-            {[questions[0], questions[4]].map((question) => (
+            {[questions[0], questions[4], questions[5]].map((question) => (
               <Pressable
                 accessibilityRole="button"
                 key={question.id}
@@ -373,10 +406,14 @@ export default function OpalScreen() {
                   {am
                     ? question.id === "food-hands"
                       ? "የምግብ ደህንነት ትምህርት አሳየኝ"
-                      : "የመጠጥ ውሃን ደህንነት እንዴት እጠብቅ?"
+                      : question.id === "diabetes"
+                        ? "ስለ ስኳር በሽታ"
+                        : "የመጠጥ ውሃን ደህንነት እንዴት እጠብቅ?"
                     : question.id === "food-hands"
                       ? "Show me a food-safety lesson"
-                      : "How do I keep drinking water safe?"}
+                      : question.id === "diabetes"
+                        ? "Diabetes guidance"
+                        : "How do I keep drinking water safe?"}
                 </Text>
               </Pressable>
             ))}
@@ -547,6 +584,22 @@ const styles = StyleSheet.create({
     fontFamily: "Righteous_400Regular",
     fontSize: 13,
     lineHeight: 18,
+  },
+  careTeamCall: {
+    alignItems: "center",
+    alignSelf: "flex-start",
+    backgroundColor: "#EAF2E9",
+    borderRadius: 999,
+    flexDirection: "row",
+    gap: 6,
+    marginTop: 10,
+    paddingHorizontal: 11,
+    paddingVertical: 8,
+  },
+  careTeamCallText: {
+    color: "#1C573E",
+    fontFamily: "Righteous_400Regular",
+    fontSize: 13,
   },
   resetButton: {
     alignItems: "center",

@@ -39,6 +39,8 @@ import { useTrinityStore } from "../store/useTrinityStore";
 type OnboardingAnswers = {
   audience: string;
   age: string;
+  ageYears: string;
+  formulaSex: "male" | "female" | "";
   support: string[];
   generalSupport: boolean;
   otherSupport: string;
@@ -58,6 +60,8 @@ type OnboardingAnswers = {
 const initialAnswers: OnboardingAnswers = {
   audience: "",
   age: "",
+  ageYears: "",
+  formulaSex: "",
   support: [],
   generalSupport: false,
   otherSupport: "",
@@ -128,6 +132,8 @@ export default function OnboardingScreen() {
           ...initialAnswers,
           audience: savedProfile.audience ?? "",
           age: savedProfile.age ?? "",
+          ageYears: savedProfile.ageYears?.toString() ?? "",
+          formulaSex: savedProfile.formulaSex ?? "",
           support: savedProfile.support ?? [],
           generalSupport: savedProfile.generalSupport ?? false,
           otherSupport: savedProfile.otherSupport ?? "",
@@ -251,6 +257,10 @@ export default function OnboardingScreen() {
                   weightKg: weightInKg,
                 }
               : {}),
+            ...(answers.ageYears.trim()
+              ? { ageYears: Number(answers.ageYears) }
+              : {}),
+            ...(answers.formulaSex ? { formulaSex: answers.formulaSex } : {}),
           });
         } catch (error) {
           console.error("Unable to save onboarding profile to Convex.", error);
@@ -412,6 +422,7 @@ export default function OnboardingScreen() {
             <Text style={[styles.sectionLabel, styles.sectionSpacing]}>
               {copy.activity}
             </Text>
+            <Text style={styles.sectionHint}>{copy.activityHint}</Text>
             <OnboardingChoiceGrid
               options={activityOptions}
               language={language}
@@ -484,6 +495,43 @@ export default function OnboardingScreen() {
             <Text style={styles.sectionHint}>{copy.measurementHint}</Text>
             {canCalculateBmi ? (
               <>
+                <Text style={styles.sectionLabel}>{copy.exactAge}</Text>
+                <TextInput
+                  accessibilityLabel={copy.exactAge}
+                  keyboardType="number-pad"
+                  maxLength={3}
+                  onChangeText={(value) =>
+                    update("ageYears", value.replace(/[^0-9]/g, ""))
+                  }
+                  placeholder="25"
+                  placeholderTextColor="#94A297"
+                  style={styles.measurementInput}
+                  value={answers.ageYears}
+                />
+                <Text style={[styles.sectionLabel, styles.sectionSpacing]}>
+                  {copy.formulaSex}
+                </Text>
+                <Text style={styles.sectionHint}>{copy.formulaSexHint}</Text>
+                <OnboardingChoiceGrid
+                  options={[
+                    {
+                      id: "female",
+                      en: "Female equation",
+                      am: "የሴት ቀመር",
+                    },
+                    {
+                      id: "male",
+                      en: "Male equation",
+                      am: "የወንድ ቀመር",
+                    },
+                  ]}
+                  language={language}
+                  selected={answers.formulaSex}
+                  onSelect={(value) =>
+                    update("formulaSex", value as "male" | "female")
+                  }
+                  columns={2}
+                />
                 <View style={styles.measurementsRow}>
                   <View style={styles.measurementField}>
                     <Text style={styles.sectionLabel}>{copy.height}</Text>

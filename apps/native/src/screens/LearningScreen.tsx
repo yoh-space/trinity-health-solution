@@ -26,6 +26,7 @@ const topics = [
   { key: "child-nutrition", en: "Child nutrition", am: "የህፃናት አመጋገብ" },
   { key: "food-safety", en: "Food safety", am: "የምግብ ደህንነት" },
   { key: "safe-water", en: "Clean water & hygiene", am: "ንጹህ ውሃ እና ንጽህና" },
+  { key: "sexual-and-reproductive-health", en: "Sexual & reproductive health", am: "የጾታና የመራቢያ ጤና" },
 ];
 
 export default function LearningScreen() {

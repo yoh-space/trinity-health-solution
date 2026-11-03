@@ -320,9 +320,18 @@ export function ContentEditor({
           <input
             value={form.category}
             onChange={(event) => onChange("category", event.target.value)}
-            placeholder="Family wellbeing"
+            placeholder="Family wellbeing or Sexual and reproductive health"
             className="rounded-xl border border-[#cfddd1] px-3.5 py-2.5 text-xs font-normal text-[#173a25] outline-none focus:border-[#1c573e]"
           />
+          <button
+            type="button"
+            onClick={() =>
+              onChange("category", "Sexual and reproductive health")
+            }
+            className="justify-self-start text-left text-[11px] font-semibold text-[#1c573e] underline"
+          >
+            Use Sexual and reproductive health
+          </button>
         </label>
 
         <label className="grid gap-2 text-xs font-bold text-[#1f3f2c]">

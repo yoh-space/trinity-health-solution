@@ -166,11 +166,32 @@ export const saveProfile = mutation({
     otherConsultation: v.string(),
     heightCm: v.optional(v.number()),
     weightKg: v.optional(v.number()),
+    ageYears: v.optional(v.number()),
+    formulaSex: v.optional(v.union(v.literal("male"), v.literal("female"))),
   },
   handler: async (ctx, args) => {
     const userId = await requireUserId(ctx);
     const updatedAt = Date.now();
     const isAdult = ["age18to39", "age40to59", "age60plus"].includes(args.age);
+    if (
+      args.ageYears !== undefined &&
+      (!Number.isInteger(args.ageYears) ||
+        args.ageYears < 18 ||
+        args.ageYears > 100 ||
+        args.audience !== "myself" ||
+        !isAdult ||
+        args.support.includes("pregnancy"))
+    ) {
+      throw new Error("Exact age is only accepted for an adult profile for yourself.");
+    }
+    if (
+      args.formulaSex !== undefined &&
+      (args.audience !== "myself" ||
+        !isAdult ||
+        args.support.includes("pregnancy"))
+    ) {
+      throw new Error("Equation choice is only accepted for an adult profile for yourself.");
+    }
     const bmiEligible =
       args.audience === "myself" &&
       isAdult &&
@@ -195,6 +216,20 @@ export const saveProfile = mutation({
       const heightM = args.heightCm / 100;
       bmi = Math.round((args.weightKg / (heightM * heightM)) * 10) / 10;
     }
+    const ageYears =
+      args.audience === "myself" &&
+      isAdult &&
+      !args.support.includes("pregnancy") &&
+      args.ageYears !== undefined &&
+      Number.isInteger(args.ageYears) &&
+      args.ageYears >= 18 &&
+      args.ageYears <= 100
+        ? args.ageYears
+        : undefined;
+    const formulaSex =
+      args.audience === "myself" && isAdult && !args.support.includes("pregnancy")
+        ? args.formulaSex
+        : undefined;
 
     const profile = {
       userId,
@@ -213,6 +248,8 @@ export const saveProfile = mutation({
       ...(heightCm !== undefined && weightKg !== undefined && bmi !== undefined
         ? { heightCm, weightKg, bmi }
         : {}),
+      ...(ageYears !== undefined ? { ageYears } : {}),
+      ...(formulaSex !== undefined ? { formulaSex } : {}),
       consentedAt: updatedAt,
       updatedAt,
     };

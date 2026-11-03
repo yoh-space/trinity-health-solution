@@ -25,7 +25,12 @@ export function EducationLibrary() {
   const items = remote?.length ? remote : fallbackEducation;
   const categories = [
     "All topics",
-    ...Array.from(new Set(items.map((item) => item.category))),
+    ...Array.from(
+      new Set([
+        "Sexual and reproductive health",
+        ...items.map((item) => item.category),
+      ]),
+    ),
   ];
 
   const visible = useMemo(() => {
