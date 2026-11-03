@@ -24,6 +24,7 @@ export function MarketingHeader() {
   }, []);
 
   const navigationItems = [
+    { labelEn: "Community", labelAm: "ማህበረሰብ", href: "https://t.me/Trinity_health_solution" },
     { labelEn: "Our Approach", labelAm: "አሰራራችን", href: "/#approach" },
     { labelEn: "Learning Library", labelAm: "የትምህርት ቤተ-መጽሐፍት", href: "/learn" },
     { labelEn: "Pantry Explorer", labelAm: "የምግብ ሀሳቦች", href: "/#pantry" },
