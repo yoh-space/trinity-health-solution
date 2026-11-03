@@ -40,3 +40,6 @@ yarn-error.log*
 # windows device artifact
 nul
 .vercel
+
+.env.production
+.env.prod.*

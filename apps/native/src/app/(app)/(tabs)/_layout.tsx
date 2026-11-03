@@ -24,20 +24,7 @@ export default function TrinityTabs() {
         profile: "You",
         community: "Community",
       };
-    ? {
-        index: "መነሻ",
-        learn: "ትምህርት",
-        food: "ምግብ",
-        care: "እንክብካቤ",
-        profile: "መገለጫ",
-      }
-    : {
-        index: "Home",
-        learn: "Learn",
-        food: "Meals",
-        care: "Care",
-        profile: "You",
-      };
+
   const icons: Record<string, keyof typeof Ionicons.glyphMap> = {
     index: "home-outline",
     learn: "library-outline",
@@ -45,12 +32,6 @@ export default function TrinityTabs() {
     care: "heart-outline",
     profile: "person-outline",
     community: "chatbubble-ellipses-outline",
-  };
-    index: "home-outline",
-    learn: "library-outline",
-    food: "restaurant-outline",
-    care: "heart-outline",
-    profile: "person-outline",
   };
 
   return (
@@ -84,7 +65,6 @@ export default function TrinityTabs() {
       <Tabs.Screen name="profile" />
       <Tabs.Screen name="saved" options={{ href: null }} />
       <Tabs.Screen name="opal" options={{ href: null }} />
-      <Tabs.Screen name="community" />
     </Tabs>
   );
 }
