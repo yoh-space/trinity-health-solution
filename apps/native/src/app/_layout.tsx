@@ -8,7 +8,7 @@ import { View } from "react-native";
 import { SystemBars } from "react-native-edge-to-edge";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import ConvexClientProvider from "./ConvexClientProvider";
+import ConvexClientProvider from "./providers/ConvexClientProvider";
 
 // Keep the native splash screen visible until the custom font is ready.
 // Without this, release builds can show un-fonted (invisible text) inputs
