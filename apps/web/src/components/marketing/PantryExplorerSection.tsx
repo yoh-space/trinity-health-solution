@@ -72,6 +72,8 @@ export function PantryExplorerSection() {
         consented: true,
         includeProfilePreferences: profileConsent && Boolean(hasSavedProfile),
         ingredients,
+        audience: "family",
+        excludedAllergens: [],
         language,
       });
       setMealIdea(result);

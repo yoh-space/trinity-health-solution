@@ -11,6 +11,13 @@ const mealIdeaPreferenceValidator = v.union(
   v.literal("healthyEating"),
   v.literal("familyMeals"),
 );
+const audienceValidator = v.union(v.literal("family"), v.literal("child"));
+const allergenValidator = v.union(
+  v.literal("egg"),
+  v.literal("nuts"),
+  v.literal("dairy"),
+  v.literal("sesame"),
+);
 const mealIdeaValidator = v.object({
   title: v.string(),
   summary: v.string(),
@@ -28,11 +35,20 @@ const preferenceLabels = {
   string
 >;
 
+const allergenLabels = {
+  egg: "Egg",
+  nuts: "Peanuts and tree nuts",
+  dairy: "Milk and dairy",
+  sesame: "Sesame",
+} satisfies Record<"egg" | "nuts" | "dairy" | "sesame", string>;
+
 export const generateMealIdea = action({
   args: {
     consented: v.literal(true),
     includeProfilePreferences: v.boolean(),
     ingredients: v.array(v.string()),
+    audience: audienceValidator,
+    excludedAllergens: v.array(allergenValidator),
     language: languageValidator,
   },
   returns: mealIdeaValidator,
@@ -77,6 +93,8 @@ export const generateMealIdea = action({
       ingredients,
       preferences,
       args.language,
+      args.audience,
+      args.excludedAllergens.map((allergen) => allergenLabels[allergen]),
     );
   },
 });
