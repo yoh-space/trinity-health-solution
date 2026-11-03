@@ -4,7 +4,7 @@
     "name": "Trinity Health Solution",
     "slug": "trinity-health-solution",
     "scheme": "trinityhealth",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -25,7 +25,7 @@
         "backgroundColor": "#ffffff"
       },
       "package": "com.unicef.trinityhealthsolution",
-      "versionCode": 10004
+      "versionCode": 10005
     },
     "web": {
       "bundler": "metro",
