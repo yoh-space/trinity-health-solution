@@ -373,44 +373,6 @@ export default function AdminManager() {
 
   return (
     <AdminShell activeTab={activeTab} onTabChange={setActiveTab}>
-      {/* Executive Command Header */}
-      <header className="mb-8 flex flex-col justify-between gap-5 lg:flex-row lg:items-end">
-        <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#1c573e]">
-              TRINITY OPERATIONS COMMAND
-            </span>
-            <span className="text-[#cbd6cc]">•</span>
-            <span className="text-xs font-semibold text-[#667e6e]">
-              Multi-Role Health Desk
-            </span>
-          </div>
-
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-[#163a27] sm:text-4xl">
-            Executive Operations & Triage
-          </h1>
-
-          <p className="mt-2 max-w-2xl text-xs leading-relaxed text-[#5a6e60] sm:text-sm">
-            Track family consultation requests, staff capacity, bilingual health
-            content, and scheduled care appointments.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab("curriculum");
-              startNew();
-            }}
-            className="flex items-center gap-2 rounded-full bg-[#1c573e] px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#154631] active:scale-95"
-          >
-            <Plus size={15} />
-            <span>New Curriculum Note</span>
-          </button>
-        </div>
-      </header>
-
       {/* Notifications / Alerts */}
       {(message || error) && (
         <div
@@ -477,27 +439,39 @@ export default function AdminManager() {
         )}
 
         {activeTab === "curriculum" && (
-          <div className="grid gap-8 xl:grid-cols-[1fr_0.95fr]">
-            <ContentEditor
-              form={form}
-              categories={categoryOptions}
-              editing={Boolean(editingItem)}
-              saving={saving}
-              onChange={setField}
-              onSubmit={save}
-              onCancel={cancelEditing}
-            />
-            <ContentList
-              items={content}
-              search={search}
-              status={status}
-              onSearch={setSearch}
-              onStatus={setStatus}
-              onEdit={startEditing}
-              onPreview={setPreviewItem}
-              onPublish={togglePublished}
-              onRemove={deleteItem}
-            />
+          <div className="space-y-5">
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={startNew}
+                className="flex items-center gap-2 rounded-full bg-[#1c573e] px-5 py-2.5 text-xs font-bold text-white shadow-sm transition hover:bg-[#154631] active:scale-95"
+              >
+                <Plus size={15} />
+                <span>New Curriculum Note</span>
+              </button>
+            </div>
+            <div className="grid gap-8 xl:grid-cols-[1fr_0.95fr]">
+              <ContentEditor
+                form={form}
+                categories={categoryOptions}
+                editing={Boolean(editingItem)}
+                saving={saving}
+                onChange={setField}
+                onSubmit={save}
+                onCancel={cancelEditing}
+              />
+              <ContentList
+                items={content}
+                search={search}
+                status={status}
+                onSearch={setSearch}
+                onStatus={setStatus}
+                onEdit={startEditing}
+                onPreview={setPreviewItem}
+                onPublish={togglePublished}
+                onRemove={deleteItem}
+              />
+            </div>
           </div>
         )}
 

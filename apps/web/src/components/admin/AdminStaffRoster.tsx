@@ -120,6 +120,10 @@ export function AdminStaffRoster({
     setTimeout(() => setActionMessage(null), 4500);
   }
 
+  function getMemberEmail(member: TeamMemberItem) {
+    return clerkUsersById[member.clerkUserId ?? ""]?.email || member.email || "";
+  }
+
   useEffect(() => {
     const userIds = [...new Set(teamMembers.map((member) => member.clerkUserId).filter((id): id is string => Boolean(id)))];
     if (userIds.length === 0) {
@@ -194,7 +198,7 @@ export function AdminStaffRoster({
         const q = searchQuery.toLowerCase();
         const matchName = m.displayName.toLowerCase().includes(q);
         const matchSpec = m.specialty.toLowerCase().includes(q);
-        const email = m.email ?? clerkUsersById[m.clerkUserId ?? ""]?.email;
+        const email = getMemberEmail(m);
         const matchEmail = email?.toLowerCase().includes(q);
         if (!matchName && !matchSpec && !matchEmail) return false;
       }
@@ -644,7 +648,7 @@ export function AdminStaffRoster({
               />
               <input
                 type="text"
-                placeholder="Search by name, specialty, or user ID..."
+                placeholder="Search by name, specialty, or Clerk email..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full rounded-xl border border-[#d2ddd0] bg-white py-2 pl-9 pr-4 text-xs font-medium text-[#1c3a2a] placeholder-[#8a9d8f] focus:border-[#1c573e] focus:outline-hidden"
@@ -848,9 +852,9 @@ export function AdminStaffRoster({
                       <div className="mt-2.5 flex items-center justify-between gap-2 text-[10px] text-[#788b7c]">
                         <span className="shrink-0 font-medium">Clerk email:</span>
                         <span className="max-w-50 truncate text-right">
-                          {member.email ?? clerkUsersById[member.clerkUserId ?? ""]?.email ?? "Email unavailable"}
+                          {getMemberEmail(member) || "Email unavailable"}
                         </span>
-                        {!member.email && !clerkUsersById[member.clerkUserId ?? ""]?.email && (
+                        {!getMemberEmail(member) && (
                           <button
                             type="button"
                             onClick={() => {
@@ -961,8 +965,8 @@ export function AdminStaffRoster({
                                   </span>
                                 )}
                               </div>
-                              <p className="max-w-56 truncate text-[10px] text-[#788a7c]" title={member.email ?? clerkUsersById[member.clerkUserId ?? ""]?.email}>
-                                {member.email ?? clerkUsersById[member.clerkUserId ?? ""]?.email ?? "Email unavailable"}
+                              <p className="max-w-56 truncate text-[10px] text-[#788a7c]" title={getMemberEmail(member)}>
+                                {getMemberEmail(member) || "Email unavailable"}
                               </p>
                             </div>
                           </div>
@@ -1020,7 +1024,7 @@ export function AdminStaffRoster({
                         </td>
                         <td className="px-5 py-3.5 text-right">
                           <div className="flex items-center justify-end gap-2">
-                            {!member.email && !clerkUsersById[member.clerkUserId ?? ""]?.email && (
+                            {!getMemberEmail(member) && (
                               <button
                                 type="button"
                                 onClick={() => {

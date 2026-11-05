@@ -22,13 +22,16 @@ async function getAdminContext() {
   return { client, userId };
 }
 
-function emailAndName(user: Awaited<ReturnType<Awaited<ReturnType<typeof clerkClient>>["users"]["getUser"]>>) {
+function emailAndName(
+  user: Awaited<ReturnType<Awaited<ReturnType<typeof clerkClient>>["users"]["getUser"]>>,
+  email = user.primaryEmailAddress?.emailAddress ?? "",
+) {
   return {
     id: user.id,
-    email: user.primaryEmailAddress?.emailAddress ?? "",
+    email,
     displayName:
       [user.firstName, user.lastName].filter(Boolean).join(" ") ||
-      user.primaryEmailAddress?.emailAddress ||
+      email ||
       "Staff member",
     role: user.publicMetadata.role,
   };
@@ -55,13 +58,20 @@ export async function GET(request: Request) {
             address.verification?.status === "verified",
         ),
       );
-      if (!user) {
+      const verifiedEmail = user?.emailAddresses.find(
+        (address) =>
+          address.emailAddress.toLowerCase() === email &&
+          address.verification?.status === "verified",
+      );
+      if (!user || !verifiedEmail) {
         return NextResponse.json(
           { error: "No verified Clerk account was found for that email." },
           { status: 404 },
         );
       }
-      return NextResponse.json({ user: emailAndName(user) });
+      return NextResponse.json({
+        user: emailAndName(user, verifiedEmail.emailAddress),
+      });
     }
 
     const ids = (url.searchParams.get("userIds") ?? "")
@@ -76,7 +86,7 @@ export async function GET(request: Request) {
       userId: ids,
       limit: ids.length,
     });
-    return NextResponse.json({ users: data.map(emailAndName) });
+    return NextResponse.json({ users: data.map((user) => emailAndName(user)) });
   } catch {
     return NextResponse.json(
       { error: "Unable to read Clerk staff accounts right now." },
