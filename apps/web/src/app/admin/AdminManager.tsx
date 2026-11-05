@@ -94,158 +94,11 @@ export default function AdminManager() {
     return [...categories.values()];
   }, [content]);
 
-  // Fallback Mock Datasets (Graceful degradation if admin JWT claim is still pending)
-  const fallbackRequests: CareRequestItem[] = useMemo(
-    () => [
-      {
-        _id: "req_clin_001",
-        requestType: "clinical",
-        status: "submitted",
-        contactMethod: "phone",
-        contactDetails: "+251 91 123 4567",
-        requestSummary: "Maternal nutrition & iron deficiency inquiry",
-        createdAt: Date.now() - 3600000 * 2,
-      },
-      {
-        _id: "req_coun_002",
-        requestType: "counselling",
-        status: "inReview",
-        contactMethod: "email",
-        contactDetails: "mother.selam@example.com",
-        requestSummary: "Postpartum infant feeding schedule counseling",
-        assignedStaffName: "Dr. Almaz Bekele",
-        assignedTo: "staff_coun_01",
-        createdAt: Date.now() - 3600000 * 6,
-      },
-      {
-        _id: "req_clin_003",
-        requestType: "clinical",
-        status: "contacted",
-        contactMethod: "phone",
-        contactDetails: "+251 92 888 9999",
-        requestSummary: "Safe water purification & hygiene verification",
-        assignedStaffName: "Dr. Dawit Haile",
-        assignedTo: "staff_clin_02",
-        createdAt: Date.now() - 3600000 * 18,
-      },
-      {
-        _id: "req_coun_004",
-        requestType: "counselling",
-        status: "closed",
-        contactMethod: "phone",
-        contactDetails: "+251 93 456 7890",
-        requestSummary: "Complementary feeding transition for 7mo child",
-        assignedStaffName: "Sr. Bethlehem Tadesse",
-        assignedTo: "staff_coun_03",
-        createdAt: Date.now() - 3600000 * 48,
-      },
-      {
-        _id: "req_clin_005",
-        requestType: "clinical",
-        status: "submitted",
-        contactMethod: "email",
-        contactDetails: "family.haile@example.com",
-        requestSummary: "Childhood diarrhea rehydration protocol follow-up",
-        createdAt: Date.now() - 3600000 * 1,
-      },
-    ],
-    []
-  );
-
-  const fallbackTeam: TeamMemberItem[] = useMemo(
-    () => [
-      {
-        _id: "staff_01",
-        displayName: "Dr. Almaz Bekele",
-        role: "clinician",
-        specialty: "Maternal & Child Health",
-        availability: "available",
-        active: true,
-        openRequestCount: 4,
-      },
-      {
-        _id: "staff_02",
-        displayName: "Dr. Dawit Haile",
-        role: "clinician",
-        specialty: "Pediatrics & Hygiene",
-        availability: "available",
-        active: true,
-        openRequestCount: 2,
-      },
-      {
-        _id: "staff_03",
-        displayName: "Sr. Bethlehem Tadesse",
-        role: "counselor",
-        specialty: "Family Nutrition & Wellbeing",
-        availability: "available",
-        active: true,
-        openRequestCount: 5,
-      },
-      {
-        _id: "staff_04",
-        displayName: "Yonas Mengistu",
-        role: "counselor",
-        specialty: "Community Health Outreach",
-        availability: "away",
-        active: true,
-        openRequestCount: 1,
-      },
-      {
-        _id: "staff_05",
-        displayName: "System Supervisor",
-        role: "admin",
-        specialty: "Public Health Operations & Triage",
-        availability: "available",
-        active: true,
-        openRequestCount: 0,
-      },
-    ],
-    []
-  );
-
-  const fallbackAppointments: AppointmentItem[] = useMemo(
-    () => [
-      {
-        _id: "appt_01",
-        requestId: "req_clin_003",
-        requestType: "clinical",
-        staffName: "Dr. Dawit Haile",
-        scheduledAt: Date.now() + 3600000 * 4,
-        durationMinutes: 30,
-        format: "online",
-      },
-      {
-        _id: "appt_02",
-        requestId: "req_coun_002",
-        requestType: "counselling",
-        staffName: "Dr. Almaz Bekele",
-        scheduledAt: Date.now() + 3600000 * 24,
-        durationMinutes: 45,
-        format: "online",
-      },
-      {
-        _id: "appt_03",
-        requestId: "req_clin_005",
-        requestType: "clinical",
-        staffName: "Dr. Dawit Haile",
-        scheduledAt: Date.now() + 3600000 * 48,
-        durationMinutes: 30,
-        format: "inPerson",
-      },
-    ],
-    []
-  );
-
-  // Synthesize Active Data
-  const effectiveTeam = teamPage?.page && teamPage.page.length > 0 ? teamPage.page : fallbackTeam;
-  const effectiveAppointments =
-    upcomingAppointments && upcomingAppointments.length > 0
-      ? upcomingAppointments
-      : fallbackAppointments;
+  const effectiveTeam = teamPage?.page ?? [];
+  const effectiveAppointments = upcomingAppointments ?? [];
 
   const effectiveRequests: CareRequestItem[] = useMemo(() => {
-    if (adminOverview?.recentRequests && adminOverview.recentRequests.length > 0) {
-      return adminOverview.recentRequests.map((r) => ({
+    return (adminOverview?.recentRequests ?? []).map((r) => ({
         _id: r._id,
         requestType: r.requestType,
         status: r.status,
@@ -254,9 +107,7 @@ export default function AdminManager() {
         contactDetails: "Active Client",
         requestSummary: `${r.requestType === "clinical" ? "Clinical" : "Counseling"} family inquiry`,
       }));
-    }
-    return fallbackRequests;
-  }, [adminOverview, fallbackRequests]);
+  }, [adminOverview]);
 
   // Aggregate KPI Metrics
   const kpiData = useMemo(() => {
@@ -517,11 +368,6 @@ export default function AdminManager() {
         </div>
       </header>
 
-      {/* Top 4-Card Executive KPI Overview */}
-      <section className="mb-8">
-        <AdminKpiOverview data={kpiData} />
-      </section>
-
       {/* Notifications / Alerts */}
       {(message || error) && (
         <div
@@ -538,22 +384,29 @@ export default function AdminManager() {
 
       <div>
         {activeTab === "overview" && (
-          <div className="space-y-8">
-            <AdminCharts
-              requestStatusCounts={chartRequestCounts}
-              staffDistribution={chartStaffDistribution}
-              appointmentFormatSplit={chartAppointmentSplit}
-              contentCategoryDistribution={contentCategoryDistribution}
-            />
+          <>
+            {/* Top 4-Card Executive KPI Overview */}
+            <section className="mb-8">
+              <AdminKpiOverview data={kpiData} />
+            </section>
 
-            {/* Quick Triage Stream in Overview */}
-            <div className="mt-8">
-              <AdminTriageQueue
-                requests={effectiveRequests.slice(0, 5)}
-                staffList={effectiveTeam}
+            <div className="space-y-8">
+              <AdminCharts
+                requestStatusCounts={chartRequestCounts}
+                staffDistribution={chartStaffDistribution}
+                appointmentFormatSplit={chartAppointmentSplit}
+                contentCategoryDistribution={contentCategoryDistribution}
               />
+
+              {/* Quick Triage Stream in Overview */}
+              <div className="mt-8">
+                <AdminTriageQueue
+                  requests={effectiveRequests.slice(0, 5)}
+                  staffList={effectiveTeam}
+                />
+              </div>
             </div>
-          </div>
+          </>
         )}
 
         {activeTab === "triage" && (

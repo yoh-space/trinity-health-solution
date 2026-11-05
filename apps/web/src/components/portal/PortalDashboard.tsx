@@ -215,57 +215,61 @@ export function PortalDashboard() {
         </div>
       </section>
 
-      {/* --- 4-CARD TOP KPI SUMMARY --- */}
-      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <SummaryCard
-          title="Active Care Requests"
-          value={activeRequestCount.toString()}
-          subtitle={
-            activeRequestCount > 0
-              ? `${activeRequestCount} awaiting response or in review`
-              : "No pending requests"
-          }
-          icon={ClipboardList}
-          accent="emerald"
-          onClick={() => {
-            setActiveTab("requests");
-            router.push("/portal?tab=requests");
-          }}
-        />
-        <SummaryCard
-          title="Next Appointment"
-          value="Thu 14:30"
-          subtitle="Online · Nutrition Guidance"
-          icon={Calendar}
-          accent="blue"
-          onClick={() => {
-            setActiveTab("appointments");
-            router.push("/portal?tab=appointments");
-          }}
-        />
-        <SummaryCard
-          title="Saved Curriculum Guides"
-          value="4"
-          subtitle="Food safety & maternal nutrition"
-          icon={Bookmark}
-          accent="amber"
-          onClick={() => {
-            setActiveTab("saved");
-            router.push("/portal?tab=saved");
-          }}
-        />
-        <SummaryCard
-          title="Care Protocol Standard"
-          value="WHO / UNICEF"
-          subtitle="Community evidence aligned"
-          icon={ShieldCheck}
-          accent="purple"
-          onClick={() => {
-            setActiveTab("profile");
-            router.push("/portal?tab=profile");
-          }}
-        />
-      </section>
+      {currentTab === "overview" && (
+        <>
+          {/* --- 4-CARD TOP KPI SUMMARY --- */}
+          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <SummaryCard
+              title="Active Care Requests"
+              value={activeRequestCount.toString()}
+              subtitle={
+                activeRequestCount > 0
+                  ? `${activeRequestCount} awaiting response or in review`
+                  : "No pending requests"
+              }
+              icon={ClipboardList}
+              accent="emerald"
+              onClick={() => {
+                setActiveTab("requests");
+                router.push("/portal?tab=requests");
+              }}
+            />
+            <SummaryCard
+              title="Next Appointment"
+              value="Thu 14:30"
+              subtitle="Online · Nutrition Guidance"
+              icon={Calendar}
+              accent="blue"
+              onClick={() => {
+                setActiveTab("appointments");
+                router.push("/portal?tab=appointments");
+              }}
+            />
+            <SummaryCard
+              title="Saved Curriculum Guides"
+              value="4"
+              subtitle="Food safety & maternal nutrition"
+              icon={Bookmark}
+              accent="amber"
+              onClick={() => {
+                setActiveTab("saved");
+                router.push("/portal?tab=saved");
+              }}
+            />
+            <SummaryCard
+              title="Care Protocol Standard"
+              value="WHO / UNICEF"
+              subtitle="Community evidence aligned"
+              icon={ShieldCheck}
+              accent="purple"
+              onClick={() => {
+                setActiveTab("profile");
+                router.push("/portal?tab=profile");
+              }}
+            />
+          </section>
+        </>
+      )}
 
       {/* --- TAB VIEW RENDERER --- */}
 
