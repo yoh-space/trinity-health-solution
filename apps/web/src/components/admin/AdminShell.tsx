@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Menu } from "lucide-react";
 import { AdminSidebar } from "./AdminSidebar";
+import { NotificationBell } from "@/components/common/NotificationBell";
 
 export function AdminShell({
   children,
@@ -73,6 +74,7 @@ export function AdminShell({
               </span>
             </div>
           </div>
+          <NotificationBell scope="admin" />
         </header>
 
         {/* Content Body */}

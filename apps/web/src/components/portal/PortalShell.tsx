@@ -8,6 +8,7 @@ import { useUser } from "@clerk/nextjs";
 import { Menu } from "lucide-react";
 import { ClientSidebar } from "./ClientSidebar";
 import { ClientProfileMenu } from "@/components/common/ClientProfileMenu";
+import { NotificationBell } from "@/components/common/NotificationBell";
 import { MarketingLanguageProvider } from "@/components/marketing/MarketingLanguageContext";
 
 function PortalHeader({ onOpenMobile }: { onOpenMobile: () => void }) {
@@ -67,6 +68,7 @@ function PortalHeader({ onOpenMobile }: { onOpenMobile: () => void }) {
 
       {/* Client profile menu */}
       <div className="flex items-center gap-3">
+        <NotificationBell scope="client" />
         <ClientProfileMenu />
       </div>
     </header>

@@ -19,6 +19,7 @@ import {
   Home,
 } from "lucide-react";
 import { Badge } from "../admin/ui/badge";
+import { NotificationBell } from "@/components/common/NotificationBell";
 
 export function StaffShell({ children }: { children: ReactNode }) {
   const { user } = useUser();
@@ -171,6 +172,7 @@ export function StaffShell({ children }: { children: ReactNode }) {
           </div>
 
           <div className="flex items-center gap-3 text-xs font-semibold">
+            <NotificationBell scope="staff" />
             <Link
               href="/admin"
               className="rounded-full border border-[#cbd8cb] bg-white px-3 py-1.5 text-[#486352] transition hover:border-[#1c573e]"
