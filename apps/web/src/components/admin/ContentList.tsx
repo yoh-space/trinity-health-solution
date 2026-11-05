@@ -12,6 +12,8 @@ type Props = {
   onPreview: (item: EducationItem) => void;
   onPublish: (item: EducationItem) => void;
   onRemove: (item: EducationItem) => void;
+  onSeed: () => void;
+  seeding: boolean;
 };
 
 export function ContentList({
@@ -24,6 +26,8 @@ export function ContentList({
   onPreview,
   onPublish,
   onRemove,
+  onSeed,
+  seeding,
 }: Props) {
   const filtered = items?.filter((item) => {
     const matchesStatus = status === "all" || item.status === status;
@@ -49,9 +53,19 @@ export function ContentList({
             and mobile.
           </p>
         </div>
-        <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold text-[#c7ddcb]">
-          {items?.length ?? 0} total
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={onSeed}
+            disabled={seeding}
+            className="rounded-full border border-white/30 px-3 py-1.5 text-xs font-bold text-white hover:bg-white/10 disabled:opacity-50"
+          >
+            {seeding ? "Loading..." : "Load starter library"}
+          </button>
+          <span className="rounded-full bg-white/10 px-3 py-1.5 text-xs font-bold text-[#c7ddcb]">
+            {items?.length ?? 0} total
+          </span>
+        </div>
       </div>
       <div className="mt-6 grid gap-3 sm:grid-cols-[1fr_auto]">
         <input

@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { type Auth } from "convex/server";
+import { internal } from "./_generated/api";
 import { internalQuery, mutation, query } from "./_generated/server";
 import { requireRole } from "./auth";
 
@@ -115,6 +116,41 @@ export const listForAdmin = query({
     await requirePublisher(ctx);
     const docs = await ctx.db.query("educationContent").order("desc").take(100);
     return await Promise.all(docs.map((doc) => hydrateCoverImageUrl(ctx, doc)));
+  },
+});
+
+export const ensureSeedContent = mutation({
+  args: {},
+  returns: v.object({
+    inserted: v.number(),
+    updated: v.number(),
+    legacyLinked: v.number(),
+    unchanged: v.number(),
+    records: v.array(
+      v.object({
+        contentKey: v.string(),
+        result: v.union(
+          v.literal("inserted"),
+          v.literal("updated"),
+          v.literal("legacy-linked"),
+          v.literal("unchanged"),
+        ),
+      }),
+    ),
+  }),
+  handler: async (ctx) => {
+    await requirePublisher(ctx);
+    const result: {
+      inserted: number;
+      updated: number;
+      legacyLinked: number;
+      unchanged: number;
+      records: Array<{
+        contentKey: string;
+        result: "inserted" | "updated" | "legacy-linked" | "unchanged";
+      }>;
+    } = await ctx.runMutation(internal.seed.seedEducation, {});
+    return result;
   },
 });
 

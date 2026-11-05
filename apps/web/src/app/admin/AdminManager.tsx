@@ -105,6 +105,7 @@ export default function AdminManager() {
   const update = useMutation(anyApi.education.update);
   const publish = useMutation(anyApi.education.publish);
   const remove = useMutation(anyApi.education.remove);
+  const ensureSeedContent = useMutation(anyApi.education.ensureSeedContent);
 
   // Content Local State
   const [form, setForm] = useState<EducationForm>(emptyEducationForm);
@@ -115,6 +116,7 @@ export default function AdminManager() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+  const [seeding, setSeeding] = useState(false);
 
   const categoryOptions = useMemo(() => {
     const categories = new Map<string, string>();
@@ -371,6 +373,26 @@ export default function AdminManager() {
     }
   }
 
+  async function seedContent() {
+    setSeeding(true);
+    setMessage("");
+    setError("");
+    try {
+      const result = await ensureSeedContent();
+      setMessage(
+        `${result.inserted + result.legacyLinked} starter notes are now available.`,
+      );
+    } catch (value) {
+      setError(
+        value instanceof Error
+          ? value.message
+          : "Unable to load the starter learning library.",
+      );
+    } finally {
+      setSeeding(false);
+    }
+  }
+
   return (
     <AdminShell activeTab={activeTab} onTabChange={setActiveTab}>
       {/* Notifications / Alerts */}
@@ -470,6 +492,8 @@ export default function AdminManager() {
                 onPreview={setPreviewItem}
                 onPublish={togglePublished}
                 onRemove={deleteItem}
+                onSeed={seedContent}
+                seeding={seeding}
               />
             </div>
           </div>
