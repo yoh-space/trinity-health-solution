@@ -57,7 +57,7 @@ export default function AdminManager() {
   const [now] = useState(() => Date.now());
   const teamPaginationArgs = useMemo(
     () => ({
-      paginationOpts: { numItems: 25, cursor: null },
+      paginationOpts: { numItems: 100, cursor: null },
       includeInactive: true,
     }),
     []

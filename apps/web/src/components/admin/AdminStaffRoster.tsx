@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import { useUser } from "@clerk/nextjs";
@@ -20,10 +20,10 @@ import {
   AlertCircle,
   Loader2,
   ArrowRightLeft,
+  Link2,
   LayoutGrid,
   List,
   Check,
-  Copy,
   SlidersHorizontal,
   Info,
   ShieldAlert,
@@ -34,6 +34,7 @@ import { Badge } from "./ui/badge";
 export interface TeamMemberItem {
   _id: string;
   clerkUserId?: string;
+  email?: string;
   role: "clinician" | "counselor" | "admin";
   displayName: string;
   specialty: string;
@@ -43,20 +44,36 @@ export interface TeamMemberItem {
 }
 
 interface NewMemberForm {
+  email: string;
   displayName: string;
   specialty: string;
   role: "clinician" | "counselor" | "admin";
   availability: "available" | "away";
-  clerkUserId: string;
 }
 
 const emptyNewMemberForm: NewMemberForm = {
+  email: "",
   displayName: "",
   specialty: "",
   role: "clinician",
   availability: "available",
-  clerkUserId: "",
 };
+
+type StaffRole = TeamMemberItem["role"];
+
+async function updateClerkStaffRole(userId: string, role: StaffRole | null) {
+  const response = await fetch("/api/admin/staff-directory", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId, role }),
+  });
+  const result = (await response.json()) as {
+    previousRole?: StaffRole | null;
+    error?: string;
+  };
+  if (!response.ok) throw new Error(result.error || "Unable to synchronize this Clerk account.");
+  return result.previousRole ?? null;
+}
 
 type ViewMode = "grid" | "table";
 type SortOption = "name" | "caseload" | "role" | "availability";
@@ -74,6 +91,7 @@ export function AdminStaffRoster({
   const updateMember = useMutation(anyApi.staff.updateTeamMember);
   const removeMember = useMutation(anyApi.staff.removeTeamMember);
   const changeRoleMutation = useMutation(anyApi.staff.changeStaffRole);
+  const linkTeamMemberMutation = useMutation(anyApi.staff.linkTeamMember);
 
   // Filter & Search State
   const [searchQuery, setSearchQuery] = useState("");
@@ -86,6 +104,8 @@ export function AdminStaffRoster({
   // Modals state
   const [showAddModal, setShowAddModal] = useState(false);
   const [editingMember, setEditingMember] = useState<TeamMemberItem | null>(null);
+  const [linkingMember, setLinkingMember] = useState<TeamMemberItem | null>(null);
+  const [linkEmail, setLinkEmail] = useState("");
   const [roleChangeMember, setRoleChangeMember] = useState<TeamMemberItem | null>(null);
   const [targetRole, setTargetRole] = useState<"clinician" | "counselor" | "admin">("clinician");
   const [newForm, setNewForm] = useState<NewMemberForm>(emptyNewMemberForm);
@@ -93,18 +113,41 @@ export function AdminStaffRoster({
   // Operation state
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [actionMessage, setActionMessage] = useState<{ text: string; error?: boolean } | null>(null);
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [clerkUsersById, setClerkUsersById] = useState<Record<string, { email: string; displayName: string }>>({});
 
   function notify(text: string, error = false) {
     setActionMessage({ text, error });
     setTimeout(() => setActionMessage(null), 4500);
   }
 
-  function copyToClipboard(text: string, id: string) {
-    navigator.clipboard.writeText(text);
-    setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
-  }
+  useEffect(() => {
+    const userIds = [...new Set(teamMembers.map((member) => member.clerkUserId).filter((id): id is string => Boolean(id)))];
+    if (userIds.length === 0) {
+      setClerkUsersById({});
+      return;
+    }
+
+    const controller = new AbortController();
+    const query = encodeURIComponent(userIds.join(","));
+    fetch(`/api/admin/staff-directory?userIds=${query}`, { signal: controller.signal })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load staff account emails.");
+        return (await response.json()) as {
+          users: Array<{ id: string; email: string; displayName: string }>;
+        };
+      })
+      .then(({ users }) => {
+        if (controller.signal.aborted) return;
+        setClerkUsersById(
+          Object.fromEntries(users.map((account) => [account.id, account])),
+        );
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) setClerkUsersById({});
+      });
+
+    return () => controller.abort();
+  }, [teamMembers]);
 
   // Aggregate KPI Calculations
   const metrics = useMemo(() => {
@@ -151,8 +194,9 @@ export function AdminStaffRoster({
         const q = searchQuery.toLowerCase();
         const matchName = m.displayName.toLowerCase().includes(q);
         const matchSpec = m.specialty.toLowerCase().includes(q);
-        const matchId = m.clerkUserId?.toLowerCase().includes(q);
-        if (!matchName && !matchSpec && !matchId) return false;
+        const email = m.email ?? clerkUsersById[m.clerkUserId ?? ""]?.email;
+        const matchEmail = email?.toLowerCase().includes(q);
+        if (!matchName && !matchSpec && !matchEmail) return false;
       }
       return true;
     });
@@ -178,31 +222,88 @@ export function AdminStaffRoster({
     });
 
     return result;
-  }, [teamMembers, roleFilter, availabilityFilter, statusFilter, searchQuery, sortBy]);
+  }, [teamMembers, clerkUsersById, roleFilter, availabilityFilter, statusFilter, searchQuery, sortBy]);
 
   // --- ACTIONS ---
 
   async function handleCreateMember(e: React.FormEvent) {
     e.preventDefault();
-    if (!newForm.displayName.trim() || !newForm.specialty.trim()) {
-      notify("Please provide both name and professional specialty.", true);
+    if (!newForm.email.trim() || !newForm.displayName.trim() || !newForm.specialty.trim()) {
+      notify("Provide the existing Clerk email, name, and professional specialty.", true);
       return;
     }
 
     setIsSubmitting(true);
     try {
-      await createMember({
-        displayName: newForm.displayName.trim(),
-        specialty: newForm.specialty.trim(),
-        role: newForm.role,
-        availability: newForm.availability,
-        ...(newForm.clerkUserId.trim() ? { clerkUserId: newForm.clerkUserId.trim() } : {}),
-      });
+      const lookupResponse = await fetch(
+        `/api/admin/staff-directory?email=${encodeURIComponent(newForm.email.trim())}`,
+      );
+      const lookup = (await lookupResponse.json()) as {
+        user?: { id: string; email: string; displayName: string };
+        error?: string;
+      };
+      if (!lookupResponse.ok || !lookup.user) {
+        throw new Error(lookup.error || "No verified Clerk account was found for that email.");
+      }
+
+      const previousRole = await updateClerkStaffRole(lookup.user.id, newForm.role);
+      try {
+        await createMember({
+          clerkUserId: lookup.user.id,
+          email: lookup.user.email,
+          displayName: newForm.displayName.trim(),
+          specialty: newForm.specialty.trim(),
+          role: newForm.role,
+          availability: newForm.availability,
+        });
+      } catch (error) {
+        await updateClerkStaffRole(lookup.user.id, previousRole);
+        throw error;
+      }
       notify(`Staff member ${newForm.displayName} added to the team.`);
       setShowAddModal(false);
       setNewForm(emptyNewMemberForm);
     } catch (err) {
       notify(err instanceof Error ? err.message : "Failed to add team member.", true);
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  async function handleLinkMember(e: React.FormEvent) {
+    e.preventDefault();
+    if (!linkingMember || !linkEmail.trim()) return;
+
+    setIsSubmitting(true);
+    try {
+      const lookupResponse = await fetch(
+        `/api/admin/staff-directory?email=${encodeURIComponent(linkEmail.trim())}`,
+      );
+      const lookup = (await lookupResponse.json()) as {
+        user?: { id: string; email: string };
+        error?: string;
+      };
+      if (!lookupResponse.ok || !lookup.user) {
+        throw new Error(lookup.error || "No verified Clerk account was found for that email.");
+      }
+
+      const previousRole = await updateClerkStaffRole(lookup.user.id, linkingMember.role);
+      try {
+        await linkTeamMemberMutation({
+          profileId: linkingMember._id as any,
+          clerkUserId: lookup.user.id,
+          email: lookup.user.email,
+        });
+      } catch (error) {
+        await updateClerkStaffRole(lookup.user.id, previousRole);
+        throw error;
+      }
+
+      notify(`${linkingMember.displayName} is linked to the verified Clerk account.`);
+      setLinkingMember(null);
+      setLinkEmail("");
+    } catch (err) {
+      notify(err instanceof Error ? err.message : "Unable to link this Clerk account.", true);
     } finally {
       setIsSubmitting(false);
     }
@@ -218,7 +319,6 @@ export function AdminStaffRoster({
         profileId: editingMember._id as any,
         displayName: editingMember.displayName.trim(),
         specialty: editingMember.specialty.trim(),
-        role: editingMember.role,
         availability: editingMember.availability,
         active: editingMember.active,
       });
@@ -251,22 +351,20 @@ export function AdminStaffRoster({
 
     setIsSubmitting(true);
     try {
-      if (changeRoleMutation) {
+      const clerkUserId = roleChangeMember.clerkUserId;
+      const previousClerkRole = clerkUserId
+        ? await updateClerkStaffRole(clerkUserId, targetRole)
+        : null;
+      try {
         await changeRoleMutation({
           profileId: roleChangeMember._id as any,
           role: targetRole,
         });
-      } else {
-        await updateMember({
-          profileId: roleChangeMember._id as any,
-          displayName: roleChangeMember.displayName,
-          specialty: roleChangeMember.specialty,
-          role: targetRole,
-          availability: roleChangeMember.availability,
-          active: roleChangeMember.active,
-        });
+      } catch (error) {
+        if (clerkUserId) await updateClerkStaffRole(clerkUserId, previousClerkRole);
+        throw error;
       }
-      notify(`Role for ${roleChangeMember.displayName} successfully changed to ${targetRole.toUpperCase()}.`);
+      notify(`Role for ${roleChangeMember.displayName} synced with Clerk. They may need to refresh their session.`);
       setRoleChangeMember(null);
     } catch (err) {
       notify(err instanceof Error ? err.message : "Failed to change role.", true);
@@ -747,27 +845,24 @@ export function AdminStaffRoster({
                       </div>
 
                       {/* User ID / Directory Identity */}
-                      <div className="mt-2.5 flex items-center justify-between text-[10px] text-[#788b7c]">
-                        <span className="font-medium">Identity ID:</span>
-                        <div className="flex items-center gap-1 font-mono">
-                          <span>
-                            {member.clerkUserId ? `${member.clerkUserId.slice(0, 16)}...` : "Directory"}
-                          </span>
-                          {member.clerkUserId && (
-                            <button
-                              type="button"
-                              onClick={() => copyToClipboard(member.clerkUserId!, member._id)}
-                              title="Copy User ID"
-                              className="text-gray-400 hover:text-gray-700"
-                            >
-                              {copiedId === member._id ? (
-                                <Check size={11} className="text-emerald-600" />
-                              ) : (
-                                <Copy size={11} />
-                              )}
-                            </button>
-                          )}
-                        </div>
+                      <div className="mt-2.5 flex items-center justify-between gap-2 text-[10px] text-[#788b7c]">
+                        <span className="shrink-0 font-medium">Clerk email:</span>
+                        <span className="max-w-50 truncate text-right">
+                          {member.email ?? clerkUsersById[member.clerkUserId ?? ""]?.email ?? "Email unavailable"}
+                        </span>
+                        {!member.email && !clerkUsersById[member.clerkUserId ?? ""]?.email && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setLinkingMember(member);
+                              setLinkEmail("");
+                            }}
+                            className="inline-flex shrink-0 items-center gap-1 font-bold text-[#1c573e] hover:underline"
+                          >
+                            <Link2 size={11} />
+                            Link
+                          </button>
+                        )}
                       </div>
                     </div>
 
@@ -837,7 +932,7 @@ export function AdminStaffRoster({
               <table className="w-full text-left text-xs">
                 <thead className="border-b border-[#eef2ea] bg-[#f9faf7] text-[11px] font-bold uppercase tracking-wider text-[#687d6f]">
                   <tr>
-                    <th className="px-5 py-3.5">Name & User ID</th>
+                    <th className="px-5 py-3.5">Name & Clerk Email</th>
                     <th className="px-5 py-3.5">Assigned Role</th>
                     <th className="px-5 py-3.5">Specialty</th>
                     <th className="px-5 py-3.5">Availability</th>
@@ -866,8 +961,8 @@ export function AdminStaffRoster({
                                   </span>
                                 )}
                               </div>
-                              <p className="text-[10px] text-[#788a7c] font-mono">
-                                {member.clerkUserId ? `${member.clerkUserId.slice(0, 16)}...` : "Directory"}
+                              <p className="max-w-56 truncate text-[10px] text-[#788a7c]" title={member.email ?? clerkUsersById[member.clerkUserId ?? ""]?.email}>
+                                {member.email ?? clerkUsersById[member.clerkUserId ?? ""]?.email ?? "Email unavailable"}
                               </p>
                             </div>
                           </div>
@@ -925,6 +1020,19 @@ export function AdminStaffRoster({
                         </td>
                         <td className="px-5 py-3.5 text-right">
                           <div className="flex items-center justify-end gap-2">
+                            {!member.email && !clerkUsersById[member.clerkUserId ?? ""]?.email && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setLinkingMember(member);
+                                  setLinkEmail("");
+                                }}
+                                title="Link a verified Clerk account"
+                                className="grid size-7 place-items-center rounded-lg border border-[#cfe0cf] bg-white text-[#1c573e] hover:bg-[#edf4ec]"
+                              >
+                                <Link2 size={12} />
+                              </button>
+                            )}
                             {/* Quick Change Role Button */}
                             <button
                               type="button"
@@ -1024,6 +1132,59 @@ export function AdminStaffRoster({
       </Card>
 
       {/* --- DEDICATED CHANGE ROLE MODAL --- */}
+      {linkingMember && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
+          <div className="relative w-full max-w-md rounded-3xl border border-[#d9e3d9] bg-white p-6 shadow-2xl">
+            <button
+              type="button"
+              onClick={() => setLinkingMember(null)}
+              className="absolute right-4 top-4 grid size-8 place-items-center rounded-full text-[#6b7e71] hover:bg-[#f1f6f1]"
+              aria-label="Close account linking"
+            >
+              <X size={18} />
+            </button>
+            <div className="flex items-center gap-2 text-[#1c573e]">
+              <Link2 size={16} />
+              <h3 className="text-lg font-bold text-[#163826]">Link Clerk account</h3>
+            </div>
+            <p className="mt-1 text-xs text-[#697d6f]">
+              Link {linkingMember.displayName} to an existing verified Clerk account.
+            </p>
+            <form onSubmit={handleLinkMember} className="mt-5 space-y-4">
+              <label className="grid gap-1.5 text-xs font-bold text-[#20402e]">
+                Account email
+                <input
+                  type="email"
+                  required
+                  autoComplete="email"
+                  value={linkEmail}
+                  onChange={(event) => setLinkEmail(event.target.value)}
+                  placeholder="name@example.com"
+                  className="w-full rounded-xl border border-[#d0ded0] px-3.5 py-2.5 text-xs font-normal text-[#163925] outline-none focus:border-[#1c573e]"
+                />
+              </label>
+              <div className="flex justify-end gap-2 border-t border-[#edf3ed] pt-4">
+                <button
+                  type="button"
+                  onClick={() => setLinkingMember(null)}
+                  className="rounded-full border border-[#d0ded0] px-4 py-2 text-xs font-semibold text-[#576b5d] hover:bg-[#f6f9f5]"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="inline-flex items-center gap-2 rounded-full bg-[#1c573e] px-4 py-2 text-xs font-bold text-white disabled:opacity-50"
+                >
+                  {isSubmitting && <Loader2 size={13} className="animate-spin" />}
+                  Link account
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {roleChangeMember && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
           <div className="relative w-full max-w-lg rounded-3xl border border-[#d9e3d9] bg-white p-6 shadow-2xl sm:p-8">
@@ -1218,6 +1379,21 @@ export function AdminStaffRoster({
 
             <form onSubmit={handleCreateMember} className="mt-5 space-y-4 text-xs font-semibold text-[#20402e]">
               <div>
+                <label className="block mb-1.5">Existing Clerk account email</label>
+                <input
+                  type="email"
+                  required
+                  placeholder="name@example.com"
+                  value={newForm.email}
+                  onChange={(e) => setNewForm({ ...newForm, email: e.target.value })}
+                  className="w-full rounded-xl border border-[#d0ded0] px-3.5 py-2.5 text-xs font-normal text-[#163925] outline-none focus:border-[#1c573e]"
+                />
+                <p className="mt-1 text-[10px] font-normal text-[#718576]">
+                  The email must belong to a verified account. Its access role will be synced with the directory.
+                </p>
+              </div>
+
+              <div>
                 <label className="block mb-1.5">Full Name & Title</label>
                 <input
                   type="text"
@@ -1266,19 +1442,6 @@ export function AdminStaffRoster({
                     <option value="away">Away</option>
                   </select>
                 </div>
-              </div>
-
-              <div>
-                <label className="block mb-1.5">
-                  Clerk User ID / Account Subject <span className="text-gray-400 font-normal">(Optional)</span>
-                </label>
-                <input
-                  type="text"
-                  placeholder="user_2... or leave empty to auto-generate identifier"
-                  value={newForm.clerkUserId}
-                  onChange={(e) => setNewForm({ ...newForm, clerkUserId: e.target.value })}
-                  className="w-full rounded-xl border border-[#d0ded0] px-3.5 py-2.5 text-xs font-normal text-[#163925] outline-none focus:border-[#1c573e]"
-                />
               </div>
 
               <div className="mt-6 flex items-center justify-end gap-3 pt-4 border-t border-[#edf3ed]">
@@ -1349,19 +1512,6 @@ export function AdminStaffRoster({
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block mb-1.5">Role Assignment</label>
-                  <select
-                    value={editingMember.role}
-                    onChange={(e) => setEditingMember({ ...editingMember, role: e.target.value as any })}
-                    className="w-full rounded-xl border border-[#d0ded0] bg-white px-3 py-2.5 text-xs font-medium text-[#163925] outline-none focus:border-[#1c573e]"
-                  >
-                    <option value="clinician">Clinician (NCD / Medical)</option>
-                    <option value="counselor">Counselor (Nutrition / Family)</option>
-                    <option value="admin">System Administrator</option>
-                  </select>
-                </div>
-
                 <div>
                   <label className="block mb-1.5">Availability Status</label>
                   <select

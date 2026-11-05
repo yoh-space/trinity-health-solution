@@ -129,6 +129,7 @@ export default defineSchema({
   }).index("by_requestId_createdAt", ["requestId", "createdAt"]),
   staffProfiles: defineTable({
     clerkUserId: v.string(),
+    email: v.optional(v.string()),
     role: v.union(
       v.literal("counselor"),
       v.literal("clinician"),

@@ -27,6 +27,7 @@ const profileValidator = v.object({
   _id: v.id("staffProfiles"),
   _creationTime: v.number(),
   clerkUserId: v.optional(v.string()),
+  email: v.optional(v.string()),
   role: staffRoleValidator,
   authorized: v.boolean(),
   displayName: v.string(),
@@ -40,6 +41,7 @@ const teamMemberValidator = v.object({
   _id: v.id("staffProfiles"),
   _creationTime: v.number(),
   clerkUserId: v.optional(v.string()),
+  email: v.optional(v.string()),
   role: staffRoleValidator,
   displayName: v.string(),
   specialty: v.string(),
@@ -123,6 +125,12 @@ export const ensureMyProfile = mutation({
       .unique();
 
     if (existing) {
+      if (identity.email && existing.email !== identity.email) {
+        await ctx.db.patch(existing._id, {
+          email: identity.email.toLowerCase(),
+          updatedAt: Date.now(),
+        });
+      }
       if (existing.role !== role) {
         if (role === "admin" && isDesignatedAdminEmail(identity.email)) {
           await ctx.db.patch(existing._id, { role: "admin", active: true, updatedAt: Date.now() });
@@ -147,6 +155,7 @@ export const ensureMyProfile = mutation({
     const now = Date.now();
     return await ctx.db.insert("staffProfiles", {
       clerkUserId: identity.subject,
+      ...(identity.email ? { email: identity.email.toLowerCase() } : {}),
       role,
       displayName,
       specialty,
@@ -208,6 +217,7 @@ export const listTeamMembers = query({
             _id: profile._id,
             _creationTime: profile._creationTime,
             ...(role === "admin" ? { clerkUserId: profile.clerkUserId } : {}),
+            ...(profile.email ? { email: profile.email } : {}),
             role: profile.role,
             displayName: profile.displayName,
             specialty: profile.specialty,
@@ -261,7 +271,8 @@ export const listAllActiveStaff = query({
 
 export const createTeamMember = mutation({
   args: {
-    clerkUserId: v.optional(v.string()),
+    clerkUserId: v.string(),
+    email: v.string(),
     role: staffRoleValidator,
     displayName: v.string(),
     specialty: v.string(),
@@ -270,10 +281,11 @@ export const createTeamMember = mutation({
   returns: v.id("staffProfiles"),
   handler: async (ctx, args) => {
     const admin = await requireActiveStaff(ctx, "admin");
-    const rawClerkId =
-      args.clerkUserId?.trim() ||
-      `staff_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`;
-    const clerkUserId = normalizeProfileText(rawClerkId, "Clerk user ID", 255);
+    const clerkUserId = normalizeProfileText(args.clerkUserId, "Clerk user ID", 255);
+    const email = normalizeProfileText(args.email, "Email", 320).toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      throw new Error("Enter a valid staff account email address.");
+    }
     const displayName = normalizeProfileText(args.displayName, "Name", 80);
     const specialty = normalizeProfileText(args.specialty, "Specialty", 100);
     const existing = await ctx.db
@@ -287,6 +299,7 @@ export const createTeamMember = mutation({
     const now = Date.now();
     return await ctx.db.insert("staffProfiles", {
       clerkUserId,
+      email,
       role: args.role,
       displayName,
       specialty,
@@ -296,6 +309,43 @@ export const createTeamMember = mutation({
       createdAt: now,
       updatedAt: now,
     });
+  },
+});
+
+export const linkTeamMember = mutation({
+  args: {
+    profileId: v.id("staffProfiles"),
+    clerkUserId: v.string(),
+    email: v.string(),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const admin = await requireActiveStaff(ctx, "admin");
+    const profile = await ctx.db.get(args.profileId);
+    if (!profile) throw new Error("This staff profile no longer exists.");
+    if (profile.clerkUserId === admin.subject && args.clerkUserId !== admin.subject) {
+      throw new Error("You cannot replace your own administrator account.");
+    }
+
+    const normalizedEmail = normalizeProfileText(args.email, "Email", 320).toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      throw new Error("Enter a valid staff account email address.");
+    }
+
+    const existing = await ctx.db
+      .query("staffProfiles")
+      .withIndex("by_clerkUserId", (q) => q.eq("clerkUserId", args.clerkUserId))
+      .unique();
+    if (existing && existing._id !== profile._id) {
+      throw new Error("This Clerk account is already linked to another staff profile.");
+    }
+
+    await ctx.db.patch(profile._id, {
+      clerkUserId: normalizeProfileText(args.clerkUserId, "Clerk user ID", 255),
+      email: normalizedEmail,
+      updatedAt: Date.now(),
+    });
+    return null;
   },
 });
 
