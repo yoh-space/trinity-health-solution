@@ -22,8 +22,6 @@ import {
   ExternalLink,
 } from "lucide-react";
 
-const ADMIN_EMAILS = new Set(["yohansdam@gmail.com", "yashaknike@gmail.com"]);
-
 interface ClientSidebarProps {
   activeTab?: string;
   onTabChange?: (tab: string) => void;
@@ -43,8 +41,7 @@ export function ClientSidebar({
   const { user } = useUser();
   const { signOut } = useClerk();
 
-  const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
-  const isAdmin = ADMIN_EMAILS.has(userEmail);
+  const isAdmin = user?.publicMetadata?.role === "admin";
   const displayName = user?.fullName || user?.firstName || "Client Account";
   const displayContact =
     user?.primaryEmailAddress?.emailAddress ||

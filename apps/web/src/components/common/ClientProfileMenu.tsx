@@ -18,8 +18,6 @@ import {
 import { ClientAuthModal } from "./ClientAuthModal";
 import { useMarketingLanguage } from "@/components/marketing/MarketingLanguageContext";
 
-const ADMIN_EMAILS = new Set(["yohansdam@gmail.com", "yashaknike@gmail.com"]);
-
 export function ClientProfileMenu() {
   const { user, isSignedIn, isLoaded } = useUser();
   const { signOut, openUserProfile } = useClerk();
@@ -70,8 +68,7 @@ export function ClientProfileMenu() {
   }
 
   // User is signed in: Check if admin
-  const userEmail = user.primaryEmailAddress?.emailAddress?.toLowerCase() || "";
-  const isAdmin = ADMIN_EMAILS.has(userEmail);
+  const isAdmin = user.publicMetadata?.role === "admin";
   const displayName = user.fullName || user.firstName || "Client";
   const displayContact =
     user.primaryEmailAddress?.emailAddress ||

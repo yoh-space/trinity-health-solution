@@ -40,12 +40,9 @@ export function AdminSidebar({
   const { user } = useUser();
   const { signOut } = useClerk();
 
-  const userEmail = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
-  const isAdmin =
-    userEmail === "yohansdam@gmail.com" ||
-    userEmail === "yashaknike@gmail.com" ||
-    user?.publicMetadata?.role === "admin";
-  const role = isAdmin ? "Administrator" : String(user?.publicMetadata?.role ?? "Administrator");
+  const role = user?.publicMetadata?.role === "admin"
+    ? "Administrator"
+    : "Staff member";
 
   const navItems = [
     {

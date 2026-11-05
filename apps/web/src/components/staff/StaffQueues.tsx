@@ -33,15 +33,13 @@ interface StaffAppointment {
   staffName?: string;
 }
 
-const ADMIN_EMAILS = new Set(["yohansdam@gmail.com", "yashaknike@gmail.com"]);
 const statuses: RequestStatus[] = ["submitted", "inReview", "contacted", "closed"];
 
 function useStaffRole(): { isLoaded: boolean; role: StaffRole | null } {
   const { user, isLoaded } = useUser();
-  const email = user?.primaryEmailAddress?.emailAddress?.toLowerCase();
   const metadataRole = user?.publicMetadata?.role;
   const role: StaffRole | null =
-    ADMIN_EMAILS.has(email ?? "") || metadataRole === "admin"
+    metadataRole === "admin"
       ? "admin"
       : metadataRole === "clinician" || metadataRole === "counselor"
         ? metadataRole

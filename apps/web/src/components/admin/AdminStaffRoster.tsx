@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import { useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import { useUser } from "@clerk/nextjs";
@@ -114,6 +114,7 @@ export function AdminStaffRoster({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [actionMessage, setActionMessage] = useState<{ text: string; error?: boolean } | null>(null);
   const [clerkUsersById, setClerkUsersById] = useState<Record<string, { email: string; displayName: string }>>({});
+  const adminSyncStarted = useRef(false);
 
   function notify(text: string, error = false) {
     setActionMessage({ text, error });
@@ -152,6 +153,47 @@ export function AdminStaffRoster({
 
     return () => controller.abort();
   }, [teamMembers]);
+
+  useEffect(() => {
+    if (adminSyncStarted.current) return;
+    adminSyncStarted.current = true;
+
+    let cancelled = false;
+    async function synchronizeAdministrators() {
+      try {
+        const response = await fetch("/api/admin/staff-directory?role=admin");
+        if (!response.ok) return;
+        const result = (await response.json()) as {
+          users?: Array<{ id: string; email: string; displayName: string }>;
+        };
+        const existingIds = new Set(
+          teamMembers.map((member) => member.clerkUserId).filter(Boolean),
+        );
+        for (const administrator of result.users ?? []) {
+          if (cancelled || existingIds.has(administrator.id)) continue;
+          try {
+            await createMember({
+              clerkUserId: administrator.id,
+              email: administrator.email,
+              displayName: administrator.displayName,
+              specialty: "Administration",
+              role: "admin",
+              availability: "available",
+            });
+          } catch {
+            // Another tab or administrator may have created the profile first.
+          }
+        }
+      } catch {
+        // The Convex directory remains usable if Clerk discovery is unavailable.
+      }
+    }
+
+    void synchronizeAdministrators();
+    return () => {
+      cancelled = true;
+    };
+  }, [createMember, teamMembers]);
 
   // Aggregate KPI Calculations
   const metrics = useMemo(() => {
@@ -456,7 +498,7 @@ export function AdminStaffRoster({
       case "counselor":
         return <Badge variant="terracotta">Counselor</Badge>;
       case "admin":
-        return <Badge variant="info">Admin</Badge>;
+        return <Badge variant="info">Administrator</Badge>;
     }
   };
 
@@ -698,7 +740,7 @@ export function AdminStaffRoster({
                 }`}
               >
                 <Shield size={11} />
-                <span>Admins ({metrics.adminsTotal})</span>
+                <span>Administrators ({metrics.adminsTotal})</span>
               </button>
             </div>
 

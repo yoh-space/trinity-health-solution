@@ -1,10 +1,6 @@
 import { auth, clerkClient } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-
-const ADMIN_EMAILS = new Set([
-  "yohansdam@gmail.com",
-  "yashaknike@gmail.com",
-]);
+import { ADMIN_EMAILS } from "@/lib/server/adminAccess";
 const STAFF_ROLES = ["admin", "clinician", "counselor"] as const;
 type StaffRole = (typeof STAFF_ROLES)[number];
 
@@ -45,6 +41,19 @@ export async function GET(request: Request) {
     }
 
     const url = new URL(request.url);
+    const role = url.searchParams.get("role");
+    if (role === "admin") {
+      const { data } = await admin.client.users.getUserList({ limit: 500 });
+      const administrators = data.filter((candidate) => {
+        const email = candidate.primaryEmailAddress?.emailAddress?.toLowerCase().trim();
+        return Boolean(email) &&
+          (candidate.publicMetadata.role === "admin" || ADMIN_EMAILS.has(email ?? ""));
+      });
+      return NextResponse.json({
+        users: administrators.map((user) => emailAndName(user)),
+      });
+    }
+
     const email = url.searchParams.get("email")?.trim().toLowerCase();
     if (email) {
       const { data } = await admin.client.users.getUserList({
