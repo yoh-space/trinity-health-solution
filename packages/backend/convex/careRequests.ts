@@ -11,7 +11,11 @@ import {
   type QueryCtx,
 } from "./_generated/server";
 import { type Doc, type Id } from "./_generated/dataModel";
-import { getActiveStaffIdentity, requireActiveStaff } from "./auth";
+import {
+  getActiveStaffIdentity,
+  getEffectiveRole,
+  requireActiveStaff,
+} from "./auth";
 
 const requestTypeValidator = v.union(
   v.literal("clinical"),
@@ -114,6 +118,18 @@ const adminQueueItemValidator = v.object({
   createdAt: v.number(),
   updatedAt: v.number(),
   assignedToProfileId: v.optional(v.id("staffProfiles")),
+  assignedToName: v.optional(v.string()),
+});
+const staffRequestDetailsValidator = v.object({
+  _id: v.id("careRequests"),
+  requestType: requestTypeValidator,
+  contactMethod: contactMethodValidator,
+  contactDetails: v.string(),
+  requestSummary: v.optional(v.string()),
+  status: requestStatusValidator,
+  createdAt: v.number(),
+  updatedAt: v.number(),
+  assignedToMe: v.boolean(),
   assignedToName: v.optional(v.string()),
 });
 
@@ -644,6 +660,51 @@ export const listAdminQueuePage = query({
           };
         }),
       ),
+    };
+  },
+});
+
+export const getStaffRequestDetails = query({
+  args: { requestId: v.id("careRequests") },
+  returns: v.union(staffRequestDetailsValidator, v.null()),
+  handler: async (ctx, { requestId }) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Authentication required.");
+    const role = getEffectiveRole(identity);
+    if (!role) throw new Error("An authorized staff role is required.");
+    await requireActiveStaff(ctx, role);
+
+    const request = await ctx.db.get(requestId);
+    if (!request) return null;
+    if (role !== "admin") {
+      const expectedType = role === "clinician" ? "clinical" : "counselling";
+      if (request.requestType !== expectedType) {
+        throw new Error("This request is outside your staff role.");
+      }
+      if (request.assignedTo !== identity.subject) {
+        throw new Error("Only assigned staff can view this request.");
+      }
+    }
+
+    const assignedTo = request.assignedTo;
+    const assignedProfile = assignedTo
+      ? await ctx.db
+          .query("staffProfiles")
+          .withIndex("by_clerkUserId", (q) => q.eq("clerkUserId", assignedTo))
+          .unique()
+      : null;
+
+    return {
+      _id: request._id,
+      requestType: request.requestType,
+      contactMethod: request.contactMethod,
+      contactDetails: request.contactDetails,
+      ...(request.requestSummary ? { requestSummary: request.requestSummary } : {}),
+      status: request.status,
+      createdAt: request.createdAt,
+      updatedAt: request.updatedAt,
+      assignedToMe: request.assignedTo === identity.subject,
+      ...(assignedProfile ? { assignedToName: assignedProfile.displayName } : {}),
     };
   },
 });

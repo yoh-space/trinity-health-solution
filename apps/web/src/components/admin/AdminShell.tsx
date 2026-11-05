@@ -17,6 +17,15 @@ export function AdminShell({
 }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
 
+  const getBreadcrumbTitle = (tab?: string) => {
+    if (!tab || tab === "overview") return "Overview";
+    if (tab === "roster") return "Manage Team";
+    if (tab === "triage") return "Care Triage Queue";
+    if (tab === "curriculum") return "Curriculum Studio";
+    if (tab === "appointments") return "Consultations";
+    return tab.replace("-", " ");
+  };
+
   return (
     <div className="min-h-screen bg-[#f7faf6] text-[#163826]">
       {/* Persistent Sidebar */}
@@ -60,11 +69,10 @@ export function AdminShell({
               </span>
               <span className="text-[#c1cdc0]">/</span>
               <span className="text-xs font-bold capitalize text-[#1a3a28]">
-                {activeTab ? activeTab.replace("-", " ") : "Overview"}
+                {getBreadcrumbTitle(activeTab)}
               </span>
             </div>
           </div>
-
         </header>
 
         {/* Content Body */}

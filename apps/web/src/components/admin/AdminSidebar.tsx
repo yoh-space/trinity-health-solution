@@ -65,7 +65,7 @@ export function AdminSidebar({
         },
         {
           id: "roster",
-          label: "Staff Directory",
+          label: "Manage Team",
           icon: Users,
           isTab: true,
         },
