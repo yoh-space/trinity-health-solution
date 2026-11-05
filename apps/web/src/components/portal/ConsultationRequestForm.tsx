@@ -68,7 +68,7 @@ export function ConsultationRequestForm() {
           A little support is on its way.
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-[#496551] max-w-md mx-auto">
-          Your inquiry has been placed into our clinical triage queue. A member of Trinity's health staff will review your note and contact you.
+          Your question has been sent to the Trinity care team. Someone will review it and contact you.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
@@ -101,13 +101,13 @@ export function ConsultationRequestForm() {
       >
         <div className="border-b border-[#e5eee5] pb-5">
           <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#1c573e]">
-            CARE TRIAGE REQUEST
+            CARE REQUEST
           </span>
           <h1 className="mt-1.5 text-3xl font-extrabold text-[#163826]">
             What health guidance would be useful?
           </h1>
           <p className="mt-2 text-xs leading-relaxed text-[#597161]">
-            Choose a consultation track and topic. Verified clinicians and nutrition counselors will reach out to assist you.
+            Choose what you need help with. Our care team will contact you to assist you.
           </p>
         </div>
 
@@ -121,7 +121,7 @@ export function ConsultationRequestForm() {
         {/* Consultation Track */}
         <div className="mt-6">
           <label className="block text-xs font-bold uppercase tracking-wider text-[#2e4a38] mb-2">
-            Consultation Track
+            What do you need help with?
           </label>
           <div className="grid grid-cols-2 gap-3">
             <button
@@ -133,8 +133,8 @@ export function ConsultationRequestForm() {
                   : "border-[#d8e3d8] bg-white text-[#4d6654] hover:bg-[#fafcfa]"
               }`}
             >
-              <p className="text-xs font-bold">Nutrition Counselling</p>
-              <p className="text-[11px] text-[#6e8574] mt-0.5">Family diet, pregnancy meals & weaning</p>
+              <p className="text-xs font-bold">Food and family guidance</p>
+              <p className="text-[11px] text-[#6e8574] mt-0.5">Meals, pregnancy, breastfeeding, and child feeding</p>
             </button>
             <button
               type="button"
@@ -145,8 +145,8 @@ export function ConsultationRequestForm() {
                   : "border-[#d8e3d8] bg-white text-[#4d6654] hover:bg-[#fafcfa]"
               }`}
             >
-              <p className="text-xs font-bold">Clinical Health Inquiry</p>
-              <p className="text-[11px] text-[#6e8574] mt-0.5">Maternal care, hygiene & general health</p>
+              <p className="text-xs font-bold">Health question</p>
+              <p className="text-[11px] text-[#6e8574] mt-0.5">General health, pregnancy care, or safe water</p>
             </button>
           </div>
         </div>

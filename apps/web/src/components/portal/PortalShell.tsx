@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
-import { Menu, PlusCircle, ShieldCheck, Heart, User } from "lucide-react";
+import { Menu } from "lucide-react";
 import { ClientSidebar } from "./ClientSidebar";
 import { ClientProfileMenu } from "@/components/common/ClientProfileMenu";
 import { MarketingLanguageProvider } from "@/components/marketing/MarketingLanguageContext";
@@ -19,7 +19,7 @@ function PortalHeader({ onOpenMobile }: { onOpenMobile: () => void }) {
     if (pathname.includes("/appointments") || tab === "appointments")
       return "Appointments & Visits";
     if (pathname.includes("/consultations/new") || tab === "new-request")
-      return "Request Support";
+      return "Send a question";
     if (pathname.includes("/saved") || tab === "saved")
       return "Saved Curriculum Guides";
     if (tab === "requests") return "My Care Requests";
@@ -65,18 +65,8 @@ function PortalHeader({ onOpenMobile }: { onOpenMobile: () => void }) {
         </div>
       </div>
 
-      {/* Right Controls */}
+      {/* Client profile menu */}
       <div className="flex items-center gap-3">
-        {/* Quick Action Button: New Care Request */}
-        <Link
-          href="/portal?tab=new-request"
-          className="hidden items-center gap-1.5 rounded-full bg-[#1c573e] px-3.5 py-1.5 text-xs font-bold text-white shadow-2xs transition hover:bg-[#154631] active:scale-95 sm:inline-flex"
-        >
-          <PlusCircle size={14} />
-          <span>Request Support</span>
-        </Link>
-
-        {/* Client Profile Menu Trigger */}
         <ClientProfileMenu />
       </div>
     </header>

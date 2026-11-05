@@ -202,36 +202,15 @@ export function PortalDashboard() {
       <section className="flex flex-col justify-between gap-5 md:flex-row md:items-end border-b border-[#e2eae1] pb-6">
         <div>
           <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#1c573e]">
-            PERSONAL CARE SPACE
+            MY CARE SPACE
           </span>
           <p className="mt-2 text-sm text-[#5d7364]">
             {language === "am"
               ? "የቤተሰብ ጤና ጥያቄዎችን፣ የምክክር ቀጠሮዎችንና የተዘጋጁ ትምህርቶችን በአንድ ቦታ ይከታተሉ።"
-              : "A dedicated workspace to organize family health inquiries, clinical consultations, and verified lessons."}
+              : "Keep your health questions, appointments, and learning notes in one simple place."}
           </p>
         </div>
 
-        {/* Action Button */}
-        <div className="flex flex-wrap gap-2.5">
-          <button
-            type="button"
-            onClick={() => {
-              setActiveTab("new-request");
-              router.push("/portal?tab=new-request");
-            }}
-            className="inline-flex items-center gap-2 rounded-full bg-[#1c573e] px-5 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-[#154631] active:scale-95"
-          >
-            <PlusCircle size={15} />
-            <span>{language === "am" ? "አዲስ ጥያቄ አቅርብ" : "Request Support"}</span>
-          </button>
-          <Link
-            href="/ask-opal"
-            className="inline-flex items-center gap-2 rounded-full border border-[#cbd8cb] bg-white px-4 py-2.5 text-xs font-semibold text-[#274c37] transition hover:bg-[#f2f7f1]"
-          >
-            <HelpCircle size={15} />
-            <span>{language === "am" ? "ኦፓልን ይጠይቁ" : "Ask Opal Guidance"}</span>
-          </Link>
-        </div>
       </section>
 
       {currentTab === "overview" && (
@@ -292,17 +271,6 @@ export function PortalDashboard() {
                 router.push("/learn");
               }}
             />
-            <SummaryCard
-              title="Requests on File"
-              value={careRequests === undefined ? "—" : String(careRequests.length)}
-              subtitle={careRequests === undefined ? "Loading care history" : "All submitted requests"}
-              icon={ClipboardList}
-              accent="purple"
-              onClick={() => {
-                setActiveTab("requests");
-                router.push("/portal?tab=requests");
-              }}
-            />
           </section>
         </>
       )}
@@ -322,12 +290,12 @@ export function PortalDashboard() {
               <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center border-b border-[#e8f0e8] pb-5">
                 <div>
                   <span className="text-xs font-bold uppercase tracking-wider text-[#1c573e]">
-                    Latest Care Request Status
+                      Latest request
                   </span>
                   <h3 className="mt-1 text-xl font-bold text-[#163826]">
                     {careRequests[0].requestType === "clinical"
-                      ? "Clinical Health Inquiry"
-                      : "Family Nutrition & Lifestyle Counselling"}
+                      ? "Health question"
+                      : "Food and family guidance"}
                   </h3>
                 </div>
 
@@ -376,7 +344,7 @@ export function PortalDashboard() {
                   Need guidance on food safety, pregnancy nutrition, or child feeding?
                 </h3>
                 <p className="mt-2 text-xs leading-relaxed text-[#5e7464]">
-                  Submit a confidential request. Our verified clinicians and nutrition staff will review and contact you via your preferred phone or email.
+                  Send a private question. Our care team will review it and contact you by phone or email.
                 </p>
               </div>
               <button
@@ -387,7 +355,7 @@ export function PortalDashboard() {
                 }}
                 className="shrink-0 rounded-2xl bg-[#1c573e] px-6 py-3 text-xs font-bold text-white shadow-xs hover:bg-[#154631] transition"
               >
-                + Start a Care Request
+                Send a question
               </button>
             </div>
           )}
@@ -470,7 +438,7 @@ export function PortalDashboard() {
               className="inline-flex items-center gap-1.5 rounded-full bg-[#1c573e] px-4 py-2 text-xs font-bold text-white shadow-xs hover:bg-[#154631] transition"
             >
               <PlusCircle size={14} />
-              <span>+ New Request</span>
+                  <span>New question</span>
             </button>
           </div>
 
@@ -485,7 +453,7 @@ export function PortalDashboard() {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-xs font-bold text-[#1c573e] uppercase tracking-wider">
-                          {req.requestType === "clinical" ? "Clinical Inquiry" : "Nutrition Counselling"}
+                          {req.requestType === "clinical" ? "Health question" : "Food and family guidance"}
                         </span>
                         <span className="text-[#cbd6cc]">•</span>
                         <span className="text-xs text-[#6e8574]">
@@ -506,7 +474,7 @@ export function PortalDashboard() {
                         <span>Contact: {req.contactDetails}</span>
                       </span>
                       <span>•</span>
-                      <span>Consent verified</span>
+                      <span>Your permission is recorded</span>
                     </div>
 
                   </div>
@@ -533,26 +501,26 @@ export function PortalDashboard() {
                 className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-[#1c573e] px-5 py-2.5 text-xs font-bold text-white shadow-xs"
               >
                 <PlusCircle size={14} />
-                <span>Submit a Request</span>
+                <span>Send a question</span>
               </button>
             </div>
           )}
         </div>
       )}
 
-      {/* TAB 3: REQUEST SUPPORT (NEW REQUEST) */}
+      {/* TAB 3: SEND A QUESTION */}
       {currentTab === "new-request" && (
         <div className="max-w-2xl">
           <div className="rounded-3xl border border-[#dce8de] bg-white p-6 sm:p-8 shadow-xs">
             <div className="border-b border-[#e4eee5] pb-5">
               <span className="text-xs font-bold uppercase tracking-wider text-[#1c573e]">
-                DIRECT CLINICAL & NUTRITION SUPPORT
+                GETTING THE RIGHT HELP
               </span>
               <h2 className="mt-1.5 text-2xl font-bold text-[#163826]">
                 Submit a Care Request
               </h2>
               <p className="mt-1 text-xs leading-relaxed text-[#5f7565]">
-                Tell our team what health guidance would be useful. We connect you with verified clinicians and nutrition counselors.
+                Tell our care team what kind of help you need.
               </p>
             </div>
 
@@ -563,7 +531,7 @@ export function PortalDashboard() {
                   Request Received!
                 </h3>
                 <p className="text-xs leading-relaxed text-[#43634c] max-w-md mx-auto">
-                  Your request has been submitted to our care triage queue. A team member will review it and reach out via your provided contact details.
+                  Your question has been sent to the care team. Someone will review it and contact you using the details you provided.
                 </p>
                 <div className="pt-2 flex justify-center gap-3">
                   <button
@@ -598,7 +566,7 @@ export function PortalDashboard() {
                 {/* Consultation Type */}
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-[#2d4937] mb-2">
-                    Consultation Track
+                    What do you need help with?
                   </label>
                   <div className="grid grid-cols-2 gap-3">
                     <button
@@ -610,8 +578,8 @@ export function PortalDashboard() {
                           : "border-[#d8e3d8] bg-white text-[#4d6654] hover:bg-[#fafcfa]"
                       }`}
                     >
-                      <p className="text-xs font-bold">Nutrition Counselling</p>
-                      <p className="text-[11px] text-[#6d8272] mt-0.5">Family diet, pregnancy meals & weaning</p>
+                      <p className="text-xs font-bold">Food and family guidance</p>
+                      <p className="text-[11px] text-[#6d8272] mt-0.5">Meals, pregnancy, breastfeeding, and child feeding</p>
                     </button>
                     <button
                       type="button"
@@ -622,8 +590,8 @@ export function PortalDashboard() {
                           : "border-[#d8e3d8] bg-white text-[#4d6654] hover:bg-[#fafcfa]"
                       }`}
                     >
-                      <p className="text-xs font-bold">Clinical Health Inquiry</p>
-                      <p className="text-[11px] text-[#6d8272] mt-0.5">Maternal care, hygiene & general health</p>
+                      <p className="text-xs font-bold">Health question</p>
+                      <p className="text-[11px] text-[#6d8272] mt-0.5">General health, pregnancy care, or safe water</p>
                     </button>
                   </div>
                 </div>
@@ -734,8 +702,8 @@ export function PortalDashboard() {
           <div className="rounded-3xl border border-[#dce8de] bg-white p-6 sm:p-8 shadow-xs">
             <div className="flex items-center justify-between border-b border-[#e2eae1] pb-4">
               <div>
-                <h3 className="text-xl font-bold text-[#163826]">Upcoming Consultations</h3>
-                <p className="text-xs text-[#627768] mt-0.5">Confirmed sessions with Trinity clinicians and community counselors.</p>
+                <h3 className="text-xl font-bold text-[#163826]">Upcoming appointments</h3>
+                  <p className="text-xs text-[#627768] mt-0.5">Your scheduled visits with the care team.</p>
               </div>
               {clientAppointments !== undefined && (
                 <span className="rounded-full bg-[#eaf4eb] px-3 py-1 text-xs font-bold text-[#1c573e]">
@@ -796,7 +764,7 @@ export function PortalDashboard() {
         </div>
       )}
 
-      {/* TAB 5: SAVED GUIDES */}
+      {/* TAB 5: LEARNING NOTES */}
       {currentTab === "saved" && (
         <div className="space-y-6">
           <div className="rounded-3xl border border-[#dce8de] bg-white p-6 sm:p-8 shadow-xs">
@@ -828,8 +796,8 @@ export function PortalDashboard() {
         <div className="max-w-2xl space-y-6">
           <div className="rounded-3xl border border-[#dce8de] bg-white p-6 sm:p-8 shadow-xs">
             <div className="border-b border-[#e2eae1] pb-4">
-              <h3 className="text-xl font-bold text-[#163826]">Client Profile & Preferences</h3>
-              <p className="text-xs text-[#627768] mt-0.5">Manage your personal details and communication preferences.</p>
+              <h3 className="text-xl font-bold text-[#163826]">My details and preferences</h3>
+              <p className="text-xs text-[#627768] mt-0.5">Update your personal details and language.</p>
             </div>
 
             <div className="mt-6 space-y-5">
@@ -887,7 +855,7 @@ export function PortalDashboard() {
               <div className="pt-4 border-t border-[#edf2ec] flex items-center justify-between">
                 <div>
                   <h5 className="text-xs font-bold text-[#163826]">Account Security & Connected Methods</h5>
-                  <p className="text-[11px] text-[#6d8272]">Manage Google OAuth, phone numbers, and active sessions.</p>
+                    <p className="text-[11px] text-[#6d8272]">Manage your sign-in methods, phone number, and active sessions.</p>
                 </div>
                 <button
                   type="button"
