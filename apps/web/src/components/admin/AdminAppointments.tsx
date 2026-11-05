@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "./ui/card";
 import { Badge } from "./ui/badge";
+import { AppointmentDayCalendar } from "@/components/appointments/AppointmentDayCalendar";
 
 export interface AppointmentItem {
   _id: string;
@@ -79,6 +80,14 @@ export function AdminAppointments({
           </div>
         )}
       </CardHeader>
+
+      <CardContent className="p-5 pb-0">
+        <AppointmentDayCalendar
+          appointments={appointments}
+          onComplete={(appointmentId) => handleStatusChange(appointmentId, "completed")}
+          onCancel={(appointmentId) => handleStatusChange(appointmentId, "cancelled")}
+        />
+      </CardContent>
 
       <CardContent className="p-0">
         <div className="overflow-x-auto">

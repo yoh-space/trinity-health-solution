@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { usePaginatedQuery, useQuery } from "convex/react";
 import { anyApi } from "convex/server";
+import { AppointmentDayCalendar } from "@/components/appointments/AppointmentDayCalendar";
 
 type StaffRole = "admin" | "clinician" | "counselor";
 type RequestStatus = "submitted" | "inReview" | "contacted" | "closed";
@@ -203,27 +204,8 @@ export function StaffAppointments() {
       {appointments === undefined ? (
         <LoadingState label="Loading appointments..." />
       ) : appointments.length > 0 ? (
-        <div className="mt-8 grid gap-4">
-          {appointments.map((appointment) => (
-            <article key={appointment._id} className="rounded-2xl border border-[#dce8de] bg-white p-6">
-              <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#438451]">
-                {new Date(appointment.scheduledAt).toLocaleString(undefined, {
-                  weekday: "long",
-                  month: "long",
-                  day: "numeric",
-                  hour: "numeric",
-                  minute: "2-digit",
-                })}
-              </p>
-              <h2 className="mt-3 text-xl font-semibold">
-                {appointment.requestSummary || `${appointment.requestType === "clinical" ? "Clinical" : "Counselling"} care request`}
-              </h2>
-              <p className="mt-2 text-sm text-[#5f7665]">
-                {appointment.format === "online" ? "Online" : "In person"} · {appointment.durationMinutes} minutes
-                {appointment.staffName ? ` · ${appointment.staffName}` : ""}
-              </p>
-            </article>
-          ))}
+        <div className="mt-8">
+          <AppointmentDayCalendar appointments={appointments} />
         </div>
       ) : (
         <EmptyState label="No upcoming appointments are scheduled." />
