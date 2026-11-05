@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
@@ -27,6 +27,8 @@ function numericCount(value: Count | undefined) {
 export function NotificationBell({ scope }: { scope: "client" | "staff" | "admin" }) {
   const { user, isLoaded } = useUser();
   const [open, setOpen] = useState(false);
+  const [dismissedCount, setDismissedCount] = useState(0);
+  const previousCount = useRef(0);
   const role = user?.publicMetadata?.role;
   const isStaff = scope !== "client";
 
@@ -58,12 +60,27 @@ export function NotificationBell({ scope }: { scope: "client" | "staff" | "admin
         : clientRequests
           ? clientRequests.filter((request) => request.status !== "closed").length
           : 0;
-  const displayCount = count === "100+" ? "99+" : String(count);
-  const hasNotifications = numericCount(count) > 0;
+  const rawCount = numericCount(count);
+
+  useEffect(() => {
+    if (rawCount < previousCount.current) {
+      setDismissedCount(0);
+    }
+    previousCount.current = rawCount;
+  }, [rawCount]);
+
+  const visibleCount = Math.max(0, rawCount - dismissedCount);
+  const displayCount = visibleCount >= 100 ? "99+" : String(visibleCount);
+  const hasNotifications = visibleCount > 0;
   const destination = scope === "admin" ? "/admin" : scope === "staff" ? "/staff/requests" : "/portal?tab=requests";
   const message = isStaff
-    ? `${displayCount} care request${numericCount(count) === 1 ? "" : "s"} need${numericCount(count) === 1 ? "s" : ""} attention.`
-    : `${displayCount} active care question${numericCount(count) === 1 ? "" : "s"}.`;
+    ? `${displayCount} care request${visibleCount === 1 ? "" : "s"} need${visibleCount === 1 ? "s" : ""} attention.`
+    : `${displayCount} active care question${visibleCount === 1 ? "" : "s"}.`;
+
+  function dismissNotification() {
+    setDismissedCount((current) => Math.min(current + 1, rawCount));
+    setOpen(false);
+  }
 
   return (
     <div className="relative">
@@ -91,7 +108,7 @@ export function NotificationBell({ scope }: { scope: "client" | "staff" | "admin
           {hasNotifications ? (
             <Link
               href={destination}
-              onClick={() => setOpen(false)}
+              onClick={dismissNotification}
               className="mt-2 block rounded-xl border border-red-100 bg-red-50 p-3 hover:bg-red-100"
             >
               <p className="text-xs font-bold text-red-800">{message}</p>
