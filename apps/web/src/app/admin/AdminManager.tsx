@@ -21,6 +21,21 @@ import { AdminTriageQueue, CareRequestItem } from "@/components/admin/AdminTriag
 import { AdminStaffRoster, TeamMemberItem } from "@/components/admin/AdminStaffRoster";
 import { AdminAppointments, AppointmentItem } from "@/components/admin/AdminAppointments";
 
+type BoundedCount = number | "100+";
+
+function sumCounts(...counts: BoundedCount[]): BoundedCount {
+  if (counts.some((count) => count === "100+")) return "100+";
+  let total = 0;
+  for (const count of counts) {
+    if (count !== "100+") total += count;
+  }
+  return total;
+}
+
+function chartCount(count: BoundedCount): number {
+  return count === "100+" ? 100 : count;
+}
+
 export default function AdminManager() {
   // Active Navigation Tab
   const [activeTab, setActiveTab] = useState<string>("overview");
@@ -33,16 +48,9 @@ export default function AdminManager() {
   const adminOverview = useQuery(anyApi.careRequests.getAdminDashboardOverview) as
     | {
         counts: {
-          clinical: { submitted: number | string; inReview: number | string; contacted: number | string; closed: number | string };
-          counselling: { submitted: number | string; inReview: number | string; contacted: number | string; closed: number | string };
+          clinical: { submitted: BoundedCount; inReview: BoundedCount; contacted: BoundedCount; closed: BoundedCount };
+          counselling: { submitted: BoundedCount; inReview: BoundedCount; contacted: BoundedCount; closed: BoundedCount };
         };
-        recentRequests: Array<{
-          _id: string;
-          requestType: "clinical" | "counselling";
-          status: "submitted" | "inReview" | "contacted" | "closed";
-          createdAt: number;
-          assigned: boolean;
-        }>;
       }
     | undefined;
 
@@ -59,6 +67,33 @@ export default function AdminManager() {
     anyApi.staff.listTeamMembers,
     teamPaginationArgs
   ) as { page: TeamMemberItem[] } | undefined;
+
+  const adminQueueArgs = useMemo(
+    () => ({
+      requestType: "all" as const,
+      status: "all" as const,
+      paginationOpts: { numItems: 25, cursor: null },
+    }),
+    []
+  );
+  const adminQueuePage = useQuery(
+    anyApi.careRequests.listAdminQueuePage,
+    adminQueueArgs
+  ) as
+    | {
+        page: Array<{
+          _id: string;
+          requestType: "clinical" | "counselling";
+          status: "submitted" | "inReview" | "contacted" | "closed";
+          contactMethod: "email" | "phone";
+          contactDetails: string;
+          requestSummary?: string;
+          createdAt: number;
+          assignedToProfileId?: string;
+          assignedToName?: string;
+        }>;
+      }
+    | undefined;
 
   const upcomingAppointments = useQuery(
     anyApi.appointments.listUpcomingForAdmin,
@@ -97,51 +132,62 @@ export default function AdminManager() {
   const effectiveTeam = teamPage?.page ?? [];
   const effectiveAppointments = upcomingAppointments ?? [];
 
-  const effectiveRequests: CareRequestItem[] = useMemo(() => {
-    return (adminOverview?.recentRequests ?? []).map((r) => ({
-        _id: r._id,
-        requestType: r.requestType,
-        status: r.status,
-        createdAt: r.createdAt,
-        contactMethod: "phone",
-        contactDetails: "Active Client",
-        requestSummary: `${r.requestType === "clinical" ? "Clinical" : "Counseling"} family inquiry`,
-      }));
-  }, [adminOverview]);
+  const effectiveRequests: CareRequestItem[] = (adminQueuePage?.page ?? []).map(
+    (request) => ({
+      _id: request._id,
+      requestType: request.requestType,
+      status: request.status,
+      contactMethod: request.contactMethod,
+      contactDetails: request.contactDetails,
+      requestSummary: request.requestSummary,
+      assignedTo: request.assignedToProfileId,
+      assignedStaffName: request.assignedToName,
+      createdAt: request.createdAt,
+    }),
+  );
 
   // Aggregate KPI Metrics
   const kpiData = useMemo(() => {
+    if (
+      !adminOverview ||
+      !teamPage ||
+      content === undefined ||
+      upcomingAppointments === undefined
+    ) {
+      return null;
+    }
+
     const clinCounts = adminOverview?.counts.clinical;
     const counCounts = adminOverview?.counts.counselling;
 
-    const clinSubmitted = Number(clinCounts?.submitted ?? 2);
-    const clinInReview = Number(clinCounts?.inReview ?? 3);
-    const clinContacted = Number(clinCounts?.contacted ?? 4);
-    const clinClosed = Number(clinCounts?.closed ?? 8);
-
-    const counSubmitted = Number(counCounts?.submitted ?? 3);
-    const counInReview = Number(counCounts?.inReview ?? 5);
-    const counContacted = Number(counCounts?.contacted ?? 6);
-    const counClosed = Number(counCounts?.closed ?? 12);
-
-    const totalClin = clinSubmitted + clinInReview + clinContacted + clinClosed;
-    const totalCoun = counSubmitted + counInReview + counContacted + counClosed;
+    const totalClin = sumCounts(
+      clinCounts.submitted,
+      clinCounts.inReview,
+      clinCounts.contacted,
+      clinCounts.closed,
+    );
+    const totalCoun = sumCounts(
+      counCounts.submitted,
+      counCounts.inReview,
+      counCounts.contacted,
+      counCounts.closed,
+    );
 
     const activeStaff = effectiveTeam.filter((m) => m.active).length;
     const availableStaff = effectiveTeam.filter((m) => m.active && m.availability === "available").length;
     const clinicians = effectiveTeam.filter((m) => m.role === "clinician").length;
     const counselors = effectiveTeam.filter((m) => m.role === "counselor").length;
 
-    const publishedNotes = content?.filter((item) => item.status === "published").length ?? 6;
-    const draftNotes = content?.filter((item) => item.status === "draft").length ?? 2;
+    const publishedNotes = content.filter((item) => item.status === "published").length;
+    const draftNotes = content.filter((item) => item.status === "draft").length;
 
     const onlineAppts = effectiveAppointments.filter((a) => a.format === "online").length;
 
     return {
-      totalCareRequests: totalClin + totalCoun,
+      totalCareRequests: sumCounts(totalClin, totalCoun),
       clinicalRequests: totalClin,
       counsellingRequests: totalCoun,
-      submittedBacklog: clinSubmitted + counSubmitted,
+      submittedBacklog: sumCounts(clinCounts.submitted, counCounts.submitted),
       activeStaffCount: activeStaff,
       availableStaffCount: availableStaff,
       clinicianCount: clinicians,
@@ -151,11 +197,12 @@ export default function AdminManager() {
       upcomingAppointmentsCount: effectiveAppointments.length,
       onlineAppointmentsCount: onlineAppts,
     };
-  }, [adminOverview, effectiveTeam, content, effectiveAppointments]);
+  }, [adminOverview, teamPage, effectiveTeam, content, upcomingAppointments, effectiveAppointments]);
 
   // Content Category Distribution Breakdown
   const contentCategoryDistribution = useMemo(() => {
-    return categoryOptions.map((category) => {
+    const categories = [...new Set((content ?? []).map((item) => item.category.trim()).filter(Boolean))];
+    return categories.map((category) => {
       const items = content?.filter(
         (item) => item.category.trim().toLocaleLowerCase() === category.toLocaleLowerCase()
       ) ?? [];
@@ -169,52 +216,48 @@ export default function AdminManager() {
 
   // Memoized Chart Data to prevent re-render thrashing
   const chartRequestCounts = useMemo(
-    () => ({
+    () => adminOverview && ({
       clinical: {
-        submitted: Number(adminOverview?.counts.clinical.submitted ?? 3),
-        inReview: Number(adminOverview?.counts.clinical.inReview ?? 4),
-        contacted: Number(adminOverview?.counts.clinical.contacted ?? 5),
-        closed: Number(adminOverview?.counts.clinical.closed ?? 10),
+        submitted: chartCount(adminOverview.counts.clinical.submitted),
+        inReview: chartCount(adminOverview.counts.clinical.inReview),
+        contacted: chartCount(adminOverview.counts.clinical.contacted),
+        closed: chartCount(adminOverview.counts.clinical.closed),
       },
       counselling: {
-        submitted: Number(adminOverview?.counts.counselling.submitted ?? 4),
-        inReview: Number(adminOverview?.counts.counselling.inReview ?? 6),
-        contacted: Number(adminOverview?.counts.counselling.contacted ?? 8),
-        closed: Number(adminOverview?.counts.counselling.closed ?? 14),
+        submitted: chartCount(adminOverview.counts.counselling.submitted),
+        inReview: chartCount(adminOverview.counts.counselling.inReview),
+        contacted: chartCount(adminOverview.counts.counselling.contacted),
+        closed: chartCount(adminOverview.counts.counselling.closed),
       },
     }),
-    [
-      adminOverview?.counts.clinical.submitted,
-      adminOverview?.counts.clinical.inReview,
-      adminOverview?.counts.clinical.contacted,
-      adminOverview?.counts.clinical.closed,
-      adminOverview?.counts.counselling.submitted,
-      adminOverview?.counts.counselling.inReview,
-      adminOverview?.counts.counselling.contacted,
-      adminOverview?.counts.counselling.closed,
-    ]
+    [adminOverview]
   );
 
   const chartStaffDistribution = useMemo(() => {
-    const clinicians = effectiveTeam.filter((m) => m.role === "clinician");
-    const counselors = effectiveTeam.filter((m) => m.role === "counselor");
-    const admins = effectiveTeam.filter((m) => m.role === "admin");
+    const clinicians = effectiveTeam.filter((member) => member.role === "clinician" && member.active);
+    const counselors = effectiveTeam.filter((member) => member.role === "counselor" && member.active);
+    const admins = effectiveTeam.filter((member) => member.role === "admin" && member.active);
+    const caseload = (members: TeamMemberItem[]) =>
+      members.reduce(
+        (total, member) => total + (member.openRequestCount === "100+" ? 100 : member.openRequestCount),
+        0,
+      );
 
     return {
       clinicians: {
         active: clinicians.length,
         available: clinicians.filter((m) => m.availability === "available").length,
-        caseload: 6,
+        caseload: caseload(clinicians),
       },
       counselors: {
         active: counselors.length,
         available: counselors.filter((m) => m.availability === "available").length,
-        caseload: 8,
+        caseload: caseload(counselors),
       },
       admins: {
         active: admins.length,
         available: admins.filter((m) => m.availability === "available").length,
-        caseload: 0,
+        caseload: caseload(admins),
       },
     };
   }, [effectiveTeam]);
@@ -386,35 +429,48 @@ export default function AdminManager() {
         {activeTab === "overview" && (
           <>
             {/* Top 4-Card Executive KPI Overview */}
-            <section className="mb-8">
-              <AdminKpiOverview data={kpiData} />
-            </section>
+            {kpiData && (
+              <section className="mb-8">
+                <AdminKpiOverview data={kpiData} />
+              </section>
+            )}
 
             <div className="space-y-8">
-              <AdminCharts
-                requestStatusCounts={chartRequestCounts}
-                staffDistribution={chartStaffDistribution}
-                appointmentFormatSplit={chartAppointmentSplit}
-                contentCategoryDistribution={contentCategoryDistribution}
-              />
+              {kpiData && chartRequestCounts ? (
+                <AdminCharts
+                  requestStatusCounts={chartRequestCounts}
+                  staffDistribution={chartStaffDistribution}
+                  appointmentFormatSplit={chartAppointmentSplit}
+                  contentCategoryDistribution={contentCategoryDistribution}
+                />
+              ) : (
+                <p className="text-sm text-[#657a6b]">Loading dashboard data...</p>
+              )}
 
               {/* Quick Triage Stream in Overview */}
               <div className="mt-8">
-                <AdminTriageQueue
-                  requests={effectiveRequests.slice(0, 5)}
-                  staffList={effectiveTeam}
-                />
+                {adminQueuePage ? (
+                  <AdminTriageQueue
+                    requests={effectiveRequests.slice(0, 5)}
+                    staffList={effectiveTeam}
+                  />
+                ) : (
+                  <p className="text-sm text-[#657a6b]">Loading care requests...</p>
+                )}
               </div>
             </div>
           </>
         )}
 
-        {activeTab === "triage" && (
-          <AdminTriageQueue
-            requests={effectiveRequests}
-            staffList={effectiveTeam}
-          />
-        )}
+        {activeTab === "triage" &&
+          (adminQueuePage ? (
+            <AdminTriageQueue
+              requests={effectiveRequests}
+              staffList={effectiveTeam}
+            />
+          ) : (
+            <p className="text-sm text-[#657a6b]">Loading care requests...</p>
+          ))}
 
         {activeTab === "roster" && (
           <AdminStaffRoster teamMembers={effectiveTeam} />

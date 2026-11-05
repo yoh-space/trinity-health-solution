@@ -67,12 +67,6 @@ function PortalHeader({ onOpenMobile }: { onOpenMobile: () => void }) {
 
       {/* Right Controls */}
       <div className="flex items-center gap-3">
-        {/* Realtime Live Indicator */}
-        <div className="hidden items-center gap-2 rounded-full border border-[#d6e2d6] bg-[#f2f7f1] px-3 py-1 text-xs font-semibold text-[#2d633f] sm:flex">
-          <span className="size-2 rounded-full bg-[#227242] animate-pulse" />
-          <span>Realtime Sync</span>
-        </div>
-
         {/* Quick Action Button: New Care Request */}
         <Link
           href="/portal?tab=new-request"

@@ -5,19 +5,15 @@ import {
   Users,
   BookOpen,
   Calendar,
-  ArrowUpRight,
-  TrendingUp,
-  ShieldCheck,
-  Clock,
 } from "lucide-react";
 import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 
 export interface KpiOverviewData {
-  totalCareRequests: number;
-  clinicalRequests: number;
-  counsellingRequests: number;
-  submittedBacklog: number;
+  totalCareRequests: number | "100+";
+  clinicalRequests: number | "100+";
+  counsellingRequests: number | "100+";
+  submittedBacklog: number | "100+";
   activeStaffCount: number;
   availableStaffCount: number;
   clinicianCount: number;
@@ -32,7 +28,7 @@ export function AdminKpiOverview({ data }: { data: KpiOverviewData }) {
   const staffAvailabilityPct =
     data.activeStaffCount > 0
       ? Math.round((data.availableStaffCount / data.activeStaffCount) * 100)
-      : 100;
+      : null;
 
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -53,7 +49,7 @@ export function AdminKpiOverview({ data }: { data: KpiOverviewData }) {
             <span className="text-3xl font-extrabold tracking-tight text-[#163a27]">
               {data.totalCareRequests}
             </span>
-            <span className="text-xs text-[#708477]">active requests</span>
+            <span className="text-xs text-[#708477]">total requests</span>
           </div>
 
           <div className="mt-3 flex items-center gap-1.5 text-xs text-[#526a5a]">
@@ -66,12 +62,8 @@ export function AdminKpiOverview({ data }: { data: KpiOverviewData }) {
             <span>{data.counsellingRequests} counsel</span>
           </div>
 
-          <div className="mt-4 flex items-center justify-between border-t border-[#edf2ea] pt-3 text-[11px] text-[#697d70]">
-            <span className="flex items-center gap-1 text-[#227242] font-semibold">
-              <TrendingUp size={13} />
-              +14% this week
-            </span>
-            <span>All-time synced</span>
+          <div className="mt-4 border-t border-[#edf2ea] pt-3 text-[11px] text-[#697d70]">
+            Counts by current request status
           </div>
         </CardContent>
       </Card>
@@ -91,7 +83,7 @@ export function AdminKpiOverview({ data }: { data: KpiOverviewData }) {
 
           <div className="mt-3 flex items-baseline gap-2">
             <span className="text-3xl font-extrabold tracking-tight text-[#163a27]">
-              {staffAvailabilityPct}%
+              {staffAvailabilityPct === null ? "—" : `${staffAvailabilityPct}%`}
             </span>
             <span className="text-xs text-[#708477]">on duty</span>
           </div>
@@ -106,12 +98,8 @@ export function AdminKpiOverview({ data }: { data: KpiOverviewData }) {
             <span>{data.counselorCount} counselors</span>
           </div>
 
-          <div className="mt-4 flex items-center justify-between border-t border-[#edf2ea] pt-3 text-[11px] text-[#697d70]">
-            <span className="flex items-center gap-1 text-[#227242] font-semibold">
-              <ShieldCheck size={13} />
-              Triage coverage active
-            </span>
-            <span>{data.activeStaffCount} total staff</span>
+          <div className="mt-4 border-t border-[#edf2ea] pt-3 text-[11px] text-[#697d70]">
+            {data.activeStaffCount} active staff records
           </div>
         </CardContent>
       </Card>
@@ -140,15 +128,10 @@ export function AdminKpiOverview({ data }: { data: KpiOverviewData }) {
             <Badge variant="secondary" className="text-[10px] px-2 py-0">
               {data.draftNotesCount} drafts
             </Badge>
-            <span>•</span>
-            <span>100% Amharic-first</span>
-            <span>•</span>
-            <span>UNICEF-aligned</span>
           </div>
 
-          <div className="mt-4 flex items-center justify-between border-t border-[#edf2ea] pt-3 text-[11px] text-[#697d70]">
-            <span className="text-[#34597b] font-semibold">Web & Mobile live</span>
-            <span>5 core categories</span>
+          <div className="mt-4 border-t border-[#edf2ea] pt-3 text-[11px] text-[#697d70]">
+            {data.publishedNotesCount + data.draftNotesCount} notes in library
           </div>
         </CardContent>
       </Card>
@@ -187,12 +170,8 @@ export function AdminKpiOverview({ data }: { data: KpiOverviewData }) {
             </span>
           </div>
 
-          <div className="mt-4 flex items-center justify-between border-t border-[#edf2ea] pt-3 text-[11px] text-[#697d70]">
-            <span className="flex items-center gap-1 text-[#227242] font-semibold">
-              <Clock size={13} />
-              Avg 30m duration
-            </span>
-            <span>Active schedule</span>
+          <div className="mt-4 border-t border-[#edf2ea] pt-3 text-[11px] text-[#697d70]">
+            Current scheduled appointments
           </div>
         </CardContent>
       </Card>

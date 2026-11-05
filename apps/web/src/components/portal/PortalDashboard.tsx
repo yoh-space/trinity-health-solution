@@ -21,7 +21,6 @@ import {
   Settings,
   HelpCircle,
   BookOpen,
-  Utensils,
   AlertCircle,
   FileText,
   Lock,
@@ -40,6 +39,26 @@ interface CareRequestItem {
   consentedAt: number;
   createdAt: number;
   updatedAt: number;
+}
+
+interface ClientAppointmentItem {
+  _id: string;
+  requestId: string;
+  requestType: "clinical" | "counselling";
+  requestSummary?: string;
+  staffName: string;
+  scheduledAt: number;
+  durationMinutes: number;
+  format: "online" | "inPerson";
+  status: "scheduled";
+}
+
+interface PublishedEducationItem {
+  _id: string;
+  title: string;
+  titleAm: string;
+  category: string;
+  readMinutes: number;
 }
 
 export function PortalDashboard() {
@@ -61,6 +80,14 @@ export function PortalDashboard() {
     anyApi.careRequests.listMine,
     isSignedIn ? {} : "skip"
   ) as CareRequestItem[] | undefined;
+  const [now] = useState(() => Date.now());
+  const clientAppointments = useQuery(
+    anyApi.appointments.listMyClientAppointments,
+    isSignedIn ? { now } : "skip"
+  ) as ClientAppointmentItem[] | undefined;
+  const publishedEducation = useQuery(anyApi.education.listPublished, {}) as
+    | PublishedEducationItem[]
+    | undefined;
 
   // New Care Request Form State
   const createCareRequest = useMutation(anyApi.careRequests.create);
@@ -85,7 +112,8 @@ export function PortalDashboard() {
     return careRequests.filter((r) => r.status === statusFilter);
   }, [careRequests, statusFilter]);
 
-  const activeRequestCount = careRequests?.filter((r) => r.status !== "closed").length ?? 0;
+  const activeRequestCount = careRequests?.filter((r) => r.status !== "closed").length;
+  const nextAppointment = clientAppointments?.[0];
 
   const handleCreateRequest = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,14 +129,14 @@ export function PortalDashboard() {
     setFormError(null);
     try {
       const fullSummary = `[${formCategory}] ${formSummary.trim()}`.trim();
-      const requestId = await createCareRequest({
+      await createCareRequest({
         consent: true,
         requestType: formType,
         contactMethod: formContactMethod,
         contactDetails: formContactDetails.trim(),
         ...(fullSummary ? { requestSummary: fullSummary.slice(0, 500) } : {}),
       });
-      setFormSuccess(requestId as string);
+      setFormSuccess("submitted");
       setFormSummary("");
     } catch (err: any) {
       setFormError(err?.message || "Failed to submit request. Please verify your details.");
@@ -173,18 +201,9 @@ export function PortalDashboard() {
       {/* --- DASHBOARD HEADER GREETING --- */}
       <section className="flex flex-col justify-between gap-5 md:flex-row md:items-end border-b border-[#e2eae1] pb-6">
         <div>
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#1c573e]">
-              PERSONAL CARE SPACE
-            </span>
-            <span className="text-[#cbd6cc]">•</span>
-            <span className="text-xs font-semibold text-[#667e6e]">
-              Active Session
-            </span>
-          </div>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight text-[#163826] sm:text-4xl">
-            {language === "am" ? `ጤና ይስጥልኝ፣ ${displayName}` : `Good day, ${displayName}`}
-          </h1>
+          <span className="text-xs font-bold uppercase tracking-[0.18em] text-[#1c573e]">
+            PERSONAL CARE SPACE
+          </span>
           <p className="mt-2 text-sm text-[#5d7364]">
             {language === "am"
               ? "የቤተሰብ ጤና ጥያቄዎችን፣ የምክክር ቀጠሮዎችንና የተዘጋጁ ትምህርቶችን በአንድ ቦታ ይከታተሉ።"
@@ -221,9 +240,11 @@ export function PortalDashboard() {
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <SummaryCard
               title="Active Care Requests"
-              value={activeRequestCount.toString()}
+              value={activeRequestCount?.toString() ?? "—"}
               subtitle={
-                activeRequestCount > 0
+                activeRequestCount === undefined
+                  ? "Loading care requests"
+                  : activeRequestCount > 0
                   ? `${activeRequestCount} awaiting response or in review`
                   : "No pending requests"
               }
@@ -236,8 +257,24 @@ export function PortalDashboard() {
             />
             <SummaryCard
               title="Next Appointment"
-              value="Thu 14:30"
-              subtitle="Online · Nutrition Guidance"
+              value={
+                clientAppointments === undefined
+                  ? "—"
+                  : nextAppointment
+                    ? new Date(nextAppointment.scheduledAt).toLocaleDateString(undefined, {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                      })
+                    : "None scheduled"
+              }
+              subtitle={
+                clientAppointments === undefined
+                  ? "Loading appointments"
+                  : nextAppointment
+                    ? `${new Date(nextAppointment.scheduledAt).toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" })} · ${nextAppointment.staffName}`
+                    : "No upcoming appointments"
+              }
               icon={Calendar}
               accent="blue"
               onClick={() => {
@@ -246,25 +283,24 @@ export function PortalDashboard() {
               }}
             />
             <SummaryCard
-              title="Saved Curriculum Guides"
-              value="4"
-              subtitle="Food safety & maternal nutrition"
-              icon={Bookmark}
+              title="Published Learning Notes"
+              value={publishedEducation === undefined ? "—" : publishedEducation.length === 50 ? "50+" : String(publishedEducation.length)}
+              subtitle={publishedEducation === undefined ? "Loading learning library" : "Available to read"}
+              icon={BookOpen}
               accent="amber"
               onClick={() => {
-                setActiveTab("saved");
-                router.push("/portal?tab=saved");
+                router.push("/learn");
               }}
             />
             <SummaryCard
-              title="Care Protocol Standard"
-              value="WHO / UNICEF"
-              subtitle="Community evidence aligned"
-              icon={ShieldCheck}
+              title="Requests on File"
+              value={careRequests === undefined ? "—" : String(careRequests.length)}
+              subtitle={careRequests === undefined ? "Loading care history" : "All submitted requests"}
+              icon={ClipboardList}
               accent="purple"
               onClick={() => {
-                setActiveTab("profile");
-                router.push("/portal?tab=profile");
+                setActiveTab("requests");
+                router.push("/portal?tab=requests");
               }}
             />
           </section>
@@ -277,19 +313,17 @@ export function PortalDashboard() {
       {currentTab === "overview" && (
         <div className="space-y-8">
           {/* Active Request Live Banner */}
-          {careRequests && careRequests.length > 0 ? (
+          {careRequests === undefined ? (
+            <div className="rounded-3xl border border-[#dce8de] bg-white p-8 text-sm text-[#657a6b]">
+              Loading care request history...
+            </div>
+          ) : careRequests.length > 0 ? (
             <div className="rounded-3xl border border-[#dce8de] bg-white p-6 sm:p-8 shadow-xs">
               <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center border-b border-[#e8f0e8] pb-5">
                 <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-bold uppercase tracking-wider text-[#1c573e]">
-                      Latest Care Request Status
-                    </span>
-                    <span className="text-[#cbd6cc]">•</span>
-                    <span className="text-xs text-[#6e8574]">
-                      ID: {careRequests[0]._id.slice(-6)}
-                    </span>
-                  </div>
+                  <span className="text-xs font-bold uppercase tracking-wider text-[#1c573e]">
+                    Latest Care Request Status
+                  </span>
                   <h3 className="mt-1 text-xl font-bold text-[#163826]">
                     {careRequests[0].requestType === "clinical"
                       ? "Clinical Health Inquiry"
@@ -358,94 +392,49 @@ export function PortalDashboard() {
             </div>
           )}
 
-          {/* Side-by-side Educational & Pantry Cards */}
-          <div className="grid gap-6 lg:grid-cols-2">
-            {/* Recommended Learning Guides */}
-            <div className="rounded-3xl border border-[#dce8de] bg-white p-6 sm:p-7 shadow-xs">
-              <div className="flex items-center justify-between border-b border-[#e8f0e8] pb-4">
-                <div className="flex items-center gap-2">
-                  <BookOpen size={16} className="text-[#1c573e]" />
-                  <h3 className="text-sm font-bold text-[#163826]">
-                    Curated Community Curriculum
-                  </h3>
-                </div>
-                <Link
-                  href="/learn"
-                  className="text-xs font-bold text-[#1c573e] hover:underline"
-                >
-                  Browse all notes
-                </Link>
+          <div className="rounded-3xl border border-[#dce8de] bg-white p-6 sm:p-7 shadow-xs">
+            <div className="flex items-center justify-between border-b border-[#e8f0e8] pb-4">
+              <div className="flex items-center gap-2">
+                <BookOpen size={16} className="text-[#1c573e]" />
+                <h3 className="text-sm font-bold text-[#163826]">
+                  Published Learning Notes
+                </h3>
               </div>
-
-              <div className="mt-4 space-y-3">
-                <CurriculumItem
-                  title="Safe Food Preparation in Ethiopian Kitchens"
-                  titleAm="በኢትዮጵያ የወጥ ቤት ውስጥ አስተማማኝ የምግብ ዝግጅት"
-                  category="Food Safety"
-                  readMinutes={3}
-                  slug="food-safety-kitchen"
-                  language={language}
-                />
-                <CurriculumItem
-                  title="Nutritious Eating During Pregnancy and Breastfeeding"
-                  titleAm="በእርግዝና እና ጡት በማጥባት ወቅት ጠቃሚ የአመጋገብ ልማዶች"
-                  category="Maternal Nutrition"
-                  readMinutes={4}
-                  slug="maternal-nutrition-pregnancy"
-                  language={language}
-                />
-                <CurriculumItem
-                  title="Complementary Feeding for Infants From 6 Months"
-                  titleAm="ከ 6 ወር ጀምሮ ለህፃናት የሚሰጡ ተጨማሪ ምግቦች"
-                  category="Child Nutrition"
-                  readMinutes={3}
-                  slug="infant-complementary-feeding"
-                  language={language}
-                />
-              </div>
+              <Link
+                href="/learn"
+                className="text-xs font-bold text-[#1c573e] hover:underline"
+              >
+                Browse library
+              </Link>
             </div>
 
-            {/* Pantry Balanced Meal Suggestion */}
-            <div className="rounded-3xl border border-[#dce8de] bg-[#fbfdfa] p-6 sm:p-7 shadow-xs flex flex-col justify-between">
-              <div>
-                <div className="flex items-center justify-between border-b border-[#e8f0e8] pb-4">
-                  <div className="flex items-center gap-2">
-                    <Utensils size={16} className="text-[#1c573e]" />
-                    <h3 className="text-sm font-bold text-[#163826]">
-                      Recommended Ethiopian Plate
-                    </h3>
-                  </div>
-                  <span className="rounded-full bg-[#f2e7c9] px-2.5 py-0.5 text-[10px] font-bold text-[#825b18]">
-                    Iron & Protein Rich
-                  </span>
-                </div>
-
-                <div className="mt-4">
-                  <h4 className="text-base font-bold text-[#163826]">
-                    Teff Injera with Misir Wot and Gomen
-                  </h4>
-                  <p className="mt-1 text-xs text-[#5e7464] leading-relaxed">
-                    Combines iron-rich whole teff with plant protein from lentils and dark leafy greens for natural folate and vitamin absorption.
-                  </p>
-
-                  <div className="mt-4 flex flex-wrap gap-2 text-[11px] font-semibold text-[#2d563d]">
-                    <span className="rounded-lg bg-[#e8f2e7] px-2.5 py-1">Teff (ጤፍ)</span>
-                    <span className="rounded-lg bg-[#e8f2e7] px-2.5 py-1">Lentils (ምስር)</span>
-                    <span className="rounded-lg bg-[#e8f2e7] px-2.5 py-1">Collard Greens (ጎመን)</span>
-                  </div>
-                </div>
+            {publishedEducation === undefined ? (
+              <p className="mt-4 text-sm text-[#657a6b]">Loading published notes...</p>
+            ) : publishedEducation.length > 0 ? (
+              <div className="mt-4 grid gap-3 md:grid-cols-3">
+                {publishedEducation.slice(0, 3).map((item) => (
+                  <Link
+                    key={item._id}
+                    href="/learn"
+                    className="rounded-xl border border-[#e5ede4] bg-[#fbfdfa] p-4 transition hover:border-[#1c573e]"
+                  >
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#1c573e]">
+                      {item.category}
+                    </span>
+                    <h4 className="mt-1 text-sm font-bold text-[#163826]">
+                      {language === "am" ? item.titleAm : item.title}
+                    </h4>
+                    <p className="mt-2 text-xs text-[#718776]">
+                      {item.readMinutes} min read
+                    </p>
+                  </Link>
+                ))}
               </div>
-
-              <div className="mt-6 pt-4 border-t border-[#e8f0e8]">
-                <Link
-                  href="/#pantry"
-                  className="flex items-center justify-between text-xs font-bold text-[#1c573e] hover:underline"
-                >
-                  <span>Explore Interactive Pantry combinations</span>
-                  <ArrowRight size={14} />
-                </Link>
-              </div>
-            </div>
+            ) : (
+              <p className="mt-4 text-sm text-[#657a6b]">
+                No published learning notes are available.
+              </p>
+            )}
           </div>
         </div>
       )}
@@ -504,7 +493,7 @@ export function PortalDashboard() {
                         </span>
                       </div>
                       <h4 className="mt-1 text-base font-bold text-[#163826]">
-                        {req.requestSummary || "General family health guidance request"}
+                        {req.requestSummary || "Care request"}
                       </h4>
                     </div>
                     <StatusBadge status={req.status} />
@@ -520,9 +509,6 @@ export function PortalDashboard() {
                       <span>Consent verified</span>
                     </div>
 
-                    <div className="text-[11px] text-[#788e7d]">
-                      Reference: <code className="bg-[#f0f6f1] px-1.5 py-0.5 rounded font-mono">{req._id}</code>
-                    </div>
                   </div>
                 </div>
               ))}
@@ -579,9 +565,6 @@ export function PortalDashboard() {
                 <p className="text-xs leading-relaxed text-[#43634c] max-w-md mx-auto">
                   Your request has been submitted to our care triage queue. A team member will review it and reach out via your provided contact details.
                 </p>
-                <div className="text-xs font-mono text-[#5b7863] bg-white border border-[#d5e5d8] rounded-xl p-2 inline-block">
-                  Reference ID: {formSuccess}
-                </div>
                 <div className="pt-2 flex justify-center gap-3">
                   <button
                     type="button"
@@ -686,7 +669,7 @@ export function PortalDashboard() {
                       type={formContactMethod === "phone" ? "tel" : "email"}
                       value={formContactDetails}
                       onChange={(e) => setFormContactDetails(e.target.value)}
-                      placeholder={formContactMethod === "phone" ? "+251 91 123 4567" : "name@example.com"}
+                      placeholder={formContactMethod === "phone" ? "Your phone number" : "Your email address"}
                       required
                       className="w-full rounded-xl border border-[#cbd8cb] bg-white px-3.5 py-2.5 text-xs text-[#163826] outline-none focus:border-[#1c573e]"
                     />
@@ -703,7 +686,7 @@ export function PortalDashboard() {
                     onChange={(e) => setFormSummary(e.target.value)}
                     maxLength={500}
                     rows={3}
-                    placeholder="For example: I would like guidance on balanced meals using local Ethiopian lentils and grains."
+                    placeholder="Briefly describe the support you need..."
                     className="w-full rounded-xl border border-[#cbd8cb] bg-white p-3 text-xs text-[#163826] outline-none focus:border-[#1c573e] placeholder:text-[#889d8d]"
                   />
                   <p className="mt-1 text-right text-[10px] text-[#718776]">
@@ -754,37 +737,61 @@ export function PortalDashboard() {
                 <h3 className="text-xl font-bold text-[#163826]">Upcoming Consultations</h3>
                 <p className="text-xs text-[#627768] mt-0.5">Confirmed sessions with Trinity clinicians and community counselors.</p>
               </div>
-              <span className="rounded-full bg-[#eaf4eb] px-3 py-1 text-xs font-bold text-[#1c573e]">
-                1 Confirmed
-              </span>
+              {clientAppointments !== undefined && (
+                <span className="rounded-full bg-[#eaf4eb] px-3 py-1 text-xs font-bold text-[#1c573e]">
+                  {clientAppointments.length} upcoming
+                </span>
+              )}
             </div>
 
-            <div className="mt-6 space-y-4">
-              <div className="rounded-2xl border border-[#cbe0ce] bg-[#f5faf6] p-5 flex flex-col sm:flex-row justify-between gap-4 sm:items-center">
-                <div className="flex items-start gap-3.5">
-                  <div className="grid size-11 place-items-center rounded-xl bg-[#1c573e] text-white shrink-0">
-                    <Calendar size={20} />
-                  </div>
-                  <div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#1c573e]">
-                      Online Virtual Consultation
-                    </span>
-                    <h4 className="text-base font-bold text-[#163826]">
-                      Pregnancy & Breastfeeding Nutrition Review
-                    </h4>
-                    <p className="text-xs text-[#5d7364] mt-0.5">
-                      Thursday, 14:30 EAT · With Dr. Almaz Bekele (Maternal Health)
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold text-emerald-800">
-                    Confirmed
-                  </span>
-                </div>
+            {clientAppointments === undefined ? (
+              <p className="mt-6 text-sm text-[#657a6b]">Loading appointments...</p>
+            ) : clientAppointments.length > 0 ? (
+              <div className="mt-6 space-y-4">
+                {clientAppointments.map((appointment) => {
+                  const date = new Date(appointment.scheduledAt);
+                  return (
+                    <article
+                      key={appointment._id}
+                      className="rounded-2xl border border-[#cbe0ce] bg-[#f5faf6] p-5"
+                    >
+                      <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                        <div className="flex items-start gap-3.5">
+                          <div className="grid size-11 shrink-0 place-items-center rounded-xl bg-[#1c573e] text-white">
+                            <Calendar size={20} />
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-[#1c573e]">
+                              {appointment.format === "online" ? "Online consultation" : "In-person consultation"}
+                            </span>
+                            <h4 className="text-base font-bold text-[#163826]">
+                              {appointment.requestSummary || `${appointment.requestType === "clinical" ? "Clinical" : "Counselling"} care request`}
+                            </h4>
+                            <p className="mt-0.5 text-xs text-[#5d7364]">
+                              {date.toLocaleDateString(undefined, {
+                                weekday: "long",
+                                month: "long",
+                                day: "numeric",
+                              })} at {date.toLocaleTimeString(undefined, {
+                                hour: "numeric",
+                                minute: "2-digit",
+                              })} · {appointment.staffName}
+                            </p>
+                          </div>
+                        </div>
+                        <span className="rounded-full bg-emerald-100 px-3 py-1 text-[11px] font-bold text-emerald-800">
+                          Scheduled · {appointment.durationMinutes} min
+                        </span>
+                      </div>
+                    </article>
+                  );
+                })}
               </div>
-            </div>
+            ) : (
+              <p className="mt-6 rounded-2xl border border-dashed border-[#ccd9cc] p-8 text-center text-sm text-[#657a6b]">
+                No upcoming appointments.
+              </p>
+            )}
           </div>
         </div>
       )}
@@ -803,19 +810,14 @@ export function PortalDashboard() {
               </Link>
             </div>
 
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <SavedNoteCard
-                title="Safe Food Preparation in Ethiopian Kitchens"
-                category="Food Safety"
-                readMinutes={3}
-                slug="food-safety-kitchen"
-              />
-              <SavedNoteCard
-                title="Nutritious Eating During Pregnancy and Breastfeeding"
-                category="Maternal Nutrition"
-                readMinutes={4}
-                slug="maternal-nutrition-pregnancy"
-              />
+            <div className="mt-6 rounded-2xl border border-dashed border-[#ccd9cc] p-8 text-center">
+              <Bookmark size={28} className="mx-auto text-[#799080]" />
+              <p className="mt-3 text-sm text-[#657a6b]">
+                No saved learning notes are available.
+              </p>
+              <Link href="/learn" className="mt-3 inline-block text-xs font-bold text-[#1c573e] hover:underline">
+                Browse the learning library
+              </Link>
             </div>
           </div>
         </div>
@@ -902,7 +904,6 @@ export function PortalDashboard() {
     </div>
   );
 }
-
 function SummaryCard({
   title,
   value,
@@ -1004,72 +1005,3 @@ function StatusTimeline({ status }: { status: CareRequestItem["status"] }) {
   );
 }
 
-function CurriculumItem({
-  title,
-  titleAm,
-  category,
-  readMinutes,
-  slug,
-  language,
-}: {
-  title: string;
-  titleAm: string;
-  category: string;
-  readMinutes: number;
-  slug: string;
-  language: "en" | "am";
-}) {
-  return (
-    <Link
-      href={`/learn/${slug}`}
-      className="group flex items-center justify-between rounded-2xl border border-[#e5ede4] bg-[#fbfdfa] p-3.5 transition hover:border-[#1c573e] hover:bg-white"
-    >
-      <div className="min-w-0 pr-3">
-        <span className="text-[10px] font-bold uppercase tracking-wider text-[#1c573e]">
-          {category}
-        </span>
-        <h5 className="truncate text-xs font-bold text-[#163826] group-hover:text-[#1c573e]">
-          {language === "am" ? titleAm : title}
-        </h5>
-      </div>
-      <div className="flex items-center gap-1 text-[11px] font-semibold text-[#718776] shrink-0">
-        <Clock size={12} />
-        <span>{readMinutes} min</span>
-      </div>
-    </Link>
-  );
-}
-
-function SavedNoteCard({
-  title,
-  category,
-  readMinutes,
-  slug,
-}: {
-  title: string;
-  category: string;
-  readMinutes: number;
-  slug: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-[#dce6dc] bg-[#fbfdfb] p-4 flex flex-col justify-between">
-      <div>
-        <span className="text-[10px] font-bold uppercase tracking-wider text-[#1c573e]">
-          {category}
-        </span>
-        <h4 className="mt-1 text-sm font-bold text-[#163826]">{title}</h4>
-      </div>
-      <div className="mt-4 pt-3 border-t border-[#edf2ec] flex items-center justify-between text-xs">
-        <span className="flex items-center gap-1 text-[#6b8271]">
-          <Clock size={12} /> {readMinutes} min read
-        </span>
-        <Link
-          href={`/learn/${slug}`}
-          className="font-bold text-[#1c573e] hover:underline"
-        >
-          Read Note
-        </Link>
-      </div>
-    </div>
-  );
-}

@@ -126,8 +126,8 @@ export function AdminCharts({
   // Chart 3: Consultation Format Pie data
   const formatPieData = useMemo(
     () => [
-      { name: "Online Video/Audio", value: Math.max(1, appointmentFormatSplit.online) },
-      { name: "In-Person Clinic", value: Math.max(0, appointmentFormatSplit.inPerson) },
+      { name: "Online Video/Audio", value: appointmentFormatSplit.online },
+      { name: "In-Person Clinic", value: appointmentFormatSplit.inPerson },
     ],
     [appointmentFormatSplit.online, appointmentFormatSplit.inPerson]
   );
@@ -239,33 +239,37 @@ export function AdminCharts({
         </CardHeader>
         <CardContent>
           <div className="flex h-72 items-center justify-center">
-            <ResponsiveContainer width="100%" height={260}>
-              <PieChart>
-                <Pie
-                  data={formatPieData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={65}
-                  outerRadius={95}
-                  paddingAngle={5}
-                  dataKey="value"
-                  label={({ name, percent }) => `${name} (${((percent || 0) * 100).toFixed(0)}%)`}
-                >
-                  {formatPieData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "#ffffff",
-                    borderRadius: "1rem",
-                    border: "1px solid #dce5db",
-                    boxShadow: "0 10px 25px rgba(0,0,0,0.06)",
-                    fontSize: "12px",
-                  }}
-                />
-              </PieChart>
-            </ResponsiveContainer>
+            {formatPieData.some((item) => item.value > 0) ? (
+              <ResponsiveContainer width="100%" height={260}>
+                <PieChart>
+                  <Pie
+                    data={formatPieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={65}
+                    outerRadius={95}
+                    paddingAngle={5}
+                    dataKey="value"
+                    label={({ name, percent }) => `${name} (${((percent || 0) * 100).toFixed(0)}%)`}
+                  >
+                    {formatPieData.map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={PIE_COLORS[index % PIE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "#ffffff",
+                      borderRadius: "1rem",
+                      border: "1px solid #dce5db",
+                      boxShadow: "0 10px 25px rgba(0,0,0,0.06)",
+                      fontSize: "12px",
+                    }}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-sm text-[#657a6b]">No upcoming appointments to chart.</p>
+            )}
           </div>
         </CardContent>
       </Card>

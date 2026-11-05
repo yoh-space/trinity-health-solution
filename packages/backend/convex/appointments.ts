@@ -31,6 +31,17 @@ const adminAppointmentResultValidator = v.object({
   durationMinutes: v.number(),
   format: appointmentFormatValidator,
 });
+const clientAppointmentResultValidator = v.object({
+  _id: v.id("careAppointments"),
+  requestId: v.id("careRequests"),
+  requestType: v.union(v.literal("clinical"), v.literal("counselling")),
+  requestSummary: v.optional(v.string()),
+  staffName: v.string(),
+  scheduledAt: v.number(),
+  durationMinutes: v.number(),
+  format: appointmentFormatValidator,
+  status: v.literal("scheduled"),
+});
 
 function staffRoleFrom(value: unknown): StaffRole | null {
   return value === "counselor" || value === "clinician" || value === "admin"
@@ -81,6 +92,62 @@ export const listMyAppointments = query({
     );
 
     return results.flatMap((appointment) => (appointment ? [appointment] : []));
+  },
+});
+
+export const listMyClientAppointments = query({
+  args: { now: v.number() },
+  returns: v.array(clientAppointmentResultValidator),
+  handler: async (ctx, { now }) => {
+    const identity = await requireIdentity(ctx);
+    const requests = await ctx.db
+      .query("careRequests")
+      .withIndex("by_userId_createdAt", (q) =>
+        q.eq("userId", identity.subject),
+      )
+      .order("desc")
+      .take(20);
+
+    const appointments = await Promise.all(
+      requests.map(async (request) => {
+        const [appointment] = await ctx.db
+          .query("careAppointments")
+          .withIndex("by_requestId_status_scheduledAt", (q) =>
+            q
+              .eq("requestId", request._id)
+              .eq("status", "scheduled")
+              .gte("scheduledAt", now),
+          )
+          .order("asc")
+          .take(1);
+        if (!appointment) return null;
+
+        const staff = await ctx.db
+          .query("staffProfiles")
+          .withIndex("by_clerkUserId", (q) =>
+            q.eq("clerkUserId", appointment.staffUserId),
+          )
+          .unique();
+
+        return {
+          _id: appointment._id,
+          requestId: request._id,
+          requestType: request.requestType,
+          ...(request.requestSummary
+            ? { requestSummary: request.requestSummary }
+            : {}),
+          staffName: staff?.displayName ?? "Staff member",
+          scheduledAt: appointment.scheduledAt,
+          durationMinutes: appointment.durationMinutes,
+          format: appointment.format,
+          status: "scheduled" as const,
+        };
+      }),
+    );
+
+    return appointments
+      .filter((appointment) => appointment !== null)
+      .sort((left, right) => left.scheduledAt - right.scheduledAt);
   },
 });
 

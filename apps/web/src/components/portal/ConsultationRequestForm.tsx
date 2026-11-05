@@ -13,7 +13,7 @@ export function ConsultationRequestForm() {
   const createCareRequest = useMutation(anyApi.careRequests.create);
 
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [submittedId, setSubmittedId] = useState<string | null>(null);
+  const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -42,14 +42,14 @@ export function ConsultationRequestForm() {
 
     try {
       const summary = `[${category}] ${note.trim()}`.trim();
-      const id = await createCareRequest({
+      await createCareRequest({
         consent: true,
         requestType: type,
         contactMethod,
         contactDetails: contactDetails.trim(),
         ...(summary ? { requestSummary: summary.slice(0, 500) } : {}),
       });
-      setSubmittedId(id as string);
+      setSubmitted(true);
     } catch (err: any) {
       setError(err?.message || "Failed to submit request. Please check your information.");
     } finally {
@@ -57,7 +57,7 @@ export function ConsultationRequestForm() {
     }
   };
 
-  if (submittedId) {
+  if (submitted) {
     return (
       <section className="max-w-2xl rounded-3xl border border-[#cbe1cf] bg-[#f0f8f1] p-8 text-center sm:p-10 shadow-xs">
         <CheckCircle2 size={44} className="mx-auto text-[#1c573e]" />
@@ -70,9 +70,6 @@ export function ConsultationRequestForm() {
         <p className="mt-3 text-sm leading-relaxed text-[#496551] max-w-md mx-auto">
           Your inquiry has been placed into our clinical triage queue. A member of Trinity's health staff will review your note and contact you.
         </p>
-        <div className="mt-4 inline-block rounded-xl border border-[#cfe2d2] bg-white px-3 py-1.5 text-xs font-mono text-[#4a6b53]">
-          Reference ID: {submittedId}
-        </div>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             href="/portal?tab=requests"
@@ -195,7 +192,7 @@ export function ConsultationRequestForm() {
               type={contactMethod === "phone" ? "tel" : "email"}
               value={contactDetails}
               onChange={(event) => setContactDetails(event.target.value)}
-              placeholder={contactMethod === "phone" ? "+251 91 123 4567" : "name@example.com"}
+              placeholder={contactMethod === "phone" ? "Your phone number" : "Your email address"}
               required
               className="w-full rounded-xl border border-[#cbd8cb] bg-white px-3.5 py-2.5 text-xs text-[#163826] outline-none focus:border-[#1c573e]"
             />
@@ -212,7 +209,7 @@ export function ConsultationRequestForm() {
             onChange={(event) => setNote(event.target.value)}
             maxLength={500}
             rows={3}
-            placeholder="For example: I would like help planning nutritious meals for a breastfeeding mother."
+            placeholder="Briefly describe the support you need..."
             className="w-full rounded-xl border border-[#cbd8cb] bg-white p-3 text-xs text-[#163826] outline-none focus:border-[#1c573e] placeholder:text-[#889d8d]"
           />
           <p className="mt-1 text-right text-[10px] text-[#718776]">

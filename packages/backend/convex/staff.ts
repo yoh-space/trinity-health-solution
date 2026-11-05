@@ -316,6 +316,9 @@ export const updateTeamMember = mutation({
     if (profile.clerkUserId === admin.subject && !args.active) {
       throw new Error("You cannot deactivate your own admin profile.");
     }
+    if (profile.clerkUserId === admin.subject && args.role && args.role !== "admin") {
+      throw new Error("You cannot remove your own administrator role.");
+    }
     if (profile.active && !args.active) {
       const openRequests = await Promise.all(
         (["submitted", "inReview", "contacted"] as const).map((status) =>
@@ -424,3 +427,25 @@ export const updateMyAvailability = mutation({
 
 
 
+
+
+export const changeStaffRole = mutation({
+  args: {
+    profileId: v.id("staffProfiles"),
+    role: staffRoleValidator,
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const admin = await requireActiveStaff(ctx, "admin");
+    const profile = await ctx.db.get(args.profileId);
+    if (!profile) throw new Error("This staff profile no longer exists.");
+    if (profile.clerkUserId === admin.subject && args.role !== "admin") {
+      throw new Error("You cannot remove your own administrator role.");
+    }
+    await ctx.db.patch(args.profileId, {
+      role: args.role,
+      updatedAt: Date.now(),
+    });
+    return null;
+  },
+});

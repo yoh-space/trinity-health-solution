@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowLeft, Bookmark, BookOpen, Clock } from "lucide-react";
+import { ArrowLeft, Bookmark } from "lucide-react";
 
 export const metadata = {
   title: "Saved Guides | Client Portal | Trinity Health Solution",
@@ -53,31 +53,12 @@ export default function PortalSavedPage() {
           </Link>
         </div>
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
-          {savedItems.map((item) => (
-            <div
-              key={item.slug}
-              className="rounded-2xl border border-[#dce6dc] bg-[#fbfdfb] p-5 flex flex-col justify-between"
-            >
-              <div>
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#1c573e]">
-                  {item.category}
-                </span>
-                <h3 className="mt-1 text-sm font-bold text-[#163826]">{item.title}</h3>
-              </div>
-              <div className="mt-4 pt-3 border-t border-[#edf2ec] flex items-center justify-between text-xs">
-                <span className="flex items-center gap-1 text-[#6b8271]">
-                  <Clock size={12} /> {item.readMinutes} min read
-                </span>
-                <Link
-                  href={`/learn/${item.slug}`}
-                  className="font-bold text-[#1c573e] hover:underline"
-                >
-                  Read Note
-                </Link>
-              </div>
-            </div>
-          ))}
+        <div className="mt-6 rounded-2xl border border-dashed border-[#ccd9cc] p-8 text-center">
+          <Bookmark size={28} className="mx-auto text-[#799080]" />
+          <p className="mt-3 text-sm text-[#657a6b]">No saved learning notes yet.</p>
+          <Link href="/learn" className="mt-3 inline-block text-xs font-bold text-[#1c573e] hover:underline">
+            Browse the learning library
+          </Link>
         </div>
       </div>
     </div>

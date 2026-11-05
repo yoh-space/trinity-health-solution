@@ -183,15 +183,9 @@ export function ClientSidebar({
         {/* Workspace Indicator Pill */}
         <div className="px-4 pt-3 pb-1">
           <div className="flex items-center justify-between rounded-xl border border-[#d6e2d6] bg-[#f4f7f2] px-3.5 py-2">
-            <div className="flex items-center gap-2">
-              <span className="size-2 rounded-full bg-[#227242] animate-pulse" />
-              <p className="text-[11px] font-bold text-[#1a3828]">
-                Client Care Space
-              </p>
-            </div>
-            <span className="rounded-md bg-[#eaf4eb] px-2 py-0.5 text-[10px] font-bold text-[#1c573e] uppercase">
-              Active
-            </span>
+            <p className="text-[11px] font-bold text-[#1a3828]">
+              Client Care Space
+            </p>
           </div>
         </div>
 
