@@ -76,8 +76,7 @@ export function AdminTriageQueue({
       const term = searchTerm.toLowerCase();
       const matchSummary = req.requestSummary?.toLowerCase().includes(term);
       const matchContact = req.contactDetails?.toLowerCase().includes(term);
-      const matchId = req._id.toLowerCase().includes(term);
-      return matchSummary || matchContact || matchId;
+      return matchSummary || matchContact;
     }
     return true;
   });
@@ -166,14 +165,14 @@ export function AdminTriageQueue({
           {/* Filter Toolbar */}
           <div className="mt-4 flex flex-wrap items-center gap-3">
             {/* Search */}
-            <div className="relative min-w-[220px] flex-1">
+            <div className="relative min-w-55 flex-1">
               <Search
                 size={14}
                 className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#839688]"
               />
               <input
                 type="text"
-                placeholder="Search by ID, summary, or contact..."
+                placeholder="Search requests, summaries, or contacts..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="w-full rounded-full border border-[#d2ddd0] bg-white py-2 pl-9 pr-4 text-xs font-medium text-[#1c3a2a] placeholder-[#8a9d8f] focus:border-[#1c573e] focus:outline-hidden"
@@ -228,7 +227,7 @@ export function AdminTriageQueue({
             <table className="w-full text-left text-xs">
               <thead className="border-b border-[#eef2ea] bg-[#f9faf7] text-[11px] font-bold uppercase tracking-wider text-[#687d6f]">
                 <tr>
-                  <th className="px-6 py-3.5">Request ID</th>
+                  <th className="px-6 py-3.5">Request</th>
                   <th className="px-6 py-3.5">Role / Type</th>
                   <th className="px-6 py-3.5">Status</th>
                   <th className="px-6 py-3.5">Contact Mode</th>
@@ -247,14 +246,16 @@ export function AdminTriageQueue({
                 ) : (
                   filteredRequests.map((req) => (
                     <tr key={req._id} className="transition hover:bg-[#f6f9f5]">
-                      <td className="px-6 py-4 font-mono font-bold text-[#1f402e]">
+                      <td className="px-6 py-4 font-semibold text-[#1f402e]">
                         <button
                           type="button"
                           onClick={() => setViewingReq(req)}
-                          className="hover:underline flex items-center gap-1.5"
+                          className="flex max-w-56 items-center gap-1.5 text-left hover:underline"
                         >
-                          <span>{req._id.slice(0, 10)}...</span>
-                          <FileText size={12} className="text-[#687e70]" />
+                          <span className="truncate">
+                            {req.requestSummary || `${req.requestType === "clinical" ? "Clinical" : "Counselling"} care request`}
+                          </span>
+                          <FileText size={12} className="shrink-0 text-[#687e70]" />
                         </button>
                       </td>
                       <td className="px-6 py-4">
@@ -352,13 +353,13 @@ export function AdminTriageQueue({
               Assign {assigningReq.requestType === "clinical" ? "Clinician" : "Counselor"}
             </h3>
             <p className="mt-1 text-xs text-[#677a6d]">
-              Choose a practitioner on duty to handle Case {assigningReq._id.slice(0, 10)}...
+              Choose a practitioner on duty to handle this request.
             </p>
 
             <div className="mt-5 space-y-2 max-h-60 overflow-y-auto">
               {eligibleStaff.length === 0 ? (
                 <p className="p-4 text-center text-xs text-[#718476]">
-                  No active {assigningReq.requestType === "clinical" ? "clinicians" : "counselors"} found in the directory. Please add team members in the Staff Directory tab first.
+                  No active {assigningReq.requestType === "clinical" ? "clinicians" : "counselors"} found in the directory. Please add team members in the Staff Directory first.
                 </p>
               ) : (
                 eligibleStaff.map((staff) => (
@@ -435,7 +436,7 @@ export function AdminTriageQueue({
             </div>
 
             <h3 className="mt-2 text-xl font-bold text-[#163826]">
-              Care Case {viewingReq._id.slice(0, 12)}
+              Care request details
             </h3>
 
             <div className="mt-5 space-y-3.5 text-xs">

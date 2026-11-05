@@ -3,17 +3,7 @@
 import { useMemo, useState } from "react";
 import { useMutation, useQuery } from "convex/react";
 import { anyApi } from "convex/server";
-import {
-  BarChart3,
-  Stethoscope,
-  Users,
-  BookOpen,
-  Calendar,
-  Plus,
-  RefreshCw,
-  CheckCircle2,
-  ShieldAlert,
-} from "lucide-react";
+import { Plus, CheckCircle2, ShieldAlert } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { ContentEditor } from "@/components/admin/ContentEditor";
 import { ContentList } from "@/components/admin/ContentList";
@@ -21,6 +11,7 @@ import { ContentPreview } from "@/components/admin/ContentPreview";
 import {
   EducationForm,
   EducationItem,
+  EDUCATION_CATEGORIES,
   emptyEducationForm,
   formFromItem,
 } from "@/components/admin/types";
@@ -29,8 +20,6 @@ import { AdminCharts } from "@/components/admin/AdminCharts";
 import { AdminTriageQueue, CareRequestItem } from "@/components/admin/AdminTriageQueue";
 import { AdminStaffRoster, TeamMemberItem } from "@/components/admin/AdminStaffRoster";
 import { AdminAppointments, AppointmentItem } from "@/components/admin/AdminAppointments";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/admin/ui/tabs";
-import { Badge } from "@/components/admin/ui/badge";
 
 export default function AdminManager() {
   // Active Navigation Tab
@@ -91,6 +80,19 @@ export default function AdminManager() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
+
+  const categoryOptions = useMemo(() => {
+    const categories = new Map<string, string>();
+    for (const value of [
+      ...EDUCATION_CATEGORIES,
+      ...(content ?? []).map((item) => item.category),
+    ]) {
+      const category = value.trim();
+      const key = category.toLocaleLowerCase();
+      if (category && !categories.has(key)) categories.set(key, category);
+    }
+    return [...categories.values()];
+  }, [content]);
 
   // Fallback Mock Datasets (Graceful degradation if admin JWT claim is still pending)
   const fallbackRequests: CareRequestItem[] = useMemo(
@@ -302,29 +304,17 @@ export default function AdminManager() {
 
   // Content Category Distribution Breakdown
   const contentCategoryDistribution = useMemo(() => {
-    const categories = [
-      { key: "food-safety", label: "Food Safety" },
-      { key: "pregnancy-nutrition", label: "Maternal Nutrition" },
-      { key: "child-feeding", label: "Child Feeding" },
-      { key: "wellbeing", label: "Everyday Wellbeing" },
-      { key: "hygiene", label: "Clean Water & Hygiene" },
-    ];
-
-    return categories.map((cat) => {
+    return categoryOptions.map((category) => {
       const items = content?.filter(
-        (c) =>
-          c.category?.toLowerCase().includes(cat.key) ||
-          c.title?.toLowerCase().includes(cat.label.toLowerCase())
+        (item) => item.category.trim().toLocaleLowerCase() === category.toLocaleLowerCase()
       ) ?? [];
-      const published = items.filter((i) => i.status === "published").length || (cat.key === "food-safety" ? 2 : 1);
-      const drafts = items.filter((i) => i.status === "draft").length;
       return {
-        category: cat.label,
-        published,
-        drafts,
+        category,
+        published: items.filter((item) => item.status === "published").length,
+        drafts: items.filter((item) => item.status === "draft").length,
       };
     });
-  }, [content]);
+  }, [categoryOptions, content]);
 
   // Memoized Chart Data to prevent re-render thrashing
   const chartRequestCounts = useMemo(
@@ -507,8 +497,8 @@ export default function AdminManager() {
           </h1>
 
           <p className="mt-2 max-w-2xl text-xs leading-relaxed text-[#5a6e60] sm:text-sm">
-            Realtime monitoring of family consultation requests, multi-role staff
-            capacity, bilingual health curriculum, and scheduled care appointments.
+            Track family consultation requests, staff capacity, bilingual health
+            content, and scheduled care appointments.
           </p>
         </div>
 
@@ -546,35 +536,8 @@ export default function AdminManager() {
         </div>
       )}
 
-      {/* Operations Workspace Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <div className="border-b border-[#e4eae2] pb-3">
-          <TabsList>
-            <TabsTrigger value="overview">
-              <BarChart3 size={14} />
-              <span>Analytics & KPIs</span>
-            </TabsTrigger>
-            <TabsTrigger value="triage">
-              <Stethoscope size={14} />
-              <span>Care Triage Queue ({effectiveRequests.length})</span>
-            </TabsTrigger>
-            <TabsTrigger value="roster">
-              <Users size={14} />
-              <span>Staff Roster ({effectiveTeam.length})</span>
-            </TabsTrigger>
-            <TabsTrigger value="curriculum">
-              <BookOpen size={14} />
-              <span>Curriculum Studio ({content?.length ?? 0})</span>
-            </TabsTrigger>
-            <TabsTrigger value="appointments">
-              <Calendar size={14} />
-              <span>Consultations ({effectiveAppointments.length})</span>
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        {/* Tab 1: Analytics & KPIs Overview */}
-        <TabsContent value="overview">
+      <div>
+        {activeTab === "overview" && (
           <div className="space-y-8">
             <AdminCharts
               requestStatusCounts={chartRequestCounts}
@@ -591,26 +554,24 @@ export default function AdminManager() {
               />
             </div>
           </div>
-        </TabsContent>
+        )}
 
-        {/* Tab 2: Care Queue & Triage Table */}
-        <TabsContent value="triage">
+        {activeTab === "triage" && (
           <AdminTriageQueue
             requests={effectiveRequests}
             staffList={effectiveTeam}
           />
-        </TabsContent>
+        )}
 
-        {/* Tab 3: Staff Roster & Availability */}
-        <TabsContent value="roster">
+        {activeTab === "roster" && (
           <AdminStaffRoster teamMembers={effectiveTeam} />
-        </TabsContent>
+        )}
 
-        {/* Tab 4: Curriculum Studio */}
-        <TabsContent value="curriculum">
+        {activeTab === "curriculum" && (
           <div className="grid gap-8 xl:grid-cols-[1fr_0.95fr]">
             <ContentEditor
               form={form}
+              categories={categoryOptions}
               editing={Boolean(editingItem)}
               saving={saving}
               onChange={setField}
@@ -629,13 +590,12 @@ export default function AdminManager() {
               onRemove={deleteItem}
             />
           </div>
-        </TabsContent>
+        )}
 
-        {/* Tab 5: Consultations Agenda */}
-        <TabsContent value="appointments">
+        {activeTab === "appointments" && (
           <AdminAppointments appointments={effectiveAppointments} />
-        </TabsContent>
-      </Tabs>
+        )}
+      </div>
 
       {/* Floating Preview Modal */}
       {previewItem && (

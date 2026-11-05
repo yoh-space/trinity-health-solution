@@ -3,9 +3,8 @@
 import { useState, ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, ShieldCheck, Layers, LogOut } from "lucide-react";
+import { Menu } from "lucide-react";
 import { AdminSidebar } from "./AdminSidebar";
-import { Badge } from "./ui/badge";
 
 export function AdminShell({
   children,
@@ -66,27 +65,6 @@ export function AdminShell({
             </div>
           </div>
 
-          <div className="flex items-center gap-3 text-xs font-semibold">
-            {/* Realtime Live Indicator */}
-            <div className="hidden items-center gap-2 rounded-full border border-[#d6e2d6] bg-[#f2f7f1] px-3 py-1 text-[#2d633f] sm:flex">
-              <span className="size-2 rounded-full bg-[#227242] animate-pulse" />
-              <span>Convex Realtime</span>
-            </div>
-
-            <Link
-              href="/learn"
-              className="hidden rounded-full border border-[#cbd8cb] bg-white px-3 py-1.5 text-[#486352] transition hover:border-[#1c573e] hover:text-[#183a25] sm:inline-flex"
-            >
-              Public Library
-            </Link>
-
-            <Link
-              href="/staff"
-              className="rounded-full bg-[#1c573e] px-3.5 py-1.5 text-white shadow-xs transition hover:bg-[#14442f]"
-            >
-              Staff Desk
-            </Link>
-          </div>
         </header>
 
         {/* Content Body */}

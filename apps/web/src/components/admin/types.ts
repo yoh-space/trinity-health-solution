@@ -1,5 +1,13 @@
 export type ContentStatus = "draft" | "published";
 
+export const EDUCATION_CATEGORIES = [
+  "Food safety",
+  "Pregnancy nutrition",
+  "Child nutrition",
+  "Breastfeeding",
+  "Clean water & hygiene",
+];
+
 export type EducationItem = {
   _id: string;
   title: string;
@@ -28,7 +36,7 @@ export const emptyEducationForm: EducationForm = {
   summaryAm: "",
   content: "",
   contentAm: "",
-  category: "Family wellbeing",
+  category: EDUCATION_CATEGORIES[0],
   readMinutes: "4",
   coverImageStorageId: undefined,
   coverImageUrl: "",

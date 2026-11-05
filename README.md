@@ -1,103 +1,145 @@
-# Fullstack Monorepo Template
+# Trinity Health Solution
 
-This repo is a modern TypeScript monorepo for a shared notes app across web and native.
+Trinity Health Solution is a bilingual health-learning and support platform built for a calm, trustworthy digital experience across web and native apps. The product blends public health education, knowledge discovery, staff workflows, and care-request pathways into a shared monorepo powered by Next.js, Expo, Clerk, and Convex.
 
-It currently uses:
+This repository is designed for a healthcare education product with a clear safety boundary: public learning content and guide-like assistance are emphasized, while clinical workflows are kept clearly labeled and scoped according to the project roadmap.
 
-- [Turborepo](https://turbo.build/repo)
-- [pnpm](https://pnpm.io/)
-- [Next.js 16](https://nextjs.org/) with the App Router
-- [Expo SDK 55](https://docs.expo.dev/) with Expo Router
-- [React 19](https://react.dev/)
-- [Convex](https://convex.dev/)
-- [Clerk](https://clerk.com/)
-- [OpenAI](https://platform.openai.com/docs/quickstart?api-mode=responses) for optional note summaries
+## Product focus
 
-## What’s inside
+- Public education library in English and Amharic
+- Safe, source-limited AI assistance for general health learning
+- Patient and staff portals for consultations, appointments, and operational dashboards
+- Care-request experiences that are clearly marked as prototype or operational depending on rollout status
+- Admin and reviewer workflows for education and staff management
+- Shared backend logic with Convex for content, appointments, onboarding, and care operations
 
-- `apps/web` - the Next.js web app
-- `apps/native` - the Expo native app
-- `packages/backend` - the Convex backend and generated API types
+## Stack
 
-## Quick start
+- [Next.js 16](https://nextjs.org/) for the marketing and portal web experience
+- [Expo / React Native](https://expo.dev/) for the mobile app
+- [Convex](https://convex.dev/) for backend data, APIs, and app logic
+- [Clerk](https://clerk.com/) for authentication and access control
+- [Turborepo](https://turbo.build/repo) + [pnpm](https://pnpm.io/) for monorepo orchestration
+- [TypeScript](https://www.typescriptlang.org/) across the stack
+
+## Repository structure
+
+- `apps/web` — Next.js app for public, portal, staff, and admin experiences
+- `apps/native` — Expo app for mobile users and staff workflows
+- `packages/backend` — Convex backend, schema, server functions, and backend utilities
+- `docs/` — implementation plans, product requirements, and project documentation
+- `.github/` — CI and release automation
+
+## Prerequisites
+
+- Node.js 20.20+
+- pnpm 10.x
+- A Clerk account
+- A Convex account
+- Optional: OpenAI API key for AI-related backend features if enabled in your environment
+
+## Local development
 
 ### 1. Install dependencies
 
-```sh
+```bash
 pnpm install
 ```
 
-### 2. Configure Convex
+### 2. Start the backend
 
-Run the backend setup command:
-
-```sh
+```bash
 pnpm --filter @packages/backend setup
 ```
 
-This will log you into Convex, create or connect a project, and generate `packages/backend/.env.local`.
+This runs Convex setup and creates or connects the workspace to a Convex project, producing `packages/backend/.env.local`.
 
-### 3. Configure Clerk for Convex
+### 3. Configure auth and environment variables
 
-Follow the official [Convex + Clerk guide](https://docs.convex.dev/auth/clerk).
+Set up your environment variables for both frontend apps and the Convex backend.
 
-In the Clerk dashboard, enable the Convex integration and copy the Clerk JWT issuer domain. Add it to your Convex environment variables as:
+In the Convex project, configure values such as:
 
-```sh
+```bash
 CLERK_JWT_ISSUER_DOMAIN=https://your-frontend-api.clerk.accounts.dev
 ```
 
-If you want native social login, enable Google and Apple in Clerk as well.
+If a feature uses AI services, also add:
 
-If you want AI summaries, also add:
-
-```sh
-OPENAI_API_KEY=...
+```bash
+OPENAI_API_KEY=your_key_here
 ```
 
-to your Convex environment variables.
+Then create `.env.local` files in `apps/web` and `apps/native` and populate them with the matching public keys and Convex URL from your local backend setup.
 
-### 4. Configure the app env files
+Common setup pattern:
 
-Create `.env.local` files in `apps/web` and `apps/native` from the provided `.example.env` files.
+- `NEXT_PUBLIC_CONVEX_URL` / `EXPO_PUBLIC_CONVEX_URL` = your Convex deployment URL
+- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` = Clerk publishable key
+- `CLERK_SECRET_KEY` = Clerk secret key for the web app
+- For Expo, use the matching Clerk publishable key in the app-specific env file
 
-- Use `CONVEX_URL` from `packages/backend/.env.local` for both `NEXT_PUBLIC_CONVEX_URL` and `EXPO_PUBLIC_CONVEX_URL`
-- Use your Clerk publishable key for both app env files
-- Use your Clerk secret key in `apps/web/.env.local`
-- In the web app, name these variables `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` and `CLERK_SECRET_KEY`. Both keys must come from the same Clerk instance.
+### 4. Run the workspace
 
-### 5. Run the apps
-
-```sh
+```bash
 pnpm dev
 ```
 
-This runs the backend, web app, and native app through Turbo.
+This starts the monorepo via Turbo, including the backend and all app targets.
 
-## Deploying
+## Useful commands
 
-From `apps/web`, use Convex to deploy the backend and build the web app:
+### Web app
 
-```sh
-cd ../../packages/backend && pnpm exec convex deploy --cmd 'cd ../../apps/web && pnpm build' --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL
+```bash
+pnpm --filter web-app build
+pnpm --filter web-app typecheck
 ```
 
-`apps/web/vercel.json` is already set up for this flow on Vercel.
+### Native app
 
-## Adding dependencies
-
-Install dependencies in the package that actually uses them.
-
-Examples:
-
-```sh
-pnpm --filter web-app add mypackage@latest
-pnpm --filter native-app add mypackage@latest
-pnpm --filter @packages/backend add mypackage@latest
+```bash
+pnpm --filter native-app typecheck
 ```
 
-## Notes
+### Backend
 
-- The native app uses Expo Router route groups under `apps/native/src/app`
-- The web app protects note routes with `apps/web/src/proxy.ts`
-- Convex enforces note ownership server-side in `packages/backend/convex/notes.ts`
+```bash
+pnpm --filter @packages/backend typecheck
+pnpm --filter @packages/backend dev
+```
+
+## Deployment notes
+
+The repo includes a Vercel deployment flow for the web app and a Convex-powered backend setup.
+
+A typical production deployment path for the web app looks like:
+
+```bash
+cd packages/backend
+pnpm exec convex deploy --cmd 'cd ../../apps/web && pnpm build' --cmd-url-env-var-name NEXT_PUBLIC_CONVEX_URL
+```
+
+## Safety and product boundaries
+
+This project intentionally distinguishes between:
+
+- public health education content
+- non-diagnostic informational guidance
+- operational healthcare workflows
+- prototype-only flows that are clearly labeled as such
+
+The roadmap documentation in `docs/` emphasizes trustworthy boundary setting, privacy, and safe educational guidance before broader clinical or operational features are enabled.
+
+## Contributing
+
+When making changes:
+
+1. Keep the educational and clinical boundaries explicit in UI copy and workflows.
+2. Prefer source-limited, reviewed content for health guidance.
+3. Preserve privacy and consent expectations in user-facing flows.
+4. Keep feature work aligned with the project roadmap and product safety goals.
+
+## License
+
+This project is distributed under the terms of the repository license. See [LICENSE](./LICENSE) for details.

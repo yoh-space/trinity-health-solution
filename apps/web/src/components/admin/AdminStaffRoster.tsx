@@ -260,7 +260,7 @@ export function AdminStaffRoster({
               />
               <input
                 type="text"
-                placeholder="Search by name, specialty, or user ID..."
+                placeholder="Search by name or specialty..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full rounded-full border border-[#d2ddd0] bg-white py-2 pl-9 pr-4 text-xs font-medium text-[#1c3a2a] placeholder-[#8a9d8f] focus:border-[#1c573e] focus:outline-hidden"
@@ -503,11 +503,11 @@ export function AdminStaffRoster({
 
               <div>
                 <label className="block mb-1.5">
-                  Clerk User ID / Account Subject <span className="text-gray-400 font-normal">(Optional)</span>
+                  Connect a staff account <span className="text-gray-400 font-normal">(Optional)</span>
                 </label>
                 <input
                   type="text"
-                  placeholder="user_2... or leave empty to auto-generate identifier"
+                  placeholder="Enter the existing staff account reference"
                   value={newForm.clerkUserId}
                   onChange={(e) => setNewForm({ ...newForm, clerkUserId: e.target.value })}
                   className="w-full rounded-xl border border-[#d0ded0] px-3.5 py-2.5 text-xs font-normal text-[#163925] outline-none focus:border-[#1c573e]"

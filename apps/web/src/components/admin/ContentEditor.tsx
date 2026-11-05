@@ -22,6 +22,7 @@ type Props = {
   onChange: (field: keyof EducationForm, value: string) => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
   onCancel: () => void;
+  categories: string[];
 };
 
 const fields: Array<[keyof EducationForm, string, string]> = [
@@ -38,6 +39,7 @@ export function ContentEditor({
   onChange,
   onSubmit,
   onCancel,
+  categories,
 }: Props) {
   const generateUploadUrl = useMutation(anyApi.education.generateUploadUrl);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -69,7 +71,7 @@ export function ContentEditor({
       });
 
       if (!response.ok) {
-        throw new Error("Failed to upload image to Convex storage.");
+        throw new Error("Image upload failed. Please try again.");
       }
 
       const { storageId } = await response.json();
@@ -244,7 +246,7 @@ export function ContentEditor({
             {isUploading ? (
               <div className="flex flex-col items-center gap-2 py-3 text-[#1c573e]">
                 <Loader2 size={28} className="animate-spin text-[#1c573e]" />
-                <span className="text-xs font-bold">Uploading to storage...</span>
+                <span className="text-xs font-bold">Uploading image...</span>
               </div>
             ) : (
               <div className="flex flex-col items-center gap-2">
@@ -317,21 +319,18 @@ export function ContentEditor({
 
         <label className="grid gap-2 text-xs font-bold text-[#1f3f2c]">
           Category
-          <input
+          <select
             value={form.category}
             onChange={(event) => onChange("category", event.target.value)}
-            placeholder="Family wellbeing or Sexual and reproductive health"
-            className="rounded-xl border border-[#cfddd1] px-3.5 py-2.5 text-xs font-normal text-[#173a25] outline-none focus:border-[#1c573e]"
-          />
-          <button
-            type="button"
-            onClick={() =>
-              onChange("category", "Sexual and reproductive health")
-            }
-            className="justify-self-start text-left text-[11px] font-semibold text-[#1c573e] underline"
+            required
+            className="rounded-xl border border-[#cfddd1] bg-white px-3.5 py-2.5 text-xs font-normal text-[#173a25] outline-none focus:border-[#1c573e]"
           >
-            Use Sexual and reproductive health
-          </button>
+            {categories.map((category) => (
+              <option key={category} value={category}>
+                {category}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label className="grid gap-2 text-xs font-bold text-[#1f3f2c]">
