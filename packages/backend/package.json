@@ -4,6 +4,7 @@
   "description": "",
   "scripts": {
     "dev": "convex dev",
+    "knowledge:upload": "node --env-file=.env.local scripts/upload-ai-resources.mjs",
     "seed:education:dev": "node scripts/seed-education-dev.mjs",
     "setup": "convex dev --until-success",
     "typecheck": "tsc --noEmit -p convex"
@@ -11,6 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/genai": "^1.52.0",
     "convex": "^1.35.1",
     "openai": "^6.34.0"
   },

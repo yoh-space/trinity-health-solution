@@ -70,6 +70,19 @@ If a feature uses AI services, also add:
 OPENAI_API_KEY=your_key_here
 ```
 
+To enable Opal's managed Gemini File Search knowledge base, upload the approved
+PDF resources and set the returned store name in the Convex deployment:
+
+```bash
+pnpm --filter @packages/backend knowledge:upload
+npx convex env set GEMINI_FILE_SEARCH_STORE_NAME fileSearchStores/your-store-name
+```
+
+The upload command requires `GEMINI_API_KEY` in the local backend environment.
+It reads PDFs from `AIReasources/` and does not commit the API key or store
+contents. Until `GEMINI_FILE_SEARCH_STORE_NAME` is set, Opal continues using
+the existing published-lesson retrieval path.
+
 Then create `.env.local` files in `apps/web` and `apps/native` and populate them with the matching public keys and Convex URL from your local backend setup.
 
 Common setup pattern:
