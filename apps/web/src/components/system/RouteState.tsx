@@ -22,22 +22,13 @@ export function TrinityLoading({ label = "Loading Trinity" }: { label?: string }
         </div>
 
         <div className="mt-6 overflow-hidden whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.32em] text-[#287343]">
-          <div className="inline-flex min-w-max animate-[trinity-marquee_9s_linear_infinite] gap-8" aria-hidden="true">
+          <div className="trinity-marquee inline-flex min-w-max gap-8" aria-hidden="true">
             <span>TRINITY HEALTH SOLUTION</span>
             <span>TRINITY HEALTH SOLUTION</span>
             <span>TRINITY HEALTH SOLUTION</span>
           </div>
         </div>
         <p className="mt-3 text-xs font-semibold text-[#68796d]">{label}…</p>
-        <style jsx>{`
-          @keyframes trinity-marquee {
-            from { transform: translateX(0); }
-            to { transform: translateX(-33.333%); }
-          }
-          @media (prefers-reduced-motion: reduce) {
-            .animate-\[trinity-marquee_9s_linear_infinite\] { animation: none; }
-          }
-        `}</style>
       </div>
     </main>
   );
