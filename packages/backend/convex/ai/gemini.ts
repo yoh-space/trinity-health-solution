@@ -9,22 +9,103 @@ import {
 } from "./opalPrompt";
 
 const DEFAULT_MODEL = "gemini-3.5-flash-lite";
-const FILE_SEARCH_MODEL = "gemini-2.5-flash";
-const FALLBACK_FILE_SEARCH_MODEL = "gemini-2.0-flash";
+const FILE_SEARCH_MODEL = "gemini-2.0-flash";
+const FALLBACK_FILE_SEARCH_MODEL = "gemini-1.5-flash";
 const DEFAULT_FILE_SEARCH_STORE_NAME =
   "fileSearchStores/trinity-health-solution-app-yj2tjeqz3qi8";
 const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
 
-type GeminiResponse = {
-  candidates?: Array<{
-    content?: { parts?: Array<{ text?: string }> };
-  }>;
+export const OPAL_SUPPORT_PHONE = "+251 98 872 0194";
+export const OPAL_EMERGENCY_HELPLINE = "952 (National Health Hotline, Ethiopia)";
+
+export type OpalStructuredSection = {
+  title: string;
+  points: string[];
 };
 
-type StructuredAnswer = {
-  answer?: unknown;
-  sourceIds?: unknown;
+export type OpalServiceSuggestion = {
+  title: string;
+  description: string;
+  actionText: string;
+  actionUrl: string;
+  phone?: string;
 };
+
+export type OpalStructuredAnswer = {
+  summary: string;
+  sections: OpalStructuredSection[];
+  practicalTips?: string[];
+  warningSigns?: string[];
+  suggestedServices?: OpalServiceSuggestion[];
+  supportPhone?: string;
+  emergencyHelpline?: string;
+};
+
+export function getOpalDefaultServices(language: OpalLanguage): OpalServiceSuggestion[] {
+  return [
+    {
+      title: language === "am" ? "የእናቶችና ህፃናት ጤና ክሊኒክ" : "Maternal & Child Health Care",
+      description: language === "am"
+        ? "ከጤና ባለሙያዎቻችን ጋር በቀጥታ በመገናኘት ተጨማሪ ምክርና የክትትል ቀጠሮ ያግኙ።"
+        : "Connect directly with Trinity's maternal care team for personalized follow-up and guidance.",
+      actionText: language === "am" ? "ከጤና ባለሙያ ጋር ቀጠሮ ይያዙ" : "Book Care Consultation",
+      actionUrl: "/portal/consultations/new",
+      phone: "+251988720194",
+    },
+    {
+      title: language === "am" ? "የህፃናት አመጋገብና የጡት ማጥባት ድጋፍ" : "Infant Nutrition & Feeding Support",
+      description: language === "am"
+        ? "ለአስቸጋሪ ሁኔታዎች እና ለተጨማሪ ምግብ አያያዝ የተዘጋጁ ተግባራዊ መመሪያዎች።"
+        : "Evidence-based guidelines on infant feeding, safe water, and lactation in challenging settings.",
+      actionText: language === "am" ? "የትምህርት ቤተ-መጽሐፍትን ይመልከቱ" : "Explore Health Library",
+      actionUrl: "/learn",
+    },
+  ];
+}
+
+export function formatStructuredAnswerToMarkdown(
+  structured: OpalStructuredAnswer,
+): string {
+  const parts: string[] = [];
+  if (structured.summary?.trim()) {
+    parts.push(structured.summary.trim());
+  }
+
+  if (Array.isArray(structured.sections)) {
+    for (const section of structured.sections) {
+      if (section.title?.trim()) {
+        parts.push(`### ${section.title.trim()}`);
+      }
+      if (Array.isArray(section.points)) {
+        for (const point of section.points) {
+          if (point?.trim()) {
+            parts.push(`• ${point.trim()}`);
+          }
+        }
+      }
+    }
+  }
+
+  if (Array.isArray(structured.practicalTips) && structured.practicalTips.length > 0) {
+    parts.push(`### 💡 Practical Action Steps`);
+    for (const tip of structured.practicalTips) {
+      if (tip?.trim()) {
+        parts.push(`• ${tip.trim()}`);
+      }
+    }
+  }
+
+  if (Array.isArray(structured.warningSigns) && structured.warningSigns.length > 0) {
+    parts.push(`### ⚠️ When to Seek Urgent Clinical Care`);
+    for (const warning of structured.warningSigns) {
+      if (warning?.trim()) {
+        parts.push(`• ${warning.trim()}`);
+      }
+    }
+  }
+
+  return parts.join("\n\n");
+}
 
 function extractInteractionText(interaction: unknown): string {
   if (!interaction || typeof interaction !== "object") return "";
@@ -41,9 +122,11 @@ function extractInteractionText(interaction: unknown): string {
     .trim();
 }
 
-function parseModelOutput(outputText: string): string {
+export function parseOpalStructuredOutput(
+  outputText: string,
+  language: OpalLanguage,
+): { structured: OpalStructuredAnswer; answer: string; sourceIds: string[] } {
   const trimmed = outputText.trim();
-  // Strip code block if present
   let cleanText = trimmed;
   if (cleanText.startsWith("```json")) {
     cleanText = cleanText.slice(7);
@@ -55,16 +138,112 @@ function parseModelOutput(outputText: string): string {
   }
   cleanText = cleanText.trim();
 
+  let parsed: any = null;
   try {
-    const structured = JSON.parse(cleanText) as StructuredAnswer;
-    if (typeof structured.answer === "string" && structured.answer.trim()) {
-      return structured.answer.trim();
-    }
+    parsed = JSON.parse(cleanText);
   } catch {
-    // If not JSON, use the raw text output
+    const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      try {
+        parsed = JSON.parse(jsonMatch[0]);
+      } catch {
+        // fallback to line parsing
+      }
+    }
   }
 
-  return trimmed;
+  let summary = "";
+  let sections: OpalStructuredSection[] = [];
+  let practicalTips: string[] = [];
+  let warningSigns: string[] = [];
+  let sourceIds: string[] = [];
+
+  if (parsed && typeof parsed === "object") {
+    if (typeof parsed.summary === "string" && parsed.summary.trim()) {
+      summary = parsed.summary.trim();
+    } else if (typeof parsed.answer === "string" && parsed.answer.trim()) {
+      summary = parsed.answer.trim();
+    }
+
+    if (Array.isArray(parsed.sections)) {
+      sections = parsed.sections
+        .filter((s: any) => s && typeof s === "object")
+        .map((s: any) => ({
+          title: typeof s.title === "string" ? s.title.trim() : "",
+          points: Array.isArray(s.points)
+            ? s.points
+                .filter((p: any) => typeof p === "string" && p.trim())
+                .map((p: any) => p.trim())
+            : [],
+        }))
+        .filter((s: OpalStructuredSection) => s.title || s.points.length > 0);
+    }
+
+    if (Array.isArray(parsed.practicalTips)) {
+      practicalTips = parsed.practicalTips
+        .filter((t: any) => typeof t === "string" && t.trim())
+        .map((t: any) => t.trim());
+    }
+
+    if (Array.isArray(parsed.warningSigns)) {
+      warningSigns = parsed.warningSigns
+        .filter((w: any) => typeof w === "string" && w.trim())
+        .map((w: any) => w.trim());
+    }
+
+    if (Array.isArray(parsed.sourceIds)) {
+      sourceIds = parsed.sourceIds.filter(
+        (id: any) => typeof id === "string" && id.trim().length > 0,
+      );
+    }
+  }
+
+  if (sections.length === 0) {
+    const rawContent = summary || trimmed;
+    const lines = rawContent.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+    const parsedPoints: string[] = [];
+    let currentTitle = language === "am" ? "ቁልፍ ምክሮች እና መመሪያዎች" : "Key Recommendations";
+
+    for (const line of lines) {
+      if (line.startsWith("#") || (line.startsWith("**") && line.endsWith("**") && line.length < 90)) {
+        if (parsedPoints.length > 0) {
+          sections.push({ title: currentTitle, points: [...parsedPoints] });
+          parsedPoints.length = 0;
+        }
+        currentTitle = line.replace(/^[#*\s]+|[#*\s]+$/g, "");
+      } else if (line.startsWith("•") || line.startsWith("-") || line.startsWith("*") || /^\d+\./.test(line)) {
+        parsedPoints.push(line.replace(/^[•\-*\d.]+\s*/, ""));
+      } else if (!summary) {
+        summary = line;
+      } else {
+        parsedPoints.push(line);
+      }
+    }
+    if (parsedPoints.length > 0) {
+      sections.push({ title: currentTitle, points: parsedPoints });
+    }
+    if (!summary && lines.length > 0) {
+      summary = lines[0];
+    }
+  }
+
+  const structured: OpalStructuredAnswer = {
+    summary: summary || (language === "am" ? "የእናቶችና ህፃናት ጤና መመሪያ" : "Maternal & Child Health Guidance"),
+    sections,
+    practicalTips: practicalTips.length > 0 ? practicalTips : undefined,
+    warningSigns: warningSigns.length > 0 ? warningSigns : undefined,
+    suggestedServices: getOpalDefaultServices(language),
+    supportPhone: OPAL_SUPPORT_PHONE,
+    emergencyHelpline: OPAL_EMERGENCY_HELPLINE,
+  };
+
+  const formattedAnswer = formatStructuredAnswerToMarkdown(structured);
+
+  return {
+    structured,
+    answer: formattedAnswer,
+    sourceIds,
+  };
 }
 
 async function generateFileSearchOpalAnswer(
@@ -73,12 +252,39 @@ async function generateFileSearchOpalAnswer(
   question: string,
   language: OpalLanguage,
   profileContext?: OpalProfileContext,
-): Promise<{ answer: string; sourceIds: string[] }> {
+): Promise<{ answer: string; structured: OpalStructuredAnswer; sourceIds: string[] }> {
   const ai = new GoogleGenAI({ apiKey });
   const responseLanguage = language === "am" ? "Amharic (አማርኛ)" : "English";
 
-  const systemInstruction =
-    "You are Opal, Trinity Health Solution's trusted maternal, child health, and nutrition education guide. Ground your answers in approved public health documents (including Ethiopian National Antenatal Care, Preconception, Family Planning Guidelines, and Breastfeeding in Emergencies). Communicate with warmth, empathy, and clear practical advice. Explain key recommendations in detail. Do not provide personal medical diagnosis or personal medication prescriptions. When appropriate, cite the guideline name.";
+  const systemInstruction = `You are Opal, Trinity Health Solution's trusted maternal, child health, and nutrition education guide.
+Ground your answers in approved public health documents (including Ethiopian National Antenatal Care, Preconception, Family Planning Guidelines, and Breastfeeding in Emergencies).
+Communicate with warmth, empathy, and clear practical advice. Explain key recommendations in detail.
+Do not provide personal medical diagnosis or personal medication prescriptions.
+When appropriate, cite the guideline name.
+
+You must respond in valid JSON with this exact schema:
+{
+  "summary": "Warm, reassuring 2-3 sentence overview directly answering the question.",
+  "sections": [
+    {
+      "title": "Clear Bold Section Title (e.g. 1. Prioritize Continued Breastfeeding On Demand)",
+      "points": [
+        "**Key Point Heading:** Detailed explanation with practical rationale based on guidelines.",
+        "**Another Key Point:** Practical steps and guidance."
+      ]
+    }
+  ],
+  "practicalTips": [
+    "Practical, realistic step 1 for mothers or caregivers in resource-limited or emergency settings",
+    "Practical tip 2"
+  ],
+  "warningSigns": [
+    "Red-flag symptom 1 when the mother or infant must seek urgent care",
+    "Red-flag symptom 2"
+  ]
+}
+
+Return ONLY valid JSON matching this schema. Do not include markdown backticks outside.`;
 
   const prompt = `Answer this maternal and child health education question in ${responseLanguage}.
 
@@ -116,9 +322,9 @@ Use the approved File Search documents as your authoritative source. Provide cle
 
       const text = typeof response.text === "string" ? response.text : "";
       if (text && text.trim()) {
-        const answer = parseModelOutput(text);
-        if (answer) {
-          return { answer, sourceIds: [] };
+        const result = parseOpalStructuredOutput(text, language);
+        if (result.answer) {
+          return result;
         }
       }
     } catch (err) {
@@ -143,9 +349,9 @@ Use the approved File Search documents as your authoritative source. Provide cle
 
       const outputText = extractInteractionText(interaction);
       if (outputText) {
-        const answer = parseModelOutput(outputText);
-        if (answer) {
-          return { answer, sourceIds: [] };
+        const result = parseOpalStructuredOutput(outputText, language);
+        if (result.answer) {
+          return result;
         }
       }
     } catch (err) {
@@ -175,7 +381,7 @@ export async function generateOpalAnswer(
   language: OpalLanguage,
   sources: OpalSource[],
   profileContext?: OpalProfileContext,
-): Promise<{ answer: string; sourceIds: string[] }> {
+): Promise<{ answer: string; structured: OpalStructuredAnswer; sourceIds: string[] }> {
   const fileSearchStoreName =
     process.env.GEMINI_FILE_SEARCH_STORE_NAME?.trim() ||
     DEFAULT_FILE_SEARCH_STORE_NAME;
@@ -218,15 +424,28 @@ export async function generateOpalAnswer(
           },
         ],
         generationConfig: {
-          maxOutputTokens: 650,
+          maxOutputTokens: 1500,
           responseMimeType: "application/json",
           responseSchema: {
             type: "OBJECT",
             properties: {
-              answer: { type: "STRING" },
+              summary: { type: "STRING" },
+              sections: {
+                type: "ARRAY",
+                items: {
+                  type: "OBJECT",
+                  properties: {
+                    title: { type: "STRING" },
+                    points: { type: "ARRAY", items: { type: "STRING" } },
+                  },
+                  required: ["title", "points"],
+                },
+              },
+              practicalTips: { type: "ARRAY", items: { type: "STRING" } },
+              warningSigns: { type: "ARRAY", items: { type: "STRING" } },
               sourceIds: { type: "ARRAY", items: { type: "STRING" } },
             },
-            required: ["answer", "sourceIds"],
+            required: ["summary", "sections"],
           },
         },
       }),
@@ -241,30 +460,16 @@ export async function generateOpalAnswer(
   }
   if (!response.ok) throw new Error(`OPAL_PROVIDER_ERROR_${response.status}`);
 
-  const payload = (await response.json()) as GeminiResponse;
+  const payload = (await response.json()) as {
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+  };
   const outputText = payload.candidates?.[0]?.content?.parts
     ?.map((part) => part.text ?? "")
     .join("")
     .trim();
   if (!outputText) throw new Error("OPAL_EMPTY_RESPONSE");
 
-  let structured: StructuredAnswer;
-  try {
-    structured = JSON.parse(outputText) as StructuredAnswer;
-  } catch {
-    return { answer: outputText, sourceIds: [] };
-  }
-
-  const answer =
-    typeof structured.answer === "string" ? structured.answer.trim() : "";
-  const sourceIds = Array.isArray(structured.sourceIds)
-    ? structured.sourceIds.filter(
-        (id): id is string => typeof id === "string" && id.trim().length > 0,
-      )
-    : [];
-
-  if (!answer) throw new Error("OPAL_EMPTY_RESPONSE");
-  return { answer, sourceIds };
+  return parseOpalStructuredOutput(outputText, language);
 }
 
 export async function generatePantryMealIdea(
@@ -352,7 +557,9 @@ Excluded allergens (JSON): ${excludedAllergensText}`,
   }
   if (!response.ok) throw new Error(`PANTRY_PROVIDER_ERROR_${response.status}`);
 
-  const payload = (await response.json()) as GeminiResponse;
+  const payload = (await response.json()) as {
+    candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>;
+  };
   const outputText = payload.candidates?.[0]?.content?.parts
     ?.map((part) => part.text ?? "")
     .join("")

@@ -33,11 +33,37 @@ const profileContextValidator = v.object({
   ),
   goals: v.array(v.union(v.literal("healthyEating"), v.literal("familyMeals"))),
 });
+
 const sourceValidator = v.object({
   id: v.string(),
   title: v.string(),
   titleAm: v.string(),
 });
+
+const structuredSectionValidator = v.object({
+  title: v.string(),
+  points: v.array(v.string()),
+});
+
+const serviceSuggestionValidator = v.object({
+  title: v.string(),
+  description: v.string(),
+  actionText: v.string(),
+  actionUrl: v.string(),
+  phone: v.optional(v.string()),
+});
+
+const structuredResponseValidator = v.optional(
+  v.object({
+    summary: v.string(),
+    sections: v.array(structuredSectionValidator),
+    practicalTips: v.optional(v.array(v.string())),
+    warningSigns: v.optional(v.array(v.string())),
+    suggestedServices: v.optional(v.array(serviceSuggestionValidator)),
+    supportPhone: v.optional(v.string()),
+    emergencyHelpline: v.optional(v.string()),
+  }),
+);
 
 export const ask = action({
   args: {
@@ -50,6 +76,7 @@ export const ask = action({
   },
   returns: v.object({
     answer: v.string(),
+    structured: structuredResponseValidator,
     safety: v.boolean(),
     redFlag: v.union(
       v.literal("none"),
@@ -70,6 +97,7 @@ export const ask = action({
     if (safetyIntent === "urgent") {
       return {
         answer: getOpalSafetyResponse("urgent", language),
+        structured: undefined,
         safety: true,
         redFlag: "urgent" as const,
         sources: [],
@@ -79,6 +107,7 @@ export const ask = action({
     if (safetyIntent === "clinical") {
       return {
         answer: getOpalSafetyResponse("clinical", language),
+        structured: undefined,
         safety: true,
         redFlag: "clinical" as const,
         sources: [],
@@ -88,6 +117,7 @@ export const ask = action({
     if (containsLikelyPersonalDetails(cleanQuestion)) {
       return {
         answer: getOpalPrivacyResponse(language),
+        structured: undefined,
         safety: true,
         redFlag: "none" as const,
         sources: [],
@@ -147,6 +177,7 @@ export const ask = action({
 
     return {
       answer: result.answer,
+      structured: result.structured,
       safety: false,
       redFlag: "none" as const,
       sources,

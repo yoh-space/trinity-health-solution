@@ -14,7 +14,12 @@ import {
   RotateCcw,
   ChevronDown,
 } from "lucide-react";
-import { getOpalErrorMessage, type OpalSource } from "@/lib/opalChat";
+import {
+  getOpalErrorMessage,
+  type OpalSource,
+  type OpalStructuredAnswer,
+} from "@/lib/opalChat";
+import { OpalMessageRenderer } from "@/components/education/OpalMessageRenderer";
 import { useMarketingLanguage } from "@/components/marketing/MarketingLanguageContext";
 
 interface ChatMessage {
@@ -22,6 +27,7 @@ interface ChatMessage {
   role: "user" | "opal";
   text: string;
   sources?: OpalSource[];
+  structured?: OpalStructuredAnswer;
   timestamp: string;
 }
 
@@ -128,6 +134,7 @@ export function FloatingOpalChat() {
           role: "opal",
           text: response.answer,
           sources: response.sources,
+          structured: response.structured,
           timestamp: new Date().toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
@@ -316,9 +323,13 @@ export function FloatingOpalChat() {
                       O
                     </div>
                     <div className="flex flex-col gap-2">
-                      <div className="rounded-2xl rounded-tl-xs border border-[#e2ece3] bg-white p-3 shadow-2xs text-[#1c3e2e]">
-                        <p className="text-xs leading-relaxed whitespace-pre-wrap">{msg.text}</p>
-                        <span className="block mt-1 text-[9px] text-[#71937e]">
+                      <div className="rounded-2xl rounded-tl-xs border border-[#e2ece3] bg-white p-3.5 shadow-2xs text-[#1c3e2e] w-full">
+                        <OpalMessageRenderer
+                          text={msg.text}
+                          structured={msg.structured}
+                          language={language}
+                        />
+                        <span className="block mt-2 text-[9px] text-[#71937e]">
                           {msg.timestamp}
                         </span>
                       </div>

@@ -12,7 +12,12 @@ import {
   Send,
   BookOpen,
 } from "lucide-react";
-import { getOpalErrorMessage, type OpalSource } from "@/lib/opalChat";
+import {
+  getOpalErrorMessage,
+  type OpalSource,
+  type OpalStructuredAnswer,
+} from "@/lib/opalChat";
+import { OpalMessageRenderer } from "@/components/education/OpalMessageRenderer";
 import { OpalNutritionCalculator } from "@/components/education/OpalNutritionCalculator";
 import { useMarketingLanguage } from "@/components/marketing/MarketingLanguageContext";
 
@@ -68,6 +73,7 @@ export function OpalChat() {
       text: string;
       sources?: OpalSource[];
       redFlag?: "none" | "clinical" | "urgent";
+      structured?: OpalStructuredAnswer;
     }>
   >([]);
 
@@ -121,6 +127,7 @@ export function OpalChat() {
           text: response.answer,
           sources: response.sources,
           redFlag: response.redFlag,
+          structured: response.structured,
         },
       ]);
     } catch (requestError) {
@@ -382,59 +389,23 @@ export function OpalChat() {
               {messages.map((message, index) => (
                 <div
                   key={`${message.role}-${index}`}
-                  className={`max-w-[88%] rounded-2xl p-4 text-xs sm:text-sm leading-relaxed ${
+                  className={`${
                     message.role === "user"
-                      ? "ml-auto bg-[#1c573e] text-white shadow-xs"
-                      : "border border-[#dce8de] bg-[#fbfdfb] text-[#22392c] shadow-2xs"
+                      ? "ml-auto max-w-[85%] rounded-2xl bg-[#1c573e] p-4 text-white shadow-xs text-xs sm:text-sm leading-relaxed"
+                      : "max-w-full rounded-2xl border border-[#dce8de] bg-[#fbfdfb] p-4 sm:p-5 text-[#22392c] shadow-2xs"
                   }`}
                 >
-                  <p className="whitespace-pre-line">{message.text}</p>
-                  {message.sources?.map((source) => (
-                    <div key={source.id} className="mt-3 pt-2.5 border-t border-[#e6eee5]">
-                      <Link
-                        href={`/learn/${source.id}`}
-                        className="inline-flex items-center gap-1.5 text-xs font-bold text-[#1c573e] hover:underline"
-                      >
-                        <BookOpen size={13} aria-hidden="true" />
-                        <span>
-                          {language === "am"
-                            ? `የትምህርት ማስታወሻውን ያንብቡ፦ ${source.titleAm}`
-                            : `Read the reviewed lesson: ${source.title}`}
-                        </span>
-                        <ArrowRight size={13} aria-hidden="true" />
-                      </Link>
-                    </div>
-                  ))}
-                  {message.role === "opal" &&
-                    message.redFlag === "clinical" && (
-                      <div className="mt-3 border-t border-[#e6eee5] pt-3">
-                                <div className="flex flex-wrap gap-2">
-                                  <Link
-                                    href="/portal/consultations/new"
-                                    className="inline-flex items-center gap-1.5 rounded-full bg-[#1c573e] px-3.5 py-2 text-xs font-bold text-white hover:bg-[#154631]"
-                                  >
-                                    <ShieldCheck size={14} aria-hidden="true" />
-                                    <span>
-                                      {language === "am"
-                                        ? "ከጤና ባለሙያ ጋር ይነጋገሩ"
-                                        : "Request care-team support"}
-                                    </span>
-                                    <ArrowRight size={13} aria-hidden="true" />
-                                  </Link>
-                                  <a
-                                    href="tel:+251988720194"
-                                    className="inline-flex items-center rounded-full border border-[#cbd8cb] px-3.5 py-2 text-xs font-bold text-[#1c573e] hover:bg-[#f4f8f3]"
-                                  >
-                                    +251 98 872 0194
-                                  </a>
-                                </div>
-                                <p className="mt-2 text-[11px] leading-4 text-[#718276]">
-                                  {language === "am"
-                                    ? "እርስዎ ካልደወሉ ወይም የእገዛ ጥያቄ ካላስገቡ በስተቀር የውይይትዎ ወይም የመገለጫዎ መረጃ አይላክም። አስቸኳይ ከሆነ የአካባቢዎን አስቸኳይ አገልግሎት ያነጋግሩ።"
-                                    : "Your chat and profile aren’t shared unless you call or submit a care request. For emergencies, contact local emergency services immediately."}
-                                </p>
-                              </div>
-                            )}
+                  {message.role === "user" ? (
+                    <p className="whitespace-pre-line">{message.text}</p>
+                  ) : (
+                    <OpalMessageRenderer
+                      text={message.text}
+                      structured={message.structured}
+                      language={language}
+                      sources={message.sources}
+                      redFlag={message.redFlag}
+                    />
+                  )}
                 </div>
               ))}
             </div>

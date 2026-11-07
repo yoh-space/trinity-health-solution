@@ -6,6 +6,29 @@ export type OpalSource = {
   titleAm: string;
 };
 
+export type OpalStructuredSection = {
+  title: string;
+  points: string[];
+};
+
+export type OpalServiceSuggestion = {
+  title: string;
+  description: string;
+  actionText: string;
+  actionUrl: string;
+  phone?: string;
+};
+
+export type OpalStructuredAnswer = {
+  summary: string;
+  sections: OpalStructuredSection[];
+  practicalTips?: string[];
+  warningSigns?: string[];
+  suggestedServices?: OpalServiceSuggestion[];
+  supportPhone?: string;
+  emergencyHelpline?: string;
+};
+
 export function getOpalErrorMessage(
   error: unknown,
   language: OpalLanguage,

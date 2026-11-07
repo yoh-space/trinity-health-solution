@@ -348,7 +348,7 @@ export default function OpalScreen() {
                           </Text>
                         </Pressable>
                       ))}
-                      {message.redFlag === "clinical" && (
+                      {isOpal && (!message.safety || message.redFlag === "clinical") && (
                         <Pressable
                           accessibilityRole="button"
                           onPress={() => void callCareTeam()}
@@ -356,7 +356,7 @@ export default function OpalScreen() {
                         >
                           <Ionicons name="call-outline" size={15} color="#1C573E" />
                           <Text style={styles.careTeamCallText}>
-                            {am ? "የጤና ቡድኑን ይደውሉ · +251 98 872 0194" : "Call the care team · +251 98 872 0194"}
+                            {am ? "የጤና ቡድኑን ይደውሉ · +251 98 872 0194" : "Support · +251 98 872 0194"}
                           </Text>
                         </Pressable>
                       )}
