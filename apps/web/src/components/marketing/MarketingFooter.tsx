@@ -10,19 +10,6 @@ export function MarketingFooter() {
 
   return (
     <footer className="border-t border-[#183b2d]/10 bg-[#f4f6ef] text-[#475b4e]">
-      {/* Disclaimer Strip */}
-      <div className="border-b border-[#183b2d]/[0.06] bg-[#eaeede] py-4">
-        <div className="mx-auto flex max-w-7xl items-center gap-3 px-5 text-xs text-[#526657] sm:px-8 lg:px-12">
-          <ShieldAlert size={16} className="shrink-0 text-[#c78157]" />
-          <p>
-            {t(
-              "Educational Notice: Trinity Health Solution provides educational guidance and is not a substitute for professional clinical diagnosis or emergency care. For medical emergencies in Ethiopia, please call 952 or contact your local health center.",
-              "የትምህርታዊ ይዘት ማሳሰቢያ፡ ትሪኒቲ ሄልዝ ሶሉሽን ትምህርታዊ የጤና መረጃ የሚሰጥ ሲሆን የድንገተኛ ህክምና ወይም የህክምና ባለሙያ ምርመራን አይተካም። ለድንገተኛ አደጋዎች እባክዎ 952 ይደውሉ ወይም በአቅራቢያዎ ወደሚገኝ ጤና ጣቢያ ይሂዱ።"
-            )}
-          </p>
-        </div>
-      </div>
-
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-20 lg:px-12">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
           {/* Col 1: Wordmark & Mission */}
