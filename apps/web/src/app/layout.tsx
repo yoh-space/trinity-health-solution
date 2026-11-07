@@ -100,7 +100,10 @@ export const metadata: Metadata = {
     images: ["/images/maternal-care-hero.png"],
   },
   verification: {
-    google: "Yo8y7Dmk4XJSO-kSP80EAkyQWLY41l_cv8QrbcPEcd0",
+    google: [
+      "Yo8y7Dmk4XJSO-kSP80EAkyQWLY41l_cv8QrbcPEcd0",
+      "googlefcb2403643e854dd",
+    ],
   },
   robots: {
     index: true,
