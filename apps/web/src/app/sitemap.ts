@@ -19,6 +19,30 @@ export default function sitemap(): MetadataRoute.Sitemap {
       },
     },
     {
+      url: `${baseUrl}/services`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+      alternates: {
+        languages: {
+          en: `${baseUrl}/services`,
+          am: `${baseUrl}/services`,
+        },
+      },
+    },
+    {
+      url: `${baseUrl}/products`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+      alternates: {
+        languages: {
+          en: `${baseUrl}/products`,
+          am: `${baseUrl}/products`,
+        },
+      },
+    },
+    {
       url: `${baseUrl}/ask-opal`,
       lastModified: now,
       changeFrequency: "weekly",

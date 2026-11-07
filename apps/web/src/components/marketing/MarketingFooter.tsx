@@ -54,9 +54,14 @@ export function MarketingFooter() {
             </h4>
             <ul className="mt-4 flex flex-col gap-2.5 text-xs font-medium">
               <li>
-                <a href="#services" className="hover:text-[#1c573e]">
+                <Link href="/services" className="hover:text-[#1c573e]">
                   {t("Maternal & Child Services", "የእናቶችና ህፃናት አገልግሎቶች")}
-                </a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/products" className="hover:text-[#1c573e]">
+                  {t("Maternal & Infant Products", "የእናቶችና ህፃናት ጤና ምርቶች")}
+                </Link>
               </li>
               <li>
                 <Link href="/ask-opal" className="hover:text-[#1c573e]">
@@ -109,7 +114,7 @@ export function MarketingFooter() {
               </li>
               <li>
                 <Link href="/admin" className="hover:text-[#1c573e]">
-                  {t("Publisher & Curriculum Manager", "የአሳታሚ አስተዳዳሪ")}
+                  {t("Staff Desk & Management Portal", "የባለሙያ እና የስራ አመራር ፖርታል (Staff Desk)")}
                 </Link>
               </li>
             </ul>

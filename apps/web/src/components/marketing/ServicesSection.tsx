@@ -158,6 +158,15 @@ export function ServicesSection() {
               "እንደ ኩሪ (Kuri) ካሉ ዘመናዊ የእናቶች ጤና መድረኮች ልምድ በመነሳት፤ ትሪኒቲ ዲጂታል የጤና ትምህርትን፣ የAI ረዳትን፣ የሀገር በቀል የተመጣጠነ ምግብ አዘገጃጀትን እና የባለሙያ ምክክርን በአንድ አጠቃሎ ለኢትዮጵያውያን ቤተሰቦች ያቀርባል።"
             )}
           </p>
+
+          <div className="mt-5">
+            <Link
+              href="/services"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-bold text-[#1c573e] hover:underline underline-offset-4"
+            >
+              <span>{t("Explore Detailed Clinical Services & Guidelines →", "ዝርዝር ክሊኒካል አገልግሎቶችንና መመሪያዎችን ይመልከቱ →")}</span>
+            </Link>
+          </div>
         </div>
 
         {/* 4 Core Services Grid */}

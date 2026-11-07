@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { ArrowRight, Globe, Menu, X, PhoneCall, ShieldCheck } from "lucide-react";
+import { Globe, Menu, X, PhoneCall, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Wordmark } from "./Wordmark";
@@ -24,11 +24,10 @@ export function MarketingHeader() {
   }, []);
 
   const navigationItems = [
-    { labelEn: "Services", labelAm: "አገልግሎቶች", href: "/#services" },
+    { labelEn: "Services", labelAm: "አገልግሎቶች", href: "/services" },
+    { labelEn: "Products", labelAm: "ምርቶች", href: "/products" },
     { labelEn: "Ask Opal AI", labelAm: "ኦፓል AI", href: "/ask-opal" },
     { labelEn: "Learning Hub", labelAm: "የትምህርት ማዕከል", href: "/learn" },
-    { labelEn: "Our Approach", labelAm: "አሰራራችን", href: "/#approach" },
-    { labelEn: "Partners", labelAm: "አጋሮች", href: "/#partners" },
     { labelEn: "Contact", labelAm: "አግኙን", href: "/#contact" },
   ];
 
@@ -53,6 +52,8 @@ export function MarketingHeader() {
           {navigationItems.map((item) => {
             const isActive =
               item.href === pathname ||
+              (item.href === "/services" && pathname?.startsWith("/services")) ||
+              (item.href === "/products" && pathname?.startsWith("/products")) ||
               (item.href === "/learn" && pathname?.startsWith("/learn")) ||
               (item.href === "/ask-opal" && pathname === "/ask-opal");
             return (
@@ -109,15 +110,6 @@ export function MarketingHeader() {
             <span>{t("Book Consultation", "የባለሙያ ቀጠሮ")}</span>
           </Link>
 
-          {/* Staff Desk Link */}
-          <Link
-            href="/admin"
-            className="hidden items-center gap-1 rounded-full border border-[#c9d2c8] bg-white/70 px-3 py-1.5 text-xs font-semibold text-[#244c39] transition hover:border-[#1c573e] hover:bg-white md:inline-flex"
-          >
-            <span>{t("Staff Desk", "የባለሙያ ፖርታል")}</span>
-            <ArrowRight size={12} aria-hidden="true" />
-          </Link>
-
           {/* Mobile Menu Hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -161,20 +153,13 @@ export function MarketingHeader() {
                 <span>+251 98 872 0194</span>
               </a>
 
-              <div className="flex items-center justify-between pt-2 text-xs font-semibold text-[#546b5b]">
+              <div className="flex items-center justify-center pt-2 text-xs font-semibold text-[#546b5b]">
                 <Link
                   href="/portal"
                   onClick={() => setMobileMenuOpen(false)}
                   className="hover:text-[#1c573e]"
                 >
-                  {t("Client Portal", "የተገልጋዮች ፖርታል")}
-                </Link>
-                <Link
-                  href="/admin"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="hover:text-[#1c573e]"
-                >
-                  {t("Staff Desk", "የባለሙያ ፖርታል")}
+                  {t("Client Portal & Consultations →", "የተገልጋዮች ፖርታል እና ቀጠሮዎች →")}
                 </Link>
               </div>
             </div>
