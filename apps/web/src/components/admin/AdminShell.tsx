@@ -22,6 +22,8 @@ export function AdminShell({
     if (!tab || tab === "overview") return "Overview";
     if (tab === "roster") return "Manage Team";
     if (tab === "triage") return "Care Triage Queue";
+    if (tab === "services-studio") return "Services Studio";
+    if (tab === "products-studio") return "Products Studio";
     if (tab === "curriculum") return "Curriculum Studio";
     if (tab === "appointments") return "Consultations";
     return tab.replace("-", " ");

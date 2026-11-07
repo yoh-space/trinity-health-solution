@@ -20,6 +20,8 @@ import { AdminCharts } from "@/components/admin/AdminCharts";
 import { AdminTriageQueue, CareRequestItem } from "@/components/admin/AdminTriageQueue";
 import { AdminStaffRoster, TeamMemberItem } from "@/components/admin/AdminStaffRoster";
 import { AdminAppointments, AppointmentItem } from "@/components/admin/AdminAppointments";
+import { ServicesStudio } from "@/components/admin/services/ServicesStudio";
+import { ProductsStudio } from "@/components/admin/products/ProductsStudio";
 
 type BoundedCount = number | "100+";
 
@@ -458,6 +460,14 @@ export default function AdminManager() {
 
         {activeTab === "roster" && (
           <AdminStaffRoster teamMembers={effectiveTeam} />
+        )}
+
+        {activeTab === "services-studio" && (
+          <ServicesStudio />
+        )}
+
+        {activeTab === "products-studio" && (
+          <ProductsStudio />
         )}
 
         {activeTab === "curriculum" && (

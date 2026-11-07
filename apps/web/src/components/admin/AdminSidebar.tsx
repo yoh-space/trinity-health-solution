@@ -20,6 +20,7 @@ import {
   ChevronRight,
   Menu,
   X,
+  ShoppingBag,
 } from "lucide-react";
 import { Badge } from "./ui/badge";
 
@@ -70,6 +71,23 @@ export function AdminSidebar({
           id: "appointments",
           label: "Consultations",
           icon: Calendar,
+          isTab: true,
+        },
+      ],
+    },
+    {
+      group: "Catalog & Content Studio",
+      items: [
+        {
+          id: "services-studio",
+          label: "Services Studio",
+          icon: Stethoscope,
+          isTab: true,
+        },
+        {
+          id: "products-studio",
+          label: "Products Studio",
+          icon: ShoppingBag,
           isTab: true,
         },
       ],

@@ -173,4 +173,62 @@ export default defineSchema({
       "scheduledAt",
     ])
     .index("by_status_scheduledAt", ["status", "scheduledAt"]),
+  servicesContent: defineTable({
+    slug: v.string(),
+    order: v.number(),
+    badgeEn: v.string(),
+    badgeAm: v.string(),
+    categoryEn: v.string(),
+    categoryAm: v.string(),
+    taglineEn: v.string(),
+    taglineAm: v.string(),
+    deliverablesEn: v.array(v.string()),
+    deliverablesAm: v.array(v.string()),
+    guidelineEn: v.string(),
+    guidelineAm: v.string(),
+    icon: v.string(),
+    accent: v.string(),
+    primaryCtaLabelEn: v.string(),
+    primaryCtaLabelAm: v.string(),
+    primaryCtaHref: v.string(),
+    status: v.union(v.literal("draft"), v.literal("published")),
+    publishedAt: v.optional(v.number()),
+    authorTokenIdentifier: v.string(),
+    updatedAt: v.number(),
+  })
+    .index("by_status", ["status"])
+    .index("by_order", ["order"])
+    .index("by_slug", ["slug"]),
+  productsContent: defineTable({
+    slug: v.string(),
+    order: v.number(),
+    category: v.string(),
+    badgeEn: v.string(),
+    badgeAm: v.string(),
+    titleEn: v.string(),
+    titleAm: v.string(),
+    subtitleEn: v.string(),
+    subtitleAm: v.string(),
+    descriptionEn: v.string(),
+    descriptionAm: v.string(),
+    highlightsEn: v.array(v.string()),
+    highlightsAm: v.array(v.string()),
+    idealForEn: v.string(),
+    idealForAm: v.string(),
+    formatEn: v.string(),
+    formatAm: v.string(),
+    coverImageStorageId: v.optional(v.id("_storage")),
+    coverImageUrl: v.optional(v.string()),
+    orderUrl: v.string(),
+    phoneContact: v.string(),
+    inStock: v.boolean(),
+    status: v.union(v.literal("draft"), v.literal("published")),
+    publishedAt: v.optional(v.number()),
+    authorTokenIdentifier: v.string(),
+    updatedAt: v.number(),
+  })
+    .index("by_status", ["status"])
+    .index("by_category", ["category"])
+    .index("by_order", ["order"])
+    .index("by_slug", ["slug"]),
 });

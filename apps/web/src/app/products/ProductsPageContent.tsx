@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useQuery } from "convex/react";
+import { anyApi } from "convex/server";
 import {
   Sparkles,
   Heart,
@@ -230,14 +232,40 @@ const PRODUCTS: Product[] = [
 
 function ProductsInner() {
   const { language, t } = useMarketingLanguage();
+  const liveProducts = useQuery(anyApi.products.listPublished);
+
   const [selectedCategory, setSelectedCategory] = useState<
     "all" | "lactation" | "weaning" | "wash" | "learning"
   >("all");
 
+  const activeProducts =
+    liveProducts && liveProducts.length > 0
+      ? liveProducts.map((p: any) => ({
+          id: p.slug || p._id,
+          category: p.category,
+          badgeEn: p.badgeEn,
+          badgeAm: p.badgeAm,
+          titleEn: p.titleEn,
+          titleAm: p.titleAm,
+          subtitleEn: p.subtitleEn,
+          subtitleAm: p.subtitleAm,
+          descriptionEn: p.descriptionEn,
+          descriptionAm: p.descriptionAm,
+          highlightsEn: p.highlightsEn,
+          highlightsAm: p.highlightsAm,
+          idealForEn: p.idealForEn,
+          idealForAm: p.idealForAm,
+          formatEn: p.formatEn,
+          formatAm: p.formatAm,
+          coverImageUrl: p.coverImageUrl,
+          inStock: p.inStock ?? true,
+        }))
+      : PRODUCTS;
+
   const filteredProducts =
     selectedCategory === "all"
-      ? PRODUCTS
-      : PRODUCTS.filter((p) => p.category === selectedCategory);
+      ? activeProducts
+      : activeProducts.filter((p: any) => p.category === selectedCategory);
 
   return (
     <div className="min-h-screen bg-[#fbfaf6] text-[#183b2d]">
@@ -363,17 +391,34 @@ function ProductsInner() {
         <section className="py-16 sm:py-24">
           <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
             <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredProducts.map((product) => (
+              {filteredProducts.map((product: any) => (
                 <div
                   key={product.id}
                   className="flex flex-col justify-between rounded-3xl border border-[#183b2d]/10 bg-white p-7 shadow-xs transition hover:shadow-md"
                 >
                   <div>
+                    {product.coverImageUrl && (
+                      <div className="mb-4 overflow-hidden rounded-2xl border border-[#e2eae2]">
+                        <img
+                          src={product.coverImageUrl}
+                          alt={product.titleEn}
+                          className="h-44 w-full object-cover"
+                        />
+                      </div>
+                    )}
+
                     {/* Badge & Format */}
                     <div className="flex items-center justify-between gap-2">
-                      <span className="rounded-full bg-[#eef6f0] px-3 py-1 text-[11px] font-bold text-[#1c573e]">
-                        {language === "am" ? product.badgeAm : product.badgeEn}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <span className="rounded-full bg-[#eef6f0] px-3 py-1 text-[11px] font-bold text-[#1c573e]">
+                          {language === "am" ? product.badgeAm : product.badgeEn}
+                        </span>
+                        {product.inStock === false && (
+                          <span className="rounded-full bg-[#fcedeb] px-2 py-0.5 text-[10px] font-bold text-[#a63939]">
+                            {language === "am" ? "አልቋል" : "Out of Stock"}
+                          </span>
+                        )}
+                      </div>
                       <span className="text-[11px] font-medium text-[#728577]">
                         {language === "am" ? product.formatAm : product.formatEn}
                       </span>
@@ -403,7 +448,7 @@ function ProductsInner() {
                         {(language === "am"
                           ? product.highlightsAm
                           : product.highlightsEn
-                        ).map((h, i) => (
+                        ).map((h: string, i: number) => (
                           <li key={i} className="flex items-start gap-2">
                             <CheckCircle2
                               size={14}

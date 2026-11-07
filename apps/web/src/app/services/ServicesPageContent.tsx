@@ -17,6 +17,8 @@ import {
   MapPin,
   HelpCircle,
 } from "lucide-react";
+import { useQuery } from "convex/react";
+import { anyApi } from "convex/server";
 import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { MarketingFooter } from "@/components/marketing/MarketingFooter";
 import {
@@ -26,10 +28,26 @@ import {
 import { BackToTopButton } from "@/components/common/BackToTopButton";
 import { FloatingOpalChat } from "@/components/chat/FloatingOpalChat";
 
+function getServiceIcon(iconName?: string) {
+  switch (iconName) {
+    case "Heart":
+      return Heart;
+    case "Droplets":
+      return Droplets;
+    case "Baby":
+      return Baby;
+    case "Sparkles":
+      return Sparkles;
+    default:
+      return Stethoscope;
+  }
+}
+
 function ServicesInner() {
   const { language, t } = useMarketingLanguage();
+  const liveServices = useQuery(anyApi.services.listPublished);
 
-  const serviceCategories = [
+  const staticServiceCategories = [
     {
       id: "antenatal-care",
       badgeEn: "Clinical Pillar 1",
@@ -193,6 +211,30 @@ function ServicesInner() {
     },
   ];
 
+  const displayServices =
+    liveServices && liveServices.length > 0
+      ? liveServices.map((s: any) => ({
+          id: s.slug || s._id,
+          badgeEn: s.badgeEn,
+          badgeAm: s.badgeAm,
+          categoryEn: s.categoryEn,
+          categoryAm: s.categoryAm,
+          taglineEn: s.taglineEn,
+          taglineAm: s.taglineAm,
+          deliverablesEn: s.deliverablesEn,
+          deliverablesAm: s.deliverablesAm,
+          guidelineEn: s.guidelineEn,
+          guidelineAm: s.guidelineAm,
+          icon: getServiceIcon(s.icon),
+          accent: s.accent,
+          primaryCta: {
+            labelEn: s.primaryCtaLabelEn,
+            labelAm: s.primaryCtaLabelAm,
+            href: s.primaryCtaHref,
+          },
+        }))
+      : staticServiceCategories;
+
   return (
     <div className="min-h-screen bg-[#fbfaf6] text-[#183b2d]">
       <MarketingHeader />
@@ -269,7 +311,7 @@ function ServicesInner() {
             </div>
 
             <div className="grid gap-8 lg:grid-cols-2">
-              {serviceCategories.map((service) => {
+              {displayServices.map((service: any) => {
                 const IconComponent = service.icon;
                 return (
                   <div
@@ -306,7 +348,7 @@ function ServicesInner() {
                           {(language === "am"
                             ? service.deliverablesAm
                             : service.deliverablesEn
-                          ).map((item, idx) => (
+                          ).map((item: string, idx: number) => (
                             <li key={idx} className="flex items-start gap-2.5 text-xs text-[#43594b] leading-relaxed">
                               <CheckCircle2
                                 size={15}

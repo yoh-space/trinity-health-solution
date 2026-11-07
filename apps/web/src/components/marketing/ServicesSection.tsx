@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useQuery } from "convex/react";
+import { anyApi } from "convex/server";
 import {
   ArrowRight,
   Heart,
@@ -10,13 +12,30 @@ import {
   CheckCircle2,
   PhoneCall,
   ShieldCheck,
+  Droplets,
 } from "lucide-react";
 import { useMarketingLanguage } from "./MarketingLanguageContext";
 
+function getServiceIcon(iconName?: string) {
+  switch (iconName) {
+    case "Heart":
+      return Heart;
+    case "Droplets":
+      return Droplets;
+    case "Baby":
+      return Baby;
+    case "Sparkles":
+      return Sparkles;
+    default:
+      return Stethoscope;
+  }
+}
+
 export function ServicesSection() {
   const { language, t } = useMarketingLanguage();
+  const liveServices = useQuery(anyApi.services.listPublished);
 
-  const services = [
+  const staticServices = [
     {
       id: "lactation-support",
       badgeEn: "Maternal Health",
@@ -135,6 +154,27 @@ export function ServicesSection() {
     },
   ];
 
+  const displayServices =
+    liveServices && liveServices.length > 0
+      ? liveServices.slice(0, 4).map((s: any) => ({
+          id: s.slug || s._id,
+          badgeEn: s.badgeEn,
+          badgeAm: s.badgeAm,
+          titleEn: s.categoryEn,
+          titleAm: s.categoryAm,
+          descriptionEn: s.taglineEn,
+          descriptionAm: s.taglineAm,
+          featuresEn: s.deliverablesEn,
+          featuresAm: s.deliverablesAm,
+          ctaLabelEn: s.primaryCtaLabelEn,
+          ctaLabelAm: s.primaryCtaLabelAm,
+          ctaHref: s.primaryCtaHref,
+          icon: getServiceIcon(s.icon),
+          tint: s.accent?.split(" border-")[0] || "bg-[#eef6f0] text-[#1c573e]",
+          border: s.accent?.includes("border-") ? "border-" + s.accent.split("border-")[1] : "border-[#d8e7dc]",
+        }))
+      : staticServices;
+
   return (
     <section id="services" className="scroll-mt-20 bg-white py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
@@ -171,7 +211,7 @@ export function ServicesSection() {
 
         {/* 4 Core Services Grid */}
         <div className="mt-14 grid gap-8 md:grid-cols-2">
-          {services.map((service) => {
+          {displayServices.map((service: any) => {
             const Icon = service.icon;
             const features =
               language === "am" ? service.featuresAm : service.featuresEn;
@@ -206,7 +246,7 @@ export function ServicesSection() {
                   {/* Bullet points */}
                   <div className="mt-6 border-t border-[#e6eee6] pt-5">
                     <ul className="space-y-2.5">
-                      {features.map((feature, fIdx) => (
+                      {features.map((feature: string, fIdx: number) => (
                         <li
                           key={fIdx}
                           className="flex items-start gap-2.5 text-xs text-[#2c4737] sm:text-sm"
