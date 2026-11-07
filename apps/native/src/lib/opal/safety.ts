@@ -2,46 +2,61 @@ export type OpalSafetyIntent = "safe" | "clinical" | "urgent";
 
 export type OpalLanguage = "am" | "en";
 
-const urgentPatterns = [
-  /emergency/i,
-  /urgent/i,
-  /can't breathe|cannot breathe|difficulty breathing/i,
-  /heavy bleeding|bleeding heavily/i,
-  /unconscious|not waking/i,
-  /severe pain/i,
-  /self[- ]?harm|suicid/i,
-  /አስቸኳይ/,
+// Patterns that indicate an active, acute medical emergency right now
+const activeUrgentCrisisPatterns = [
+  /\b(?:i am having an? emergency|this is an? emergency|it(?:'s| is) an? emergency|medical emergency right now|call an? ambulance|call 911)\b/i,
+  /\b(?:can't breathe|cannot breathe|difficulty breathing|stopped breathing|choking)\b/i,
+  /\b(?:heavy bleeding|bleeding heavily|hemorrhag\w*)\b/i,
+  /\b(?:unconscious|not waking(?: up)?|passed out|unresponsive)\b/i,
+  /\b(?:having a seizure|convulsing)\b/i,
+  /\b(?:severe (?:chest )?pain|chest pain|heart attack|stroke)\b/i,
+  /\b(?:self[- ]?harm|commit(?:ting)? suicide|kill(?:ing)? myself)\b/i,
+  /\b(?:rush to (?:the )?hospital|call emergency services)\b/i,
+  /አስቸኳይ እርዳታ እፈልጋለሁ/,
   /መተንፈስ አልቻልኩም/,
   /ከባድ ደም መፍሰስ/,
+  /ራሴን ልጎዳ/,
 ];
 
-const clinicalPatterns = [
-  /diagnos/i,
-  /disease do i have/i,
-  /what is wrong with me/i,
-  /cure|treat|treatment/i,
-  /medicine|medication|tablet|dose|dosage|prescri/i,
-  /should i stop taking/i,
-  /symptom/i,
-  /pain|fever|vomit|vomiting|diarrhea/i,
-  /blood sugar|blood pressure/i,
-  /calculate (?:my )?(?:calories|bmr|tdee|macros)|my calorie target|prescribe (?:a )?diet/i,
-  /ምርመራ/,
-  /በሽታ/,
-  /መድሃኒት|መድኃኒት/,
-  /ህመም/,
-  /ትኩሳት/,
+// If a question is educational, informational, or asks about guidelines/practices/preparedness,
+// it should NOT be flagged as an active personal emergency, even if the word "emergency" appears.
+const educationalIntentPatterns = [
+  /\b(?:practices?|recommendations?|guidelines?|tips?|how to|what (?:is|are|should)|can i|advice on|best way)\b/i,
+  /\b(?:in an? emergency|during an? emergency|emergency preparedness|emergency kit|emergency supplies|emergency contraception|emergency situation)\b/i,
+  /\b(?:breastfeeding in emergencies|child feeding in emergencies)\b/i,
+  /እንዴት|ምን አይነት|ምክረ ሀሳብ|መመሪያ|ዝግጅት|በአስቸኳይ ጊዜ/,
+];
+
+// Explicit requests for personal clinical diagnosis, personal prescriptions, or individualized calorie targets
+const personalClinicalPatterns = [
+  /\b(?:diagnose (?:me|this rash|my condition)|what disease do i have|what is wrong with me|what do i have|tell me my diagnosis)\b/i,
+  /\b(?:what (?:medicine|medication|drug|dose|dosage|pills?) should i take|prescribe me|how many tablets should i (?:take|drink))\b/i,
+  /\b(?:should i stop taking (?:my )?medication)\b/i,
+  /\b(?:calculate (?:my )?(?:calories|bmr|tdee|macros)|my calorie target|prescribe (?:a )?diet)\b/i,
+  /በሽታዬን መርምርልኝ|ምን በሽታ አለብኝ/,
+  /ምን አይነት መድኃኒት መውሰድ አለብኝ|ምን መድሃኒት ልውሰድ|የመድሃኒት መጠን አዝዝልኝ/,
   /የካሎሪ መጠን አስላልኝ|የግል የአመጋገብ ማዘዣ/,
 ];
 
 export function classifyOpalQuestion(question: string): OpalSafetyIntent {
   const normalized = question.trim();
-  if (urgentPatterns.some((pattern) => pattern.test(normalized))) {
-    return "urgent";
-  }
-  if (clinicalPatterns.some((pattern) => pattern.test(normalized))) {
+
+  // If question is educational/guideline-seeking, do not flag as urgent crisis
+  const isEducational = educationalIntentPatterns.some((pattern) => pattern.test(normalized));
+
+  // Check personal clinical requests first
+  if (personalClinicalPatterns.some((pattern) => pattern.test(normalized))) {
     return "clinical";
   }
+
+  // Check active acute emergency
+  if (activeUrgentCrisisPatterns.some((pattern) => pattern.test(normalized))) {
+    // If it's a general question like "What are recommendations for... in an emergency", it's safe
+    if (!isEducational) {
+      return "urgent";
+    }
+  }
+
   return "safe";
 }
 
@@ -49,16 +64,15 @@ const likelyPersonalDetailPatterns = [
   /\b[\w.+-]+@[\w.-]+\.[a-z]{2,}\b/i,
   /\+?\d[\d\s().-]{7,}\d/,
   /\b(?:my name is|call me|i am called)\s+[\p{L}'-]+(?:\s+[\p{L}'-]+){0,2}/iu,
-  /\b(?:my age is|i am|i'm)\s+\d{1,3}\s*(?:years? old)?\b/i,
-  /\b(?:my (?:weight|height|bmi|blood pressure)|i weigh)\s*(?:is|about|of)?\s*\d/i,
-  /\b(?:my (?:address|email|phone|telephone|date of birth|dob)|i live at)\b/i,
-  /\b(?:i am|i'm|i have|i've|my|our)\b[\s\S]{0,100}\b(?:pregnan\w*|breastfeed\w*|diabet\w*|asthma|epilep\w*|cancer|hiv|tuberculosis|anemia|anaemia|depression|anxiety|allerg\w*|infection|disorder|disease|condition|diagnos\w*)\b/i,
-  /\bmy\s+(?:child|baby|son|daughter|kid|mother|father|wife|husband|partner)\b/i,
-  /\b(?:my|our)\s+\d{1,2}\s*[- ]?(?:year|month|week)[- ]?old\b/i,
-  /\b(?:i was diagnosed with|my diagnosis is|i suffer from)\s+\w+/i,
-  /(?:ስሜ|ዕድሜዬ|እድሜዬ|ክብደቴ|ቁመቴ|ልጄ|ህፃኔ|ሕፃኔ|አድራሻዬ|ስልኬ|ኢሜይሌ)/,
-  /የእኔ.*(?:ስም|ዕድሜ|እድሜ|ቁመት|ክብደት|አድራሻ|ስልክ)/,
-  /(?:እርጉዝ ነኝ|ጡት እያጠባሁ ነኝ)/,
+  /\b(?:my age is|i am)\s+\d{1,3}\s*years? old\b/i,
+  /\b(?:my (?:weight|height|bmi)|i weigh)\s*(?:is|about|of)?\s*\d/i,
+  /\b(?:my (?:address|email|phone|telephone|date of birth|dob)|i live at \d+)\b/i,
+  /\b(?:i am|i'm|i have|i've)\b[\s\S]{0,60}\b(?:diagnosed with|suffering from)\b[\s\S]{0,60}\b(?:diabetes|cancer|hiv|asthma|tuberculosis|epilepsy)\b/i,
+  /\b(?:i was diagnosed with|my diagnosis is)\s+\w+/i,
+  /\b(?:i am pregnant and have diabetes|i am pregnant and have high blood pressure)\b/i,
+  /(?:ስሜ|ዕድሜዬ|እድሜዬ|ክብደቴ|ቁመቴ|አድራሻዬ|ስልኬ|ኢሜይሌ)\s*(?:ነው|ይባላል)/,
+  /የእኔ.*(?:ስም|አድራሻ|ስልክ)\s*(?:ነው|፡)/,
+  /እርጉዝ ነኝ እና ደም ግፊት አለብኝ/,
 ];
 
 export function containsLikelyPersonalDetails(question: string): boolean {
