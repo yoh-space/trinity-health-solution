@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { Wordmark } from "./Wordmark";
 import { useMarketingLanguage } from "./MarketingLanguageContext";
-import { ShieldAlert, Heart, Globe } from "lucide-react";
+import { ShieldAlert, Heart, Globe, PhoneCall, MessageSquare } from "lucide-react";
 
 export function MarketingFooter() {
   const { language, toggleLanguage, t } = useMarketingLanguage();
@@ -47,20 +47,25 @@ export function MarketingFooter() {
             </div>
           </div>
 
-          {/* Col 2: Learning & Tools */}
+          {/* Col 2: Services & Learning */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#1e3c2c]">
-              {t("Explore", "ማሰሻ")}
+              {t("Services & Learning", "አገልግሎቶች እና ትምህርት")}
             </h4>
             <ul className="mt-4 flex flex-col gap-2.5 text-xs font-medium">
               <li>
-                <Link href="/learn" className="hover:text-[#1c573e]">
-                  {t("Learning Library", "የትምህርት ቤተ-መጽሐፍት")}
-                </Link>
+                <a href="#services" className="hover:text-[#1c573e]">
+                  {t("Maternal & Child Services", "የእናቶችና ህፃናት አገልግሎቶች")}
+                </a>
               </li>
               <li>
                 <Link href="/ask-opal" className="hover:text-[#1c573e]">
                   {t("Ask Opal AI Assistant", "ኦፓል የጤና ረዳት")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/learn" className="hover:text-[#1c573e]">
+                  {t("Learning Library", "የትምህርት ቤተ-መጽሐፍት")}
                 </Link>
               </li>
               <li>
@@ -76,12 +81,22 @@ export function MarketingFooter() {
             </ul>
           </div>
 
-          {/* Col 3: Portals */}
+          {/* Col 3: Collaboration & Portals */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#1e3c2c]">
-              {t("Portals", "ፖርታሎች")}
+              {t("Collaboration & Care", "አጋርነት እና ፖርታሎች")}
             </h4>
             <ul className="mt-4 flex flex-col gap-2.5 text-xs font-medium">
+              <li>
+                <a href="#partners" className="hover:text-[#1c573e] font-semibold text-[#1c573e]">
+                  {t("Become a Partner", "አጋራችን ይሁኑ (Partners)")}
+                </a>
+              </li>
+              <li>
+                <Link href="/portal/consultations/new" className="hover:text-[#1c573e]">
+                  {t("Book Care Consultation", "የባለሙያ ቀጠሮ ይያዙ")}
+                </Link>
+              </li>
               <li>
                 <Link href="/portal" className="hover:text-[#1c573e]">
                   {t("Client Portal", "የተገልጋዮች ፖርታል")}
@@ -89,7 +104,7 @@ export function MarketingFooter() {
               </li>
               <li>
                 <Link href="/staff" className="hover:text-[#1c573e]">
-                  {t("Staff Queues & Consultations", "የሰራተኞች የስራ ሰሌዳ")}
+                  {t("Staff Queues & Care Desk", "የሰራተኞች የስራ ሰሌዳ")}
                 </Link>
               </li>
               <li>
@@ -100,23 +115,44 @@ export function MarketingFooter() {
             </ul>
           </div>
 
-          {/* Col 4: Commitments & Emergency */}
+          {/* Col 4: Contact & Hotlines */}
           <div>
             <h4 className="text-xs font-bold uppercase tracking-wider text-[#1e3c2c]">
-              {t("Emergency Contacts", "አስፈላጊ ስልኮች")}
+              {t("Direct Contact & Support", "የቀጥታ ድጋፍ እና ስልኮች")}
             </h4>
-            <p className="mt-3 text-xs leading-relaxed text-[#687a6d]">
-              {t(
-                "National Health Hotline (Ethiopia): Dial 952",
-                "ብሄራዊ የጤና መረጃ ስልክ (ኢትዮጵያ)፡ 952 ይደውሉ"
-              )}
-            </p>
-            <p className="mt-2 text-xs text-[#687a6d]">
-              {t(
-                "Primary Care & Maternal-Child Health Learning Focus",
-                "የእናቶች፣ ወጣቶችና ህፃናት ጤና ትምህርት ትኩረት"
-              )}
-            </p>
+            <div className="mt-4 flex flex-col gap-3 text-xs">
+              <a
+                href="tel:+251988720194"
+                className="flex items-center gap-2 font-bold text-[#1c573e] hover:underline"
+              >
+                <PhoneCall size={14} className="shrink-0" />
+                <span>+251 98 872 0194 (Support)</span>
+              </a>
+              <a
+                href="tel:952"
+                className="flex items-center gap-2 font-bold text-[#b45d34] hover:underline"
+              >
+                <span className="rounded bg-[#ffece2] px-1.5 py-0.5 text-[11px] font-extrabold text-[#a74619]">
+                  952
+                </span>
+                <span>{t("National Emergency Hotline", "ብሄራዊ የጤና መረጃ ስልክ")}</span>
+              </a>
+              <a
+                href="https://t.me/Trinity_health_solution"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 text-[#246392] hover:underline"
+              >
+                <MessageSquare size={14} className="shrink-0" />
+                <span>@Trinity_health_solution</span>
+              </a>
+              <a
+                href="#contact"
+                className="text-xs text-[#526657] hover:text-[#1c573e] pt-1"
+              >
+                {t("Visit Contact & Office Info →", "የአድራሻ ዝርዝሮችን ይመልከቱ →")}
+              </a>
+            </div>
           </div>
         </div>
 
