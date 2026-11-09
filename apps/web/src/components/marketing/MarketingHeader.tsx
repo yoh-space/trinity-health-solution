@@ -24,6 +24,7 @@ export function MarketingHeader() {
   }, []);
 
   const navigationItems = [
+    { labelEn: "Home", labelAm: "ዋና ገጽ", href: "/" },
     { labelEn: "Services", labelAm: "አገልግሎቶች", href: "/services" },
     { labelEn: "Products", labelAm: "ምርቶች", href: "/products" },
     { labelEn: "Ask Opal AI", labelAm: "ኦፓል AI", href: "/ask-opal" },
@@ -51,11 +52,12 @@ export function MarketingHeader() {
         <div className="hidden items-center gap-6 lg:flex xl:gap-8">
           {navigationItems.map((item) => {
             const isActive =
-              item.href === pathname ||
+              (item.href === "/" && pathname === "/") ||
               (item.href === "/services" && pathname?.startsWith("/services")) ||
               (item.href === "/products" && pathname?.startsWith("/products")) ||
               (item.href === "/learn" && pathname?.startsWith("/learn")) ||
-              (item.href === "/ask-opal" && pathname === "/ask-opal");
+              (item.href === "/ask-opal" && pathname === "/ask-opal") ||
+              (item.href === "/#contact" && pathname === "/#contact");
             return (
               <Link
                 key={item.href}
