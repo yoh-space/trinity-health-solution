@@ -99,7 +99,8 @@ export const listMyClientAppointments = query({
   args: { now: v.number() },
   returns: v.array(clientAppointmentResultValidator),
   handler: async (ctx, { now }) => {
-    const identity = await requireIdentity(ctx);
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity?.subject) return [];
     const requests = await ctx.db
       .query("careRequests")
       .withIndex("by_userId_createdAt", (q) =>

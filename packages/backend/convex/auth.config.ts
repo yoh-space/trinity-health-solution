@@ -6,6 +6,8 @@ const issuerDomains = Array.from(
   new Set(
     [
       clerkJwtIssuerDomain,
+      "https://clerk.trinityhealthsolution.com.et",
+      "https://trinity-health-solution.vercel.app/__clerk",
       "https://enabled-stag-589.clerk.accounts.dev",
       "https://promoted-raven-5308.clerk.accounts.dev",
     ].filter(Boolean) as string[],

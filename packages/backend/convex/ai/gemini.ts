@@ -8,9 +8,9 @@ import {
   type OpalProfileContext,
 } from "./opalPrompt";
 
-const DEFAULT_MODEL = "gemini-3.5-flash-lite";
-const FILE_SEARCH_MODEL = "gemini-2.0-flash";
-const FALLBACK_FILE_SEARCH_MODEL = "gemini-1.5-flash";
+const DEFAULT_MODEL = "gemini-2.5-flash";
+const FILE_SEARCH_MODEL = "gemini-2.5-flash";
+const FALLBACK_FILE_SEARCH_MODEL = "gemini-2.5-flash";
 const DEFAULT_FILE_SEARCH_STORE_NAME =
   "fileSearchStores/trinity-health-solution-app-yj2tjeqz3qi8";
 const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
