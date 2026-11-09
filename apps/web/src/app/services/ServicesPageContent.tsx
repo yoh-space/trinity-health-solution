@@ -27,6 +27,7 @@ import {
 } from "@/components/marketing/MarketingLanguageContext";
 import { BackToTopButton } from "@/components/common/BackToTopButton";
 import { FloatingOpalChat } from "@/components/chat/FloatingOpalChat";
+import { FloatingTelegramButton } from "@/components/common/FloatingTelegramButton";
 
 function getServiceIcon(iconName?: string) {
   switch (iconName) {
@@ -491,7 +492,8 @@ function ServicesInner() {
 
       <MarketingFooter />
       <BackToTopButton />
-      <FloatingOpalChat />
+      <FloatingTelegramButton />
+        <FloatingOpalChat />
     </div>
   );
 }

@@ -27,6 +27,7 @@ import {
 } from "@/components/marketing/MarketingLanguageContext";
 import { BackToTopButton } from "@/components/common/BackToTopButton";
 import { FloatingOpalChat } from "@/components/chat/FloatingOpalChat";
+import { FloatingTelegramButton } from "@/components/common/FloatingTelegramButton";
 
 interface Product {
   id: string;
@@ -632,7 +633,8 @@ function ProductsInner() {
 
       <MarketingFooter />
       <BackToTopButton />
-      <FloatingOpalChat />
+      <FloatingTelegramButton />
+        <FloatingOpalChat />
     </div>
   );
 }
