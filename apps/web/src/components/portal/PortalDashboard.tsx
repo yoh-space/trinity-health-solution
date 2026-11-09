@@ -25,7 +25,6 @@ import {
   FileText,
   Lock,
 } from "lucide-react";
-import { ClientAuthModal } from "@/components/common/ClientAuthModal";
 import { useMarketingLanguage } from "@/components/marketing/MarketingLanguageContext";
 
 interface CareRequestItem {
@@ -63,15 +62,14 @@ interface PublishedEducationItem {
 
 export function PortalDashboard() {
   const { user, isSignedIn, isLoaded } = useUser();
-  const { openUserProfile } = useClerk();
+  const { openUserProfile, openSignIn } = useClerk();
   const { language, setLanguage, t } = useMarketingLanguage();
   const searchParams = useSearchParams();
   const router = useRouter();
 
   const tabParam = searchParams.get("tab") || "overview";
   const [activeTab, setActiveTab] = useState(tabParam);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-
+  
   // Keep state synced with URL search params
   const currentTab = searchParams.get("tab") || activeTab;
 
@@ -118,7 +116,7 @@ export function PortalDashboard() {
   const handleCreateRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isSignedIn) {
-      setAuthModalOpen(true);
+      openSignIn({ fallbackRedirectUrl: "/portal", signUpFallbackRedirectUrl: "/portal" });
       return;
     }
     if (!formContactDetails.trim()) {
@@ -168,7 +166,7 @@ export function PortalDashboard() {
             <div className="mt-8 flex flex-wrap gap-4">
               <button
                 type="button"
-                onClick={() => setAuthModalOpen(true)}
+                onClick={() => openSignIn({ fallbackRedirectUrl: "/portal", signUpFallbackRedirectUrl: "/portal" })}
                 className="flex items-center gap-2.5 rounded-full bg-[#1c573e] px-7 py-3.5 text-sm font-bold text-white shadow-md transition hover:bg-[#154631] active:scale-95"
               >
                 <span>{t("Sign In to Access Care Space", "ይግቡና ፖርታልዎን ይክፈቱ")}</span>
@@ -184,11 +182,6 @@ export function PortalDashboard() {
               </Link>
             </div>
           </div>
-
-          <ClientAuthModal
-            isOpen={authModalOpen}
-            onClose={() => setAuthModalOpen(false)}
-          />
         </section>
       </div>
     );

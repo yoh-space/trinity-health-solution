@@ -21,7 +21,10 @@ import type * as onboarding from "../onboarding.js";
 import type * as opal from "../opal.js";
 import type * as openai from "../openai.js";
 import type * as pantry from "../pantry.js";
+import type * as products from "../products.js";
 import type * as seed from "../seed.js";
+import type * as seedCatalog from "../seedCatalog.js";
+import type * as services from "../services.js";
 import type * as staff from "../staff.js";
 import type * as utils from "../utils.js";
 
@@ -45,7 +48,10 @@ declare const fullApi: ApiFromModules<{
   opal: typeof opal;
   openai: typeof openai;
   pantry: typeof pantry;
+  products: typeof products;
   seed: typeof seed;
+  seedCatalog: typeof seedCatalog;
+  services: typeof services;
   staff: typeof staff;
   utils: typeof utils;
 }>;

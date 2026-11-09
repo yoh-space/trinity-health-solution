@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export function TrinityLoading({ label = "Loading Trinity" }: { label?: string }) {
   return (
-    <main className="flex min-h-[60vh] items-center justify-center overflow-hidden bg-[#f7faf6] px-5 text-[#183b2d]">
+    <main className="flex min-h-screen items-center justify-center overflow-hidden bg-[#f7faf6] px-5 text-[#183b2d]">
       <div className="w-full max-w-sm text-center" role="status" aria-live="polite">
         <div className="relative mx-auto grid size-32 place-items-center">
           <div className="absolute inset-0 rounded-full border border-[#bcd9c2]" aria-hidden="true" />
@@ -50,7 +50,7 @@ export function RouteError({
   message?: string;
 }) {
   return (
-    <main className="flex min-h-[60vh] items-center justify-center bg-[#f7faf6] px-5 text-[#183b2d]">
+    <main className="flex min-h-screen items-center justify-center bg-[#f7faf6] px-5 text-[#183b2d]">
       <div className="max-w-md text-center">
         <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#438451]">
           TRINITY HEALTH SOLUTION

@@ -15,16 +15,14 @@ import {
   Sparkles,
   ArrowRight,
 } from "lucide-react";
-import { ClientAuthModal } from "./ClientAuthModal";
 import { useMarketingLanguage } from "@/components/marketing/MarketingLanguageContext";
 
 export function ClientProfileMenu() {
   const { user, isSignedIn, isLoaded } = useUser();
-  const { signOut, openUserProfile } = useClerk();
+  const { signOut, openUserProfile, openSignIn } = useClerk();
   const { language, t } = useMarketingLanguage();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const menuRef = useRef<HTMLDivElement>(null);
+    const menuRef = useRef<HTMLDivElement>(null);
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -49,7 +47,7 @@ export function ClientProfileMenu() {
       <>
         <button
           type="button"
-          onClick={() => setAuthModalOpen(true)}
+          onClick={() => openSignIn({ fallbackRedirectUrl: "/portal", signUpFallbackRedirectUrl: "/portal" })}
           className="flex items-center gap-2 rounded-full border border-[#cbd8cb] bg-white px-3.5 py-1.5 text-xs font-bold text-[#1c573e] shadow-2xs transition hover:border-[#1c573e] hover:bg-[#f6faf6] active:scale-95"
           title="Sign in with Google or Phone"
         >
@@ -57,12 +55,7 @@ export function ClientProfileMenu() {
             <User size={13} />
           </div>
           <span>{language === "am" ? "ግባ" : "Sign In"}</span>
-        </button>
-
-        <ClientAuthModal
-          isOpen={authModalOpen}
-          onClose={() => setAuthModalOpen(false)}
-        />
+        </button>
       </>
     );
   }

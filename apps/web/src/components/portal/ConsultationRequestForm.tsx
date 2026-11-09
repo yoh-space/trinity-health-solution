@@ -2,18 +2,17 @@
 
 import Link from "next/link";
 import { FormEvent, useState } from "react";
-import { useUser } from "@clerk/nextjs";
+import { useUser, useClerk } from "@clerk/nextjs";
 import { useMutation } from "convex/react";
 import { anyApi } from "convex/server";
 import { ArrowLeft, CheckCircle2, AlertCircle, PlusCircle, ShieldCheck } from "lucide-react";
-import { ClientAuthModal } from "@/components/common/ClientAuthModal";
 
 export function ConsultationRequestForm() {
   const { user, isSignedIn } = useUser();
+  const { openSignIn } = useClerk();
   const createCareRequest = useMutation(anyApi.careRequests.create);
 
-  const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -29,7 +28,7 @@ export function ConsultationRequestForm() {
   const submit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!isSignedIn) {
-      setAuthModalOpen(true);
+      openSignIn({ fallbackRedirectUrl: "/portal", signUpFallbackRedirectUrl: "/portal" });
       return;
     }
     if (!contactDetails.trim()) {
@@ -245,11 +244,6 @@ export function ConsultationRequestForm() {
           <span>{submitting ? "Submitting..." : "Submit Care Request"}</span>
         </button>
       </form>
-
-      <ClientAuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-      />
     </div>
   );
 }
