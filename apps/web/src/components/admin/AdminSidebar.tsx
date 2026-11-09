@@ -171,18 +171,9 @@ export function AdminSidebar({
         {/* Workspace Indicator Pill */}
         <div className="p-4 pb-2">
           <div className="flex items-center justify-between rounded-xl border border-[#d6e2d6] bg-[#f4f7f2] px-3.5 py-2.5">
-            <div className="flex items-center gap-2">
-              <ShieldCheck size={16} className="text-[#1c573e]" />
-              <div>
                 <p className="text-[11px] font-bold text-[#1a3828]">
                   Administrator Desk
                 </p>
-                <p className="text-[10px] text-[#637769]">Operations workspace</p>
-              </div>
-            </div>
-            <Badge variant="emerald" className="text-[9px] px-1.5 py-0 uppercase">
-              {role}
-            </Badge>
           </div>
         </div>
 
