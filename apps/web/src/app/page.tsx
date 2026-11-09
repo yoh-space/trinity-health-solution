@@ -2,6 +2,7 @@ import { MarketingHeader } from "@/components/marketing/MarketingHeader";
 import { MarketingHero } from "@/components/marketing/MarketingHero";
 import { CommitmentsBar } from "@/components/marketing/CommitmentsBar";
 import { ServicesSection } from "@/components/marketing/ServicesSection";
+import { ProductsShowcaseSection } from "@/components/marketing/ProductsShowcaseSection";
 import { LearningTopicsSection } from "@/components/marketing/LearningTopicsSection";
 import { OpalLiveTeaser } from "@/components/marketing/OpalLiveTeaser";
 import { PantryExplorerSection } from "@/components/marketing/PantryExplorerSection";
@@ -26,6 +27,7 @@ export default function Home() {
           <MarketingHero />
           <CommitmentsBar />
           <ServicesSection />
+          <ProductsShowcaseSection />
           <LearningTopicsSection />
           <OpalLiveTeaser />
           <PantryExplorerSection />
