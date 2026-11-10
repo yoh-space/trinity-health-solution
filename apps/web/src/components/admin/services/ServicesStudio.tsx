@@ -31,6 +31,7 @@ import {
   formFromService,
 } from "./types";
 import { ServiceEditor } from "./ServiceEditor";
+import { EditorDrawer } from "../ui/EditorDrawer";
 
 export function ServicesStudio() {
   const services = useQuery(anyApi.services.listForAdmin) as ServiceItem[] | undefined;
@@ -268,8 +269,17 @@ export function ServicesStudio() {
         </div>
       )}
 
-      {/* Active Editor Drawer / Modal */}
-      {(isCreating || editingItem) && (
+      {/* Editor Slide-Over Drawer */}
+      <EditorDrawer
+        open={isCreating || !!editingItem}
+        title={editingItem ? `Edit: ${editingItem.categoryEn}` : "New Service Pillar"}
+        subtitle={
+          editingItem
+            ? "Changes are saved to draft until you publish."
+            : "Fill in the fields below to add a clinical service card."
+        }
+        onClose={handleCancelEditor}
+      >
         <ServiceEditor
           form={form}
           editing={!!editingItem}
@@ -278,7 +288,7 @@ export function ServicesStudio() {
           onSubmit={handleSubmit}
           onCancel={handleCancelEditor}
         />
-      )}
+      </EditorDrawer>
 
       {/* Overview Stats Strip */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -359,116 +369,131 @@ export function ServicesStudio() {
               </p>
             </div>
           ) : (
-            filteredServices.map((item, index) => (
-              <div
-                key={item._id}
-                className="flex flex-col justify-between gap-4 rounded-2xl border border-[#e1eae1] bg-white p-5 shadow-2xs transition hover:border-[#b8cfba] sm:flex-row sm:items-center"
-              >
-                <div className="flex items-start gap-3.5">
-                  {/* Order Arrows */}
-                  <div className="flex flex-col items-center gap-1 pt-1 text-[#7a8f81]">
-                    <button
-                      onClick={() => handleMoveOrder(item, "up")}
-                      disabled={index === 0}
-                      className="rounded p-0.5 hover:bg-[#eaf1e8] disabled:opacity-30"
-                      title="Move up"
-                    >
-                      <ArrowUp size={12} />
-                    </button>
-                    <span className="text-[10px] font-bold text-[#1c573e]">{item.order}</span>
-                    <button
-                      onClick={() => handleMoveOrder(item, "down")}
-                      disabled={index === filteredServices.length - 1}
-                      className="rounded p-0.5 hover:bg-[#eaf1e8] disabled:opacity-30"
-                      title="Move down"
-                    >
-                      <ArrowDown size={12} />
-                    </button>
-                  </div>
-
-                  {/* Icon */}
-                  <div
-                    className={`flex size-11 shrink-0 items-center justify-center rounded-xl border ${item.accent}`}
-                  >
-                    {renderIcon(item.icon)}
-                  </div>
-
-                  {/* Main Details */}
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="rounded-full bg-[#f0f4ee] px-2.5 py-0.5 text-[10px] font-bold text-[#1c573e]">
-                        {item.badgeEn}
-                      </span>
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                          item.status === "published"
-                            ? "bg-[#eaf5ee] text-[#1a5f36]"
-                            : "bg-[#fdf2e8] text-[#974d1a]"
-                        }`}
+            filteredServices.map((item, index) => {
+              const isActive = editingItem?._id === item._id;
+              return (
+                <div
+                  key={item._id}
+                  className={`rounded-2xl border p-4 shadow-2xs transition ${
+                    isActive
+                      ? "border-[#1c573e] bg-[#f4fbf6] ring-2 ring-[#1c573e]/20"
+                      : "border-[#e1eae1] bg-white hover:border-[#b8cfba]"
+                  }`}
+                >
+                  {/* Top row: order + icon + details */}
+                  <div className="flex items-start gap-3">
+                    {/* Order Arrows */}
+                    <div className="flex shrink-0 flex-col items-center gap-0.5 pt-1 text-[#7a8f81]">
+                      <button
+                        onClick={() => handleMoveOrder(item, "up")}
+                        disabled={index === 0}
+                        className="rounded p-0.5 hover:bg-[#eaf1e8] disabled:opacity-30"
+                        title="Move up"
                       >
-                        {item.status === "published" ? "Published" : "Draft"}
-                      </span>
-                      <span className="text-[11px] text-[#86998b]">slug: {item.slug}</span>
+                        <ArrowUp size={12} />
+                      </button>
+                      <span className="text-[10px] font-black text-[#1c573e]">{item.order}</span>
+                      <button
+                        onClick={() => handleMoveOrder(item, "down")}
+                        disabled={index === filteredServices.length - 1}
+                        className="rounded p-0.5 hover:bg-[#eaf1e8] disabled:opacity-30"
+                        title="Move down"
+                      >
+                        <ArrowDown size={12} />
+                      </button>
                     </div>
 
-                    <h4 className="mt-1 text-sm font-extrabold text-[#173827]">
-                      {item.categoryEn}
-                      <span className="ml-2 font-normal text-[#597161]">({item.categoryAm})</span>
-                    </h4>
+                    {/* Icon */}
+                    <div
+                      className={`flex size-11 shrink-0 items-center justify-center rounded-xl border ${item.accent}`}
+                    >
+                      {renderIcon(item.icon)}
+                    </div>
 
-                    <p className="mt-0.5 line-clamp-1 text-xs text-[#526658]">
-                      {item.taglineEn}
-                    </p>
+                    {/* Details */}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="rounded-full bg-[#f0f4ee] px-2 py-0.5 text-[10px] font-bold text-[#1c573e]">
+                          {item.badgeEn}
+                        </span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                            item.status === "published"
+                              ? "bg-[#eaf5ee] text-[#1a5f36]"
+                              : "bg-[#fdf2e8] text-[#974d1a]"
+                          }`}
+                        >
+                          {item.status === "published" ? "● Published" : "○ Draft"}
+                        </span>
+                        <span className="text-[11px] text-[#86998b]">slug: {item.slug}</span>
+                        {isActive && (
+                          <span className="rounded-full bg-[#1c573e] px-2 py-0.5 text-[10px] font-bold text-white">
+                            Editing
+                          </span>
+                        )}
+                      </div>
 
-                    <div className="mt-2 flex flex-wrap items-center gap-3 text-[11px] text-[#718576]">
-                      <span>{item.deliverablesEn?.length ?? 0} deliverables listed</span>
-                      <span>•</span>
-                      <span className="text-[#1c573e] font-semibold">{item.guidelineEn}</span>
+                      <h4 className="mt-1 truncate text-sm font-extrabold text-[#173827]">
+                        {item.categoryEn}
+                        <span className="ml-1.5 font-normal text-[#718a7a]">({item.categoryAm})</span>
+                      </h4>
+
+                      <p className="mt-0.5 line-clamp-1 text-xs text-[#526658]">{item.taglineEn}</p>
+
+                      <p className="mt-0.5 text-[11px] text-[#8ea394]">
+                        {item.deliverablesEn?.length ?? 0} deliverables
+                        {item.guidelineEn ? ` · ${item.guidelineEn}` : ""}
+                      </p>
                     </div>
                   </div>
+
+                  {/* Action bar */}
+                  <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-[#edf2ed] pt-3">
+                    {/* Primary: Edit */}
+                    <button
+                      onClick={() => handleStartEdit(item)}
+                      className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition ${
+                        isActive
+                          ? "bg-[#1c573e] text-white shadow-sm"
+                          : "border border-[#b8d4be] bg-white text-[#1c573e] hover:bg-[#eef6f0]"
+                      }`}
+                    >
+                      <Edit2 size={13} />
+                      <span>{isActive ? "Currently Editing" : "Edit Details"}</span>
+                    </button>
+
+                    {/* Divider */}
+                    <span className="h-5 w-px bg-[#dce6dc]" />
+
+                    {/* Publish toggle */}
+                    <button
+                      onClick={() => handleTogglePublish(item)}
+                      className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition ${
+                        item.status === "published"
+                          ? "border border-[#ccdacc] bg-white text-[#455c4d] hover:bg-[#f6f8f5]"
+                          : "border border-[#b6d4c0] bg-[#eef6f0] text-[#1c573e] hover:bg-[#ddf0e5]"
+                      }`}
+                    >
+                      {item.status === "published" ? (
+                        <><EyeOff size={13} /><span>Unpublish</span></>
+                      ) : (
+                        <><Eye size={13} /><span>Publish</span></>
+                      )}
+                    </button>
+
+                    {/* Delete — danger, pushed to the right */}
+                    <button
+                      onClick={() => handleDelete(item)}
+                      className="ml-auto inline-flex items-center gap-1.5 rounded-xl border border-transparent px-2.5 py-2 text-[#97a69b] transition hover:border-[#f0c3c3] hover:bg-[#fbeaea] hover:text-[#b43d3d]"
+                      title="Delete service"
+                    >
+                      <Trash2 size={14} />
+                      <span className="text-xs font-semibold">Delete</span>
+                    </button>
+                  </div>
                 </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-2 border-t border-[#eaf0ea] pt-3 sm:border-0 sm:pt-0">
-                  <button
-                    onClick={() => handleTogglePublish(item)}
-                    className={`inline-flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold transition ${
-                      item.status === "published"
-                        ? "border border-[#ccdacc] bg-white text-[#455c4d] hover:bg-[#f6f8f5]"
-                        : "bg-[#1c573e] text-white hover:bg-[#154631]"
-                    }`}
-                  >
-                    {item.status === "published" ? (
-                      <>
-                        <EyeOff size={12} />
-                        <span>Unpublish</span>
-                      </>
-                    ) : (
-                      <>
-                        <Eye size={12} />
-                        <span>Publish</span>
-                      </>
-                    )}
-                  </button>
-
-                  <button
-                    onClick={() => handleStartEdit(item)}
-                    className="inline-flex items-center gap-1 rounded-xl border border-[#ccdacc] bg-white px-3 py-1.5 text-xs font-bold text-[#1c573e] transition hover:bg-[#f4f8f4]"
-                  >
-                    <Edit2 size={12} />
-                    <span>Edit</span>
-                  </button>
-
-                  <button
-                    onClick={() => handleDelete(item)}
-                    className="rounded-xl p-1.5 text-[#97a69b] transition hover:bg-[#fbeaea] hover:text-[#b43d3d]"
-                    title="Delete service"
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

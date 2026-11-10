@@ -120,14 +120,14 @@ export function ProductEditor({
   };
 
   return (
-    <div className="rounded-3xl border border-[#dce6dc] bg-white p-6 shadow-sm sm:p-8">
+    <div>
       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#e5ede5] pb-5">
         <div>
-          <h3 className="text-xl font-extrabold text-[#163826]">
-            {editing ? "Edit Product Details" : "Add New Maternal / Infant Product"}
+          <h3 className="text-base font-extrabold text-[#163826]">
+            {editing ? "Edit Product" : "New Maternal / Infant Product"}
           </h3>
-          <p className="mt-1 text-xs text-[#526b5c]">
-            Updates appear live on the /products catalog and ordering channels.
+          <p className="mt-0.5 text-xs text-[#526b5c]">
+            Updates appear live on the /products catalog.
           </p>
         </div>
 
@@ -142,7 +142,7 @@ export function ProductEditor({
                 : "text-[#587061] hover:text-[#1c573e]"
             }`}
           >
-            English Fields
+            English
           </button>
           <button
             type="button"
@@ -153,7 +153,7 @@ export function ProductEditor({
                 : "text-[#587061] hover:text-[#1c573e]"
             }`}
           >
-            አማርኛ (Amharic)
+            አማርኛ
           </button>
         </div>
       </div>
@@ -601,7 +601,7 @@ export function ProductEditor({
             className="inline-flex items-center gap-2 rounded-xl bg-[#1c573e] px-6 py-2.5 text-xs font-bold text-white shadow-xs hover:bg-[#154631] disabled:opacity-50"
           >
             {saving ? (
-              <span>Saving Product...</span>
+              <span>Saving...</span>
             ) : (
               <span>{editing ? "Save Changes" : "Create Product"}</span>
             )}

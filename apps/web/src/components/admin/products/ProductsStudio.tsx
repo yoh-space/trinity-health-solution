@@ -32,6 +32,7 @@ import {
   PRODUCT_CATEGORIES,
 } from "./types";
 import { ProductEditor } from "./ProductEditor";
+import { EditorDrawer } from "../ui/EditorDrawer";
 
 export function ProductsStudio() {
   const products = useQuery(anyApi.products.listForAdmin) as ProductItem[] | undefined;
@@ -291,8 +292,17 @@ export function ProductsStudio() {
         </div>
       )}
 
-      {/* Active Editor Drawer / Modal */}
-      {(isCreating || editingItem) && (
+      {/* Editor Slide-Over Drawer */}
+      <EditorDrawer
+        open={isCreating || !!editingItem}
+        title={editingItem ? `Edit: ${editingItem.titleEn}` : "Add New Product"}
+        subtitle={
+          editingItem
+            ? "Changes are saved to draft until you publish."
+            : "Fill in the fields below to add a product to the catalog."
+        }
+        onClose={handleCancelEditor}
+      >
         <ProductEditor
           form={form}
           editing={!!editingItem}
@@ -301,7 +311,7 @@ export function ProductsStudio() {
           onSubmit={handleSubmit}
           onCancel={handleCancelEditor}
         />
-      )}
+      </EditorDrawer>
 
       {/* Overview Stats Strip */}
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -410,139 +420,153 @@ export function ProductsStudio() {
               </p>
             </div>
           ) : (
-            filteredProducts.map((item, index) => (
-              <div
-                key={item._id}
-                className="flex flex-col justify-between gap-4 rounded-2xl border border-[#e1eae1] bg-white p-5 shadow-2xs transition hover:border-[#b8cfba] sm:flex-row sm:items-center"
-              >
-                <div className="flex items-start gap-3.5">
-                  {/* Order Arrows */}
-                  <div className="flex flex-col items-center gap-1 pt-1 text-[#7a8f81]">
-                    <button
-                      onClick={() => handleMoveOrder(item, "up")}
-                      disabled={index === 0}
-                      className="rounded p-0.5 hover:bg-[#eaf1e8] disabled:opacity-30"
-                      title="Move up"
-                    >
-                      <ArrowUp size={12} />
-                    </button>
-                    <span className="text-[10px] font-bold text-[#1c573e]">{item.order}</span>
-                    <button
-                      onClick={() => handleMoveOrder(item, "down")}
-                      disabled={index === filteredProducts.length - 1}
-                      className="rounded p-0.5 hover:bg-[#eaf1e8] disabled:opacity-30"
-                      title="Move down"
-                    >
-                      <ArrowDown size={12} />
-                    </button>
-                  </div>
-
-                  {/* Thumbnail / Category Icon */}
-                  {item.coverImageUrl ? (
-                    <img
-                      src={item.coverImageUrl}
-                      alt={item.titleEn}
-                      className="size-14 shrink-0 rounded-xl border border-[#d2ddd0] object-cover"
-                    />
-                  ) : (
-                    <div className="flex size-14 shrink-0 items-center justify-center rounded-xl border border-[#d2ddd0] bg-[#f4f7f2] text-[#1c573e]">
-                      {getCategoryIcon(item.category)}
-                    </div>
-                  )}
-
-                  {/* Main Details */}
-                  <div>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <span className="flex items-center gap-1 rounded-full bg-[#f0f4ee] px-2.5 py-0.5 text-[10px] font-bold text-[#1c573e]">
-                        {getCategoryIcon(item.category)}
-                        <span>{item.badgeEn}</span>
-                      </span>
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                          item.status === "published"
-                            ? "bg-[#eaf5ee] text-[#1a5f36]"
-                            : "bg-[#fdf2e8] text-[#974d1a]"
-                        }`}
+            filteredProducts.map((item, index) => {
+              const isActive = editingItem?._id === item._id;
+              return (
+                <div
+                  key={item._id}
+                  className={`rounded-2xl border p-4 shadow-2xs transition ${
+                    isActive
+                      ? "border-[#1c573e] bg-[#f4fbf6] ring-2 ring-[#1c573e]/20"
+                      : "border-[#e1eae1] bg-white hover:border-[#b8cfba]"
+                  }`}
+                >
+                  {/* Top row: order + thumbnail + details */}
+                  <div className="flex items-start gap-3">
+                    {/* Order Arrows */}
+                    <div className="flex shrink-0 flex-col items-center gap-0.5 pt-1 text-[#7a8f81]">
+                      <button
+                        onClick={() => handleMoveOrder(item, "up")}
+                        disabled={index === 0}
+                        className="rounded p-0.5 hover:bg-[#eaf1e8] disabled:opacity-30"
+                        title="Move up"
                       >
-                        {item.status === "published" ? "Published" : "Draft"}
-                      </span>
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
-                          item.inStock
-                            ? "bg-[#eef8f1] text-[#1e613b]"
-                            : "bg-[#fdeded] text-[#b33a3a]"
-                        }`}
+                        <ArrowUp size={12} />
+                      </button>
+                      <span className="text-[10px] font-black text-[#1c573e]">{item.order}</span>
+                      <button
+                        onClick={() => handleMoveOrder(item, "down")}
+                        disabled={index === filteredProducts.length - 1}
+                        className="rounded p-0.5 hover:bg-[#eaf1e8] disabled:opacity-30"
+                        title="Move down"
                       >
-                        {item.inStock ? "In Stock" : "Out of Stock"}
-                      </span>
+                        <ArrowDown size={12} />
+                      </button>
                     </div>
 
-                    <h4 className="mt-1 text-sm font-extrabold text-[#173827]">
-                      {item.titleEn}
-                      <span className="ml-2 font-normal text-[#597161]">({item.titleAm})</span>
-                    </h4>
-
-                    <p className="mt-0.5 text-xs font-semibold text-[#8b5a38]">
-                      {item.subtitleEn}
-                    </p>
-
-                    <div className="mt-1 flex flex-wrap items-center gap-3 text-[11px] text-[#718576]">
-                      <span>Packaging: {item.formatEn}</span>
-                      <span>•</span>
-                      <span>{item.highlightsEn?.length ?? 0} benefits listed</span>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex flex-wrap items-center gap-2 border-t border-[#eaf0ea] pt-3 sm:border-0 sm:pt-0">
-                  <button
-                    onClick={() => handleToggleStock(item)}
-                    className="rounded-xl border border-[#ccdacc] bg-white px-2.5 py-1.5 text-xs font-bold text-[#34513f] hover:bg-[#f6f8f5]"
-                    title="Toggle stock availability"
-                  >
-                    {item.inStock ? "Mark Out of Stock" : "Mark In Stock"}
-                  </button>
-
-                  <button
-                    onClick={() => handleTogglePublish(item)}
-                    className={`inline-flex items-center gap-1 rounded-xl px-3 py-1.5 text-xs font-bold transition ${
-                      item.status === "published"
-                        ? "border border-[#ccdacc] bg-white text-[#455c4d] hover:bg-[#f6f8f5]"
-                        : "bg-[#1c573e] text-white hover:bg-[#154631]"
-                    }`}
-                  >
-                    {item.status === "published" ? (
-                      <>
-                        <EyeOff size={12} />
-                        <span>Unpublish</span>
-                      </>
+                    {/* Thumbnail */}
+                    {item.coverImageUrl ? (
+                      <img
+                        src={item.coverImageUrl}
+                        alt={item.titleEn}
+                        className="size-12 shrink-0 rounded-xl border border-[#d2ddd0] object-cover"
+                      />
                     ) : (
-                      <>
-                        <Eye size={12} />
-                        <span>Publish</span>
-                      </>
+                      <div className="flex size-12 shrink-0 items-center justify-center rounded-xl border border-[#d2ddd0] bg-[#f4f7f2] text-[#1c573e]">
+                        {getCategoryIcon(item.category)}
+                      </div>
                     )}
-                  </button>
 
-                  <button
-                    onClick={() => handleStartEdit(item)}
-                    className="inline-flex items-center gap-1 rounded-xl border border-[#ccdacc] bg-white px-3 py-1.5 text-xs font-bold text-[#1c573e] transition hover:bg-[#f4f8f4]"
-                  >
-                    <Edit2 size={12} />
-                    <span>Edit</span>
-                  </button>
+                    {/* Info */}
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        <span className="flex items-center gap-1 rounded-full bg-[#f0f4ee] px-2 py-0.5 text-[10px] font-bold text-[#1c573e]">
+                          {getCategoryIcon(item.category)}
+                          <span>{item.badgeEn}</span>
+                        </span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                            item.status === "published"
+                              ? "bg-[#eaf5ee] text-[#1a5f36]"
+                              : "bg-[#fdf2e8] text-[#974d1a]"
+                          }`}
+                        >
+                          {item.status === "published" ? "● Published" : "○ Draft"}
+                        </span>
+                        <span
+                          className={`rounded-full px-2 py-0.5 text-[10px] font-bold ${
+                            item.inStock
+                              ? "bg-[#eef8f1] text-[#1e613b]"
+                              : "bg-[#fdeded] text-[#b33a3a]"
+                          }`}
+                        >
+                          {item.inStock ? "In Stock" : "Out of Stock"}
+                        </span>
+                        {isActive && (
+                          <span className="rounded-full bg-[#1c573e] px-2 py-0.5 text-[10px] font-bold text-white">
+                            Editing
+                          </span>
+                        )}
+                      </div>
 
-                  <button
-                    onClick={() => handleDelete(item)}
-                    className="rounded-xl p-1.5 text-[#97a69b] transition hover:bg-[#fbeaea] hover:text-[#b43d3d]"
-                    title="Delete product"
-                  >
-                    <Trash2 size={14} />
-                  </button>
+                      <h4 className="mt-1 truncate text-sm font-extrabold text-[#173827]">
+                        {item.titleEn}
+                        <span className="ml-1.5 font-normal text-[#718a7a]">({item.titleAm})</span>
+                      </h4>
+
+                      <p className="mt-0.5 text-xs text-[#8b5a38]">{item.subtitleEn}</p>
+
+                      <p className="mt-0.5 text-[11px] text-[#8ea394]">
+                        {item.formatEn} · {item.highlightsEn?.length ?? 0} benefits listed
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Action bar — always visible, clearly separated */}
+                  <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-[#edf2ed] pt-3">
+                    {/* Primary: Edit — most prominent */}
+                    <button
+                      onClick={() => handleStartEdit(item)}
+                      className={`inline-flex items-center gap-1.5 rounded-xl px-3.5 py-2 text-xs font-bold transition ${
+                        isActive
+                          ? "bg-[#1c573e] text-white shadow-sm"
+                          : "border border-[#b8d4be] bg-white text-[#1c573e] hover:bg-[#eef6f0]"
+                      }`}
+                    >
+                      <Edit2 size={13} />
+                      <span>{isActive ? "Currently Editing" : "Edit Details"}</span>
+                    </button>
+
+                    {/* Divider */}
+                    <span className="h-5 w-px bg-[#dce6dc]" />
+
+                    {/* Publish toggle */}
+                    <button
+                      onClick={() => handleTogglePublish(item)}
+                      className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-semibold transition ${
+                        item.status === "published"
+                          ? "border border-[#ccdacc] bg-white text-[#455c4d] hover:bg-[#f6f8f5]"
+                          : "border border-[#b6d4c0] bg-[#eef6f0] text-[#1c573e] hover:bg-[#ddf0e5]"
+                      }`}
+                    >
+                      {item.status === "published" ? (
+                        <><EyeOff size={13} /><span>Unpublish</span></>
+                      ) : (
+                        <><Eye size={13} /><span>Publish</span></>
+                      )}
+                    </button>
+
+                    {/* Stock toggle */}
+                    <button
+                      onClick={() => handleToggleStock(item)}
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-[#d4ddd4] bg-white px-3 py-2 text-xs font-semibold text-[#425d4c] transition hover:bg-[#f6f8f5]"
+                    >
+                      {item.inStock ? "Mark Out of Stock" : "Mark In Stock"}
+                    </button>
+
+                    {/* Delete — danger, far right, icon only */}
+                    <button
+                      onClick={() => handleDelete(item)}
+                      className="ml-auto inline-flex items-center gap-1.5 rounded-xl border border-transparent px-2.5 py-2 text-[#97a69b] transition hover:border-[#f0c3c3] hover:bg-[#fbeaea] hover:text-[#b43d3d]"
+                      title="Delete product"
+                    >
+                      <Trash2 size={14} />
+                      <span className="text-xs font-semibold">Delete</span>
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>
