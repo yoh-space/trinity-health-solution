@@ -5,7 +5,6 @@ import { anyApi } from "convex/server";
 import { useRouter, type Href } from "expo-router";
 import { useRef, useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
   Linking,
   Platform,
@@ -18,6 +17,13 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { GuestHomeHeader } from "../components/public/GuestHomeHeader";
+import { OpalConsentModal } from "../components/opal/OpalConsentModal";
+import { OpalHealthTools } from "../components/opal/OpalHealthTools";
+import {
+  OpalMessageRenderer,
+  type OpalSource,
+  type OpalStructuredAnswer,
+} from "../components/opal/OpalMessageRenderer";
 import { AUTHENTICATED_HOME_TABS } from "../constants/authRoutes";
 import {
   classifyOpalQuestion,
@@ -27,12 +33,8 @@ import {
 } from "../lib/opal/safety";
 import { useTrinityStore } from "../store/useTrinityStore";
 
-type Question = {
-  id: string;
-  question: string;
-  questionAm: string;
-};
-type OpalSource = { id: string; title: string; titleAm: string };
+// ─── Types ────────────────────────────────────────────────────────────────────
+
 type Message = {
   id: number;
   role: "user" | "opal";
@@ -40,72 +42,80 @@ type Message = {
   sources?: OpalSource[];
   safety?: boolean;
   redFlag?: "none" | "clinical" | "urgent";
+  structured?: OpalStructuredAnswer;
   error?: boolean;
 };
+
 type AskOpalResult = {
   answer: string;
   safety: boolean;
   redFlag: "none" | "clinical" | "urgent";
   sources: OpalSource[];
+  structured?: OpalStructuredAnswer;
 };
 
-const questions: Question[] = [
+type ActiveTab = "chat" | "tools";
+
+// ─── Quick prompt suggestions (expanded to match web) ─────────────────────────
+
+const QUICK_PROMPTS = [
   {
-    id: "food-hands",
-    question: "How can I keep food preparation clean?",
-    questionAm: "ምግብ ሲዘጋጅ ንጽህናን እንዴት መጠበቅ እችላለሁ?",
+    id: "water-safety",
+    en: "How do I make drinking water safe?",
+    am: "የመጠጥ ውሃን እንዴት ደህንነቱን እጠብቃለሁ?",
   },
   {
     id: "pregnancy-food",
-    question: "What foods can I choose during pregnancy?",
-    questionAm: "በእርግዝና ጊዜ ምን ልመገብ?",
+    en: "What foods should I choose during pregnancy?",
+    am: "በእርግዝና ጊዜ ምን ልመገብ?",
   },
   {
-    id: "child-texture",
-    question: "What texture is right for a young child?",
-    questionAm: "ለታዳጊ ህፃን ምን ዓይነት ምግብ ማዘጋጀት አለብኝ?",
+    id: "infant-feeding",
+    en: "What should I feed my 6-month-old?",
+    am: "ለ 6 ወር ህጻን ምን ምግብ ልስጥ?",
   },
   {
-    id: "breastfeeding-water",
-    question: "What should I drink while breastfeeding?",
-    questionAm: "ጡት በማጥባት ጊዜ ምን መጠጣት አለብኝ?",
-  },
-  {
-    id: "safe-water",
-    question: "How do I make drinking water safe?",
-    questionAm: "የመጠጥ ውሃን እንዴት ደህንነቱን መጠበቅ እችላለሁ?",
-  },
-  {
-    id: "diabetes",
-    question: "Can Opal calculate or diagnose diabetes for me?",
-    questionAm: "ኦፓል የስኳር በሽታን ሊያሰላ ወይም ሊመረምርልኝ ይችላል?",
+    id: "food-hygiene",
+    en: "How can I keep food preparation clean?",
+    am: "የምግብ ማዘጋጃ ቦታን እንዴት ንጹህ ማድረግ እችላለሁ?",
   },
 ];
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function OpalScreen() {
   const router = useRouter();
   const { isSignedIn } = useAuth();
   const language = useTrinityStore((state) => state.language);
   const askOpal = useAction(anyApi.opal.ask);
+
+  const [activeTab, setActiveTab] = useState<ActiveTab>("chat");
   const [draft, setDraft] = useState("");
   const [messages, setMessages] = useState<Message[]>([]);
   const [isSending, setIsSending] = useState(false);
   const [aiConsent, setAiConsent] = useState(false);
+  const [consentModalOpen, setConsentModalOpen] = useState(false);
+  const [pendingQuestion, setPendingQuestion] = useState<string | null>(null);
+
   const nextMessageId = useRef(0);
+  const scrollRef = useRef<ScrollView>(null);
   const am = language === "am";
+
   const homeRoute = isSignedIn ? AUTHENTICATED_HOME_TABS : "/public/home";
   const profileRoute = isSignedIn ? "/(app)/(tabs)/profile" : "/public/profile";
   const savedRoute = isSignedIn ? "/(app)/(tabs)/saved" : "/public/saved";
 
+  // ── Sending logic ───────────────────────────────────────────────────────────
+
   const sendToGemini = async (text: string) => {
-    const userMessageId = nextMessageId.current++;
-    const opalMessageId = nextMessageId.current++;
-    setMessages((previous) => [
-      ...previous,
-      { id: userMessageId, role: "user", text },
-    ]);
+    const userMsgId = nextMessageId.current++;
+    const opalMsgId = nextMessageId.current++;
+
+    setMessages((prev) => [...prev, { id: userMsgId, role: "user", text }]);
     setDraft("");
     setIsSending(true);
+    // Auto-scroll to bottom
+    setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 100);
 
     try {
       const result = (await askOpal({
@@ -113,15 +123,17 @@ export default function OpalScreen() {
         language,
         question: text,
       })) as AskOpalResult;
-      setMessages((previous) => [
-        ...previous,
+
+      setMessages((prev) => [
+        ...prev,
         {
-          id: opalMessageId,
+          id: opalMsgId,
           role: "opal",
           text: result.answer,
           safety: result.safety,
           redFlag: result.redFlag,
           sources: result.sources,
+          structured: result.structured,
         },
       ]);
     } catch (error) {
@@ -129,43 +141,44 @@ export default function OpalScreen() {
       let message: string;
       if (code.includes("OPAL_NOT_CONFIGURED")) {
         message = am
-          ? "ኦፓል ገና ከGemini ጋር አልተገናኘም። በConvex ቅንብሮች ውስጥ GEMINI_API_KEY ያክሉ።"
-          : "Opal is not connected to Gemini yet. Add GEMINI_API_KEY in Convex environment settings.";
+          ? "ኦፓል ገና ከGemini ጋር አልተገናኘም። GEMINI_API_KEY ያስፈልጋል።"
+          : "Opal is not connected to Gemini yet. Add GEMINI_API_KEY in Convex settings.";
       } else if (code.includes("OPAL_RATE_LIMIT")) {
         message = am
-          ? "የGemini ነፃ የጥያቄ ገደብ ደርሷል። ቆይተው እንደገና ይሞክሩ።"
-          : "Gemini’s free request limit has been reached. Please try again later.";
+          ? "የGemini ነፃ ደረጃ ወደ ሙላቱ ደርሷል። ቆይተው እንደገና ይሞክሩ።"
+          : "Gemini's free tier limit reached. Please try again later.";
       } else if (code.includes("OPAL_INVALID_API_KEY")) {
         message = am
-          ? "የGemini API ቁልፉ አልሰራም። በConvex ቅንብሮች ውስጥ GEMINI_API_KEYን ያረጋግጡ።"
+          ? "የGemini API ቁልፉ አልሰራም። GEMINI_API_KEY ያረጋግጡ።"
           : "The Gemini API key was rejected. Check GEMINI_API_KEY in Convex settings.";
       } else {
         message = am
-          ? "ኦፓል አሁን መልስ ማግኘት አልቻለም። ኢንተርኔትዎን ያረጋግጡና እንደገና ይሞክሩ።"
-          : "Opal couldn’t get an answer right now. Check your connection and try again.";
+          ? "ኦፓል አሁን መልስ ማግኘት አልቻለም። ኢንተርኔትዎን ያረጋግጡ።"
+          : "Opal couldn't get an answer right now. Check your connection.";
       }
-      setMessages((previous) => [
-        ...previous,
-        { id: opalMessageId, role: "opal", text: message, error: true },
+      setMessages((prev) => [
+        ...prev,
+        { id: opalMsgId, role: "opal", text: message, error: true },
       ]);
     } finally {
       setIsSending(false);
+      setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 150);
     }
   };
 
-  const requestAnswer = (rawText: string) => {
+  const initiateAsk = (rawText: string) => {
     const text = rawText.trim();
     if (!text || isSending) return;
 
     if (text.length > 1000) {
-      setMessages((previous) => [
-        ...previous,
+      setMessages((prev) => [
+        ...prev,
         {
           id: nextMessageId.current++,
           role: "opal",
           text: am
             ? "ጥያቄው በጣም ረጅም ነው። እስከ 1000 ፊደላት ድረስ ያሳጥሩት።"
-            : "That question is too long. Please shorten it to 1,000 characters or less.",
+            : "That question is too long. Please keep it under 1,000 characters.",
           error: true,
         },
       ]);
@@ -173,8 +186,8 @@ export default function OpalScreen() {
     }
 
     if (containsLikelyPersonalDetails(text)) {
-      setMessages((previous) => [
-        ...previous,
+      setMessages((prev) => [
+        ...prev,
         {
           id: nextMessageId.current++,
           role: "opal",
@@ -188,13 +201,13 @@ export default function OpalScreen() {
 
     const safetyIntent = classifyOpalQuestion(text);
     if (safetyIntent !== "safe") {
-      const userMessageId = nextMessageId.current++;
-      const opalMessageId = nextMessageId.current++;
-      setMessages((previous) => [
-        ...previous,
-        { id: userMessageId, role: "user", text },
+      const userMsgId = nextMessageId.current++;
+      const opalMsgId = nextMessageId.current++;
+      setMessages((prev) => [
+        ...prev,
+        { id: userMsgId, role: "user", text },
         {
-          id: opalMessageId,
+          id: opalMsgId,
           role: "opal",
           text: getOpalSafetyResponse(safetyIntent, language),
           safety: true,
@@ -210,38 +223,45 @@ export default function OpalScreen() {
       return;
     }
 
-    Alert.alert(
-      am ? "Gemini የሚቀበለው መረጃ" : "What Gemini will receive",
-      am
-        ? "ኦፓል አጠቃላይ የጤና ትምህርት ይሰጣል፤ የግል ምርመራ ወይም ሕክምና አይሰጥም። ጥያቄዎንና ተዛማጅ የታተመ የትምህርት ጽሑፍን ለGoogle Gemini ይልካል። የመገለጫዎ መረጃና የውይይት ታሪክ አይላኩም። በነፃ ደረጃ Google የሚላኩ ጥያቄዎችንና መልሶችን ምርቶቹን ለማሻሻል ሊጠቀምባቸው እና የሰው ገምጋሚዎች ሊያዩአቸው ይችላሉ። ስም፣ የመገናኛ ወይም የግል የጤና መረጃ አያስገቡ።"
-        : "Opal provides general health education, not personal diagnosis or treatment. It sends your question and relevant published lesson text to Google Gemini. Your onboarding profile and earlier chat messages are not sent. On the free tier, Google may use submitted questions and answers to improve its products, and human reviewers may review them. Don’t include names, contact details, or personal health information.",
-      [
-        { text: am ? "ተመለስ" : "Cancel", style: "cancel" },
-        {
-          text: am ? "እስማማለሁ እና ቀጥል" : "Agree & continue",
-          onPress: () => {
-            setAiConsent(true);
-            void sendToGemini(text);
-          },
-        },
-      ],
-    );
+    // Show just-in-time consent modal instead of Alert
+    setPendingQuestion(text);
+    setConsentModalOpen(true);
   };
 
-  const submitDraft = () => {
-    requestAnswer(draft);
+  const handleConsentConfirmed = () => {
+    setAiConsent(true);
+    setConsentModalOpen(false);
+    const question = pendingQuestion ?? draft.trim();
+    setPendingQuestion(null);
+    if (question) void sendToGemini(question);
   };
+
+  const handleConsentDismissed = () => {
+    setConsentModalOpen(false);
+    setPendingQuestion(null);
+  };
+
+  const submitDraft = () => initiateAsk(draft);
 
   const callCareTeam = async () => {
     try {
       await Linking.openURL("tel:+251988720194");
     } catch {
-      Alert.alert(
-        am ? "ጥሪ ማድረግ አልተቻለም" : "Unable to place call",
-        am ? "እባክዎ በእጅ ወደ +251 98 872 0194 ይደውሉ።" : "Please call +251 98 872 0194 manually.",
-      );
+      // silent
     }
   };
+
+  const handleSourcePress = (sourceId: string) => {
+    router.push(`/public/article/${encodeURIComponent(sourceId)}` as Href);
+  };
+
+  // Switch to chat tab when a prompt from tools is selected
+  const handleToolPrompt = (text: string) => {
+    setActiveTab("chat");
+    setTimeout(() => initiateAsk(text), 150);
+  };
+
+  // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
     <SafeAreaView edges={["top", "left", "right"]} style={styles.safeArea}>
@@ -249,6 +269,7 @@ export default function OpalScreen() {
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.keyboardView}
       >
+        {/* ── Page header ── */}
         <View style={styles.pageHeader}>
           <GuestHomeHeader
             language={language}
@@ -257,213 +278,255 @@ export default function OpalScreen() {
             onSettingsPress={() => router.push(profileRoute as Href)}
           />
         </View>
-        <ScrollView
-          contentContainerStyle={styles.conversation}
-          keyboardShouldPersistTaps="handled"
-          showsVerticalScrollIndicator={false}
-          style={styles.conversationScroll}
-        >
-          <Text style={styles.eyebrow}>
-            {am ? "ትንሽ መመሪያ" : "A LITTLE GUIDANCE"}
-          </Text>
-          <Text style={styles.title}>{am ? "ኦፓልን ይጠይቁ" : "Ask Opal"}</Text>
+
+        {/* ── Title row ── */}
+        <View style={styles.titleRow}>
+          <View>
+            <Text style={styles.eyebrow}>{am ? "ትንሽ መመሪያ" : "A LITTLE GUIDANCE"}</Text>
+            <Text style={styles.title}>{am ? "ኦፓልን ይጠይቁ" : "Ask Opal"}</Text>
+          </View>
           <Text style={styles.subtitle}>
             {am
-              ? "ከተዛማጅ የታተሙ ትምህርቶች ጋር Gemini አጠቃላይ መልስ ይሰጣል።"
-              : "Gemini gives general answers using relevant published lessons."}
+              ? "Gemini ከታተሙ ትምህርቶች ጋር ምላሽ ይሰጣል።"
+              : "Gemini answers using published lessons."}
           </Text>
-          {!messages.length && (
-            <View style={styles.welcomeRow}>
-              <View style={styles.leafBadge}>
-                <Ionicons name="leaf" size={18} color="#2E8A4D" />
-              </View>
-              <View style={styles.welcomeBubble}>
-                <Text style={styles.welcomeTitle}>
-                  {am ? "ሰላም! ምን እንመርምር?" : "Selam! What shall we explore?"}
-                </Text>
-                <Text style={styles.welcomeText}>
-                  {am
-                    ? "ከታች ያለውን ይምረጡ ወይም አጠቃላይ ጥያቄ ይጻፉ። የመገለጫ መረጃዎ አይላክም።"
-                    : "Pick a question below or ask your own general question. Your onboarding profile is not sent."}
-                </Text>
-              </View>
-            </View>
-          )}
-          {!!messages.length && (
-            <View style={styles.messageList}>
-              {messages.map((message) => {
-                const isOpal = message.role === "opal";
-                return (
-                  <View
-                    key={message.id}
-                    style={[
-                      styles.messageRow,
-                      !isOpal && styles.userMessageRow,
-                    ]}
-                  >
-                    {isOpal && (
+        </View>
+
+        {/* ── Tab switcher ── */}
+        <View style={styles.tabBar}>
+          <Pressable
+            onPress={() => setActiveTab("chat")}
+            style={[styles.tabBtn, activeTab === "chat" && styles.tabBtnActive]}
+            accessibilityRole="tab"
+          >
+            <Ionicons
+              name="chatbubble-outline"
+              size={14}
+              color={activeTab === "chat" ? "#fff" : "#547963"}
+            />
+            <Text
+              style={[styles.tabText, activeTab === "chat" && styles.tabTextActive]}
+            >
+              {am ? "የኦፓል ውይይት" : "Message Opal"}
+            </Text>
+          </Pressable>
+          <Pressable
+            onPress={() => setActiveTab("tools")}
+            style={[styles.tabBtn, activeTab === "tools" && styles.tabBtnActive]}
+            accessibilityRole="tab"
+          >
+            <Ionicons
+              name="calculator-outline"
+              size={14}
+              color={activeTab === "tools" ? "#fff" : "#547963"}
+            />
+            <Text
+              style={[styles.tabText, activeTab === "tools" && styles.tabTextActive]}
+            >
+              {am ? "የጤና መሳሪያዎች" : "Health Tools"}
+            </Text>
+          </Pressable>
+        </View>
+
+        {/* ── Chat panel ── */}
+        {activeTab === "chat" && (
+          <>
+            <ScrollView
+              ref={scrollRef}
+              contentContainerStyle={styles.conversation}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              style={styles.conversationScroll}
+            >
+              {/* Welcome / empty state */}
+              {!messages.length && (
+                <>
+                  <View style={styles.welcomeRow}>
+                    <View style={styles.leafBadge}>
+                      <Ionicons name="leaf" size={18} color="#2E8A4D" />
+                    </View>
+                    <View style={styles.welcomeBubble}>
+                      <Text style={styles.welcomeTitle}>
+                        {am ? "ሰላም! ምን እንመርምር?" : "Selam! What shall we explore?"}
+                      </Text>
+                      <Text style={styles.welcomeText}>
+                        {am
+                          ? "ከታች ያለውን ይምረጡ ወይም አጠቃላይ ጥያቄ ይጻፉ። የመገለጫ መረጃዎ አይላክም።"
+                          : "Pick a question below or ask your own. Your profile is never sent."}
+                      </Text>
+                    </View>
+                  </View>
+
+                  {/* 2×2 quick prompts grid */}
+                  <View style={styles.quickGrid}>
+                    {QUICK_PROMPTS.map((q) => (
+                      <Pressable
+                        key={q.id}
+                        accessibilityRole="button"
+                        disabled={isSending}
+                        onPress={() => initiateAsk(am ? q.am : q.en)}
+                        style={({ pressed }) => [
+                          styles.quickCard,
+                          pressed && styles.quickCardPressed,
+                        ]}
+                      >
+                        <Text style={styles.quickCardText} numberOfLines={3}>
+                          {am ? q.am : q.en}
+                        </Text>
+                      </Pressable>
+                    ))}
+                  </View>
+                </>
+              )}
+
+              {/* Message thread */}
+              {!!messages.length && (
+                <View style={styles.messageList}>
+                  {messages.map((message) => {
+                    const isOpal = message.role === "opal";
+                    return (
+                      <View
+                        key={message.id}
+                        style={[
+                          styles.messageRow,
+                          !isOpal && styles.userMessageRow,
+                        ]}
+                      >
+                        {isOpal && (
+                          <View style={styles.messageLeaf}>
+                            <Ionicons name="leaf" size={13} color="#2E8A4D" />
+                          </View>
+                        )}
+                        <View
+                          style={[
+                            styles.messageBubble,
+                            isOpal
+                              ? message.safety
+                                ? styles.safetyBubble
+                                : message.error
+                                  ? styles.errorBubble
+                                  : styles.opalBubble
+                              : styles.userBubble,
+                          ]}
+                        >
+                          {isOpal && !message.error ? (
+                            <OpalMessageRenderer
+                              text={message.text}
+                              structured={message.structured}
+                              language={language}
+                              sources={message.sources}
+                              redFlag={message.redFlag}
+                              onSourcePress={handleSourcePress}
+                            />
+                          ) : (
+                            <Text
+                              style={[
+                                styles.messageText,
+                                !isOpal && styles.userMessageText,
+                              ]}
+                            >
+                              {message.text}
+                            </Text>
+                          )}
+                        </View>
+                      </View>
+                    );
+                  })}
+
+                  {isSending && (
+                    <View style={styles.messageRow}>
                       <View style={styles.messageLeaf}>
                         <Ionicons name="leaf" size={13} color="#2E8A4D" />
                       </View>
-                    )}
-                    <View
-                      style={[
-                        styles.messageBubble,
-                        isOpal
-                          ? message.safety
-                            ? styles.safetyBubble
-                            : message.error
-                              ? styles.errorBubble
-                              : styles.opalBubble
-                          : styles.userBubble,
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.messageText,
-                          !isOpal && styles.userMessageText,
-                        ]}
-                      >
-                        {message.text}
-                      </Text>
-                      {message.sources?.map((source) => (
-                        <Pressable
-                          accessibilityRole="link"
-                          key={source.id}
-                          onPress={() =>
-                            router.push(
-                              `/public/article/${encodeURIComponent(source.id)}` as Href,
-                            )
-                          }
-                          style={styles.sourceLink}
-                        >
-                          <Ionicons
-                            name="book-outline"
-                            size={13}
-                            color="#087A3D"
-                          />
-                          <Text style={styles.sourceLinkText}>
-                            {am ? "ምንጭ" : "Read source"}:{" "}
-                            {am ? source.titleAm : source.title}
-                          </Text>
-                        </Pressable>
-                      ))}
-                      {isOpal && (!message.safety || message.redFlag === "clinical") && (
-                        <Pressable
-                          accessibilityRole="button"
-                          onPress={() => void callCareTeam()}
-                          style={styles.careTeamCall}
-                        >
-                          <Ionicons name="call-outline" size={15} color="#1C573E" />
-                          <Text style={styles.careTeamCallText}>
-                            {am ? "የጤና ቡድኑን ይደውሉ · +251 98 872 0194" : "Support · +251 98 872 0194"}
-                          </Text>
-                        </Pressable>
-                      )}
+                      <View style={[styles.messageBubble, styles.opalBubble]}>
+                        <Text style={styles.messageText}>
+                          {am ? "ኦፓል እያሰበ ነው..." : "Opal is thinking..."}
+                        </Text>
+                      </View>
                     </View>
-                  </View>
-                );
-              })}
-              {isSending && (
-                <View style={styles.messageRow}>
-                  <View style={styles.messageLeaf}>
-                    <Ionicons name="leaf" size={13} color="#2E8A4D" />
-                  </View>
-                  <View style={[styles.messageBubble, styles.opalBubble]}>
-                    <Text style={styles.messageText}>
-                      {am ? "ኦፓል እያሰበ ነው..." : "Opal is thinking..."}
+                  )}
+
+                  <Pressable
+                    disabled={isSending}
+                    onPress={() => setMessages([])}
+                    style={styles.resetButton}
+                  >
+                    <Ionicons name="refresh-outline" size={14} color="#438451" />
+                    <Text style={styles.resetText}>
+                      {am ? "አዲስ ውይይት ጀምር" : "Start a new conversation"}
                     </Text>
-                  </View>
+                  </Pressable>
                 </View>
               )}
-              <Pressable
-                disabled={isSending}
-                onPress={() => setMessages([])}
-                style={styles.resetButton}
-              >
-                <Ionicons name="refresh-outline" size={14} color="#438451" />
-                <Text style={styles.resetText}>
-                  {am ? "አዲስ ውይይት ጀምር" : "Start a new conversation"}
-                </Text>
-              </Pressable>
+            </ScrollView>
+
+            {/* Chat composer */}
+            <View style={styles.composerSection}>
+              <View style={styles.composer}>
+                <TextInput
+                  accessibilityLabel={am ? "ጥያቄዎን ይጻፉ" : "Ask Opal a question"}
+                  onChangeText={setDraft}
+                  editable={!isSending}
+                  onSubmitEditing={submitDraft}
+                  placeholder={
+                    am
+                      ? "ስለ ምግብ፣ ውሃ ወይም ንጽህና ይጠይቁ..."
+                      : "Ask about food, water or hygiene..."
+                  }
+                  placeholderTextColor="#9AA79D"
+                  returnKeyType="send"
+                  style={styles.input}
+                  value={draft}
+                />
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={am ? "ጥያቄ ላክ" : "Send question"}
+                  disabled={!draft.trim() || isSending}
+                  onPress={submitDraft}
+                  style={[
+                    styles.sendButton,
+                    (!draft.trim() || isSending) && styles.sendDisabled,
+                  ]}
+                >
+                  <Ionicons name="arrow-up" size={18} color="#FFFFFF" />
+                </Pressable>
+              </View>
+              <Text style={styles.disclaimer}>
+                {am
+                  ? "አጠቃላይ ትምህርት ብቻ። የመገለጫ መረጃ አይላክም፤ የግል ዝርዝሮችን አያስገቡ።"
+                  : "General education only. Your profile isn't sent; don't include personal details."}
+              </Text>
             </View>
-          )}
-          <View style={styles.quickQuestions}>
-            {[questions[0], questions[4], questions[5]].map((question) => (
-              <Pressable
-                accessibilityRole="button"
-                key={question.id}
-                disabled={isSending}
-                onPress={() =>
-                  requestAnswer(am ? question.questionAm : question.question)
-                }
-                style={({ pressed }) => [
-                  styles.quickQuestion,
-                  pressed && styles.quickQuestionPressed,
-                ]}
-              >
-                <Text numberOfLines={1} style={styles.quickQuestionText}>
-                  {am
-                    ? question.id === "food-hands"
-                      ? "የምግብ ደህንነት ትምህርት አሳየኝ"
-                      : question.id === "diabetes"
-                        ? "ስለ ስኳር በሽታ"
-                        : "የመጠጥ ውሃን ደህንነት እንዴት እጠብቅ?"
-                    : question.id === "food-hands"
-                      ? "Show me a food-safety lesson"
-                      : question.id === "diabetes"
-                        ? "Diabetes guidance"
-                        : "How do I keep drinking water safe?"}
-                </Text>
-              </Pressable>
-            ))}
-          </View>
-        </ScrollView>
-        <View style={styles.composerSection}>
-          <View style={styles.composer}>
-            <TextInput
-              accessibilityLabel={am ? "ጥያቄዎን ይጻፉ" : "Ask Opal a question"}
-              onChangeText={setDraft}
-              editable={!isSending}
-              onSubmitEditing={submitDraft}
-              placeholder={
-                am
-                  ? "ስለ ምግብ፣ ውሃ ወይም ንጽህና ይጠይቁ..."
-                  : "Ask about food, water or hygiene..."
-              }
-              placeholderTextColor="#9AA79D"
-              returnKeyType="send"
-              style={styles.input}
-              value={draft}
-            />
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel={am ? "ጥያቄ ላክ" : "Send question"}
-              disabled={!draft.trim() || isSending}
-              onPress={submitDraft}
-              style={[
-                styles.sendButton,
-                (!draft.trim() || isSending) && styles.sendDisabled,
-              ]}
-            >
-              <Ionicons name="arrow-up" size={18} color="#FFFFFF" />
-            </Pressable>
-          </View>
-          <Text style={styles.disclaimer}>
-            {am
-              ? "አጠቃላይ ትምህርት ብቻ ነው። የመገለጫ መረጃ አይላክም፤ የግል ዝርዝሮችን አያስገቡ።"
-              : "General education only. Your profile isn’t sent; don’t include personal details."}
-          </Text>
-        </View>
+          </>
+        )}
+
+        {/* ── Health Tools panel ── */}
+        {activeTab === "tools" && (
+          <OpalHealthTools
+            language={language}
+            onSelectPrompt={handleToolPrompt}
+          />
+        )}
       </KeyboardAvoidingView>
+
+      {/* ── JIT Consent modal ── */}
+      <OpalConsentModal
+        isOpen={consentModalOpen}
+        language={language}
+        onClose={handleConsentDismissed}
+        onConfirm={handleConsentConfirmed}
+      />
     </SafeAreaView>
   );
 }
+
+// ─── Styles ───────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
   safeArea: { backgroundColor: "#F8FBF8", flex: 1 },
   keyboardView: { flex: 1 },
   conversationScroll: { flex: 1 },
+
   pageHeader: {
     backgroundColor: "#FFFFFF",
     borderBottomColor: "#E2EAE3",
@@ -471,32 +534,79 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     paddingTop: 5,
   },
-  conversation: { paddingBottom: 10, paddingHorizontal: 15, paddingTop: 13 },
+
+  titleRow: {
+    backgroundColor: "#FFFFFF",
+    borderBottomColor: "#edf3ec",
+    borderBottomWidth: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    gap: 10,
+  },
   eyebrow: {
     color: "#438451",
     fontFamily: "Righteous_400Regular",
-    fontSize: 13,
-    letterSpacing: 1.2,
+    fontSize: 11,
+    letterSpacing: 1.1,
   },
   title: {
     color: "#203A28",
     fontFamily: "Righteous_400Regular",
-    fontSize: 27,
-    lineHeight: 29,
-    marginTop: 4,
+    fontSize: 22,
+    lineHeight: 25,
   },
   subtitle: {
     color: "#718075",
+    flex: 1,
     fontFamily: "Righteous_400Regular",
-    fontSize: 14,
-    lineHeight: 18,
-    marginTop: 2,
+    fontSize: 12,
+    lineHeight: 16,
+    textAlign: "right",
   },
+
+  // Tab bar
+  tabBar: {
+    backgroundColor: "#fff",
+    borderBottomColor: "#e2eae3",
+    borderBottomWidth: 1,
+    flexDirection: "row",
+    gap: 6,
+    padding: 8,
+  },
+  tabBtn: {
+    alignItems: "center",
+    borderColor: "#d2ddd0",
+    borderRadius: 12,
+    borderWidth: 1,
+    flex: 1,
+    flexDirection: "row",
+    gap: 6,
+    justifyContent: "center",
+    paddingVertical: 9,
+  },
+  tabBtnActive: {
+    backgroundColor: "#1c573e",
+    borderColor: "#1c573e",
+  },
+  tabText: {
+    color: "#547963",
+    fontFamily: "Righteous_400Regular",
+    fontSize: 13,
+  },
+  tabTextActive: { color: "#fff" },
+
+  // Conversation
+  conversation: { paddingBottom: 10, paddingHorizontal: 15, paddingTop: 13 },
+
+  // Welcome
   welcomeRow: {
     alignItems: "flex-start",
     flexDirection: "row",
     gap: 7,
-    marginTop: 18,
+    marginBottom: 14,
   },
   leafBadge: {
     alignItems: "center",
@@ -517,20 +627,49 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 10,
   },
-  welcomeTitle: { color: "#203A28", fontFamily: "Righteous_400Regular", fontSize: 14 },
+  welcomeTitle: {
+    color: "#203A28",
+    fontFamily: "Righteous_400Regular",
+    fontSize: 14,
+  },
   welcomeText: {
     color: "#657568",
     fontFamily: "Righteous_400Regular",
     fontSize: 13,
     lineHeight: 18,
-    marginTop: 5,
+    marginTop: 4,
   },
-  messageList: { marginTop: 17 },
+
+  // 2×2 quick prompts
+  quickGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+  },
+  quickCard: {
+    backgroundColor: "#FFFFFF",
+    borderColor: "#DEE8DF",
+    borderRadius: 14,
+    borderWidth: 1,
+    justifyContent: "center",
+    minHeight: 60,
+    padding: 10,
+    width: "47.5%",
+  },
+  quickCardPressed: { backgroundColor: "#EEF7EF" },
+  quickCardText: {
+    color: "#4B6751",
+    fontFamily: "Righteous_400Regular",
+    fontSize: 13,
+    lineHeight: 17,
+  },
+
+  // Messages
+  messageList: { gap: 10, marginTop: 4 },
   messageRow: {
     alignItems: "flex-end",
     flexDirection: "row",
     gap: 6,
-    marginBottom: 10,
   },
   userMessageRow: { justifyContent: "flex-end" },
   messageLeaf: {
@@ -541,7 +680,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: 22,
   },
-  messageBubble: { borderRadius: 13, maxWidth: "86%", padding: 10 },
+  messageBubble: { borderRadius: 13, maxWidth: "88%", padding: 11 },
   opalBubble: {
     backgroundColor: "#FFFFFF",
     borderColor: "#DDE8DF",
@@ -568,72 +707,29 @@ const styles = StyleSheet.create({
     lineHeight: 19,
   },
   userMessageText: { color: "#FFFFFF" },
-  sourceLink: {
-    alignItems: "center",
-    backgroundColor: "#EEF6EF",
-    borderRadius: 8,
-    flexDirection: "row",
-    gap: 4,
-    marginTop: 8,
-    paddingHorizontal: 7,
-    paddingVertical: 6,
-  },
-  sourceLinkText: {
-    color: "#087A3D",
-    flex: 1,
-    fontFamily: "Righteous_400Regular",
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  careTeamCall: {
-    alignItems: "center",
-    alignSelf: "flex-start",
-    backgroundColor: "#EAF2E9",
-    borderRadius: 999,
-    flexDirection: "row",
-    gap: 6,
-    marginTop: 10,
-    paddingHorizontal: 11,
-    paddingVertical: 8,
-  },
-  careTeamCallText: {
-    color: "#1C573E",
-    fontFamily: "Righteous_400Regular",
-    fontSize: 13,
-  },
+
   resetButton: {
     alignItems: "center",
     alignSelf: "center",
     flexDirection: "row",
     gap: 5,
-    marginTop: 2,
+    marginTop: 4,
     padding: 7,
   },
-  resetText: { color: "#438451", fontFamily: "Righteous_400Regular", fontSize: 13 },
-  quickQuestions: { flexDirection: "row", gap: 7, marginTop: 15 },
-  quickQuestion: {
-    backgroundColor: "#FFFFFF",
-    borderColor: "#DEE8DF",
-    borderRadius: 12,
-    borderWidth: 1,
-    flex: 1,
-    minHeight: 32,
-    justifyContent: "center",
-    paddingHorizontal: 8,
-  },
-  quickQuestionPressed: { backgroundColor: "#EEF7EF" },
-  quickQuestionText: {
-    color: "#4B6751",
+  resetText: {
+    color: "#438451",
     fontFamily: "Righteous_400Regular",
     fontSize: 13,
-    textAlign: "center",
   },
+
+  // Composer
   composerSection: {
     backgroundColor: "#FFFFFF",
     borderTopColor: "#E2EAE3",
     borderTopWidth: 1,
     paddingHorizontal: 13,
     paddingTop: 8,
+    paddingBottom: 4,
   },
   composer: { alignItems: "center", flexDirection: "row", gap: 7 },
   input: {
@@ -660,10 +756,11 @@ const styles = StyleSheet.create({
   disclaimer: {
     color: "#829087",
     fontFamily: "Righteous_400Regular",
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 12,
+    lineHeight: 17,
     marginHorizontal: 4,
     marginTop: 5,
+    marginBottom: 2,
     textAlign: "center",
   },
 });

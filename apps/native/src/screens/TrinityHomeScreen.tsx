@@ -1,10 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@clerk/expo";
+import { useQuery } from "convex/react";
+import { anyApi } from "convex/server";
 import { useRouter, type Href } from "expo-router";
 import { useEffect, useRef } from "react";
 import {
   Animated,
   ImageBackground,
+  Linking,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -19,7 +22,53 @@ import { homeCopy } from "../components/public/homeContent";
 import { AUTHENTICATED_HOME_TABS } from "../constants/authRoutes";
 import { useTrinityStore } from "../store/useTrinityStore";
 
+// ─── Static fallback services (shown if Convex has no published services yet) ──
+
+const STATIC_SERVICES = [
+  {
+    id: "lactation",
+    icon: "heart-outline",
+    badgeEn: "Maternal Health",
+    badgeAm: "የእናቶች ጤና",
+    titleEn: "Lactation & Postpartum Support",
+    titleAm: "የጡት ማጥባት እና የአራስ እናቶች",
+    href: "/learn",
+    accent: "#eef6f0",
+  },
+  {
+    id: "infant",
+    icon: "happy-outline",
+    badgeEn: "Child Nutrition",
+    badgeAm: "የህፃናት አመጋገብ",
+    titleEn: "Infant Feeding & Pantry",
+    titleAm: "የህፃናት ምግብ እና ጓዳ",
+    href: "/#pantry",
+    accent: "#f9f1e8",
+  },
+  {
+    id: "opal",
+    icon: "sparkles-outline",
+    badgeEn: "24/7 AI Companion",
+    badgeAm: "AI ረዳት",
+    titleEn: "Ask Opal AI Guide",
+    titleAm: "ኦፓል AI ረዳት",
+    href: "/ask-opal",
+    accent: "#edf3f8",
+  },
+  {
+    id: "consult",
+    icon: "people-outline",
+    badgeEn: "Clinical & Community",
+    badgeAm: "የባለሙያ ድጋፍ",
+    titleEn: "Care Consultations",
+    titleAm: "የጤና ምክክር",
+    href: "/portal/consultations/new",
+    accent: "#f2eff8",
+  },
+];
+
 export default function TrinityHomeScreen() {
+  const liveServices = useQuery(anyApi.services.listPublished);
   const router = useRouter();
   const { isSignedIn } = useAuth();
   const { language, savedIds, toggleSaved } = useTrinityStore();
@@ -220,6 +269,79 @@ export default function TrinityHomeScreen() {
             onToggleSaved={() => toggleSaved("child-nutrition")}
             onPress={() => openArticle("child-nutrition")}
           />
+
+          {/* ── Our Services section ── */}
+          <View style={[styles.sectionHeader, styles.growthHeader]}>
+            <View style={styles.sectionHeadingGroup}>
+              <View style={styles.sectionIcon}>
+                <Ionicons name="grid-outline" size={17} color="#287544" />
+              </View>
+              <Text style={styles.sectionTitle}>
+                {language === "am" ? "አገልግሎቶቻችን" : "Our Services"}
+              </Text>
+            </View>
+          </View>
+
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.servicesRow}
+          >
+            {/* Use live Convex data if seeded, otherwise static fallback */}
+            {(liveServices && liveServices.length > 0
+              ? liveServices.slice(0, 5).map((s: any) => ({
+                  id: s.slug ?? s._id,
+                  icon: (s.icon as string) ?? "grid-outline",
+                  badgeEn: s.badgeEn ?? "",
+                  badgeAm: s.badgeAm ?? "",
+                  titleEn: s.categoryEn ?? "",
+                  titleAm: s.categoryAm ?? "",
+                  href: s.primaryCtaHref ?? "/",
+                  accent: "#eef6f0",
+                }))
+              : STATIC_SERVICES
+            ).map((service: any) => (
+              <Pressable
+                key={service.id}
+                style={({ pressed }) => [
+                  styles.serviceCard,
+                  { backgroundColor: service.accent ?? "#eef6f0" },
+                  pressed && styles.serviceCardPressed,
+                ]}
+                onPress={() => {
+                  const url = service.href;
+                  if (url.startsWith("http")) {
+                    void Linking.openURL(url);
+                  } else {
+                    // Deep-link or just navigate to opal tab for in-app links
+                    if (url.includes("ask-opal") || url.includes("opal")) {
+                      router.push("/(app)/(tabs)/opal" as Href);
+                    } else if (url.includes("learn")) {
+                      router.push(isSignedIn ? "/(app)/(tabs)/learn" : "/public/learn" as Href);
+                    } else {
+                      router.push(isSignedIn ? "/(app)/(tabs)/care" : "/public/home" as Href);
+                    }
+                  }
+                }}
+                accessibilityRole="button"
+              >
+                <View style={styles.serviceCardIcon}>
+                  <Ionicons
+                    name={(service.icon as any) ?? "grid-outline"}
+                    size={18}
+                    color="#1c573e"
+                  />
+                </View>
+                <Text style={styles.serviceCardBadge} numberOfLines={1}>
+                  {language === "am" ? service.badgeAm : service.badgeEn}
+                </Text>
+                <Text style={styles.serviceCardTitle} numberOfLines={2}>
+                  {language === "am" ? service.titleAm : service.titleEn}
+                </Text>
+                <Ionicons name="arrow-forward-outline" size={13} color="#1c573e" style={styles.serviceCardArrow} />
+              </Pressable>
+            ))}
+          </ScrollView>
 
           <View style={styles.footer}>
             <View style={styles.footerIcon}>
@@ -453,4 +575,40 @@ const styles = StyleSheet.create({
     fontFamily: "Righteous_400Regular",
     fontSize: 14,
   },
+
+  // Services section
+  servicesRow: {
+    gap: 10,
+    paddingBottom: 4,
+    paddingHorizontal: 0,
+  },
+  serviceCard: {
+    borderRadius: 18,
+    gap: 6,
+    padding: 14,
+    width: 155,
+  },
+  serviceCardPressed: { opacity: 0.8, transform: [{ scale: 0.97 }] },
+  serviceCardIcon: {
+    alignItems: "center",
+    backgroundColor: "rgba(28,87,62,0.1)",
+    borderRadius: 10,
+    height: 34,
+    justifyContent: "center",
+    width: 34,
+  },
+  serviceCardBadge: {
+    color: "#355742",
+    fontFamily: "Righteous_400Regular",
+    fontSize: 11,
+    letterSpacing: 0.3,
+    marginTop: 2,
+  },
+  serviceCardTitle: {
+    color: "#163826",
+    fontFamily: "Righteous_400Regular",
+    fontSize: 13,
+    lineHeight: 17,
+  },
+  serviceCardArrow: { marginTop: 4 },
 });

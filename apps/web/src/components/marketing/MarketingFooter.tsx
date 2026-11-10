@@ -3,14 +3,15 @@
 import Link from "next/link";
 import { Wordmark } from "./Wordmark";
 import { useMarketingLanguage } from "./MarketingLanguageContext";
-import { ShieldAlert, Heart, Globe, PhoneCall, MessageSquare } from "lucide-react";
+import { Globe, PhoneCall, MessageSquare } from "lucide-react";
 
 export function MarketingFooter() {
   const { language, toggleLanguage, t } = useMarketingLanguage();
+  const brandName = "Trinity Health Solution";
 
   return (
     <footer className="border-t border-[#183b2d]/10 bg-[#f4f6ef] text-[#475b4e]">
-      <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 sm:py-20 lg:px-12">
+      <div className="mx-auto max-w-7xl px-5 pt-16 pb-12 sm:px-8 sm:pt-20 sm:pb-16 lg:px-12">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-4">
           {/* Col 1: Wordmark & Mission */}
           <div className="space-y-4">
@@ -147,17 +148,44 @@ export function MarketingFooter() {
             </div>
           </div>
         </div>
+      </div>
 
-        {/* Bottom Bar */}
-        <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-[#183b2d]/[0.08] pt-8 text-xs text-[#738578] sm:flex-row">
-          <p>
-            © {new Date().getFullYear()} Trinity Health Solution.{" "}
-            {t("All rights reserved.", "መብቱ በህግ የተጠበቀ ነው።")}
-          </p>
-          <p className="flex items-center gap-1.5">
-            <span>{t("Crafted with care for community health", "ለማህበረሰብ ጤና በጥንቃቄ የተዘጋጀ")}</span>
-            <Heart size={13} className="text-[#c78157] fill-[#c78157]" />
-          </p>
+      {/* Bottom Banner with CSS Mosaic Grid */}
+      <div className="relative w-full overflow-hidden bg-white dark:bg-[#0a0a0a]">
+        {/* CSS Mosaic Grid Generation */}
+        <div className="absolute inset-0 flex flex-col w-full h-full pointer-events-none select-none">
+          {Array.from({ length: 12 }).map((_, r) => (
+            <div key={r} className="flex-1 flex w-full">
+              {Array.from({ length: 48 }).map((_, c) => {
+                // Deterministic pseudo-randomness for the mosaic pattern
+                const hash = Math.sin(r * 12.9898 + c * 78.233) * 43758.5453;
+                const rand = hash - Math.floor(hash);
+
+                // Gradient mapping: top rows are lighter/transparent, bottom rows are solid cyan/blue
+                const rowFactor = r / 11; // 0 to 1
+
+                // Base opacity combines the random noise with the vertical gradient
+                const opacity = rand * 0.2 + rowFactor * 0.85;
+
+                return (
+                  <div
+                    key={c}
+                    className="flex-1 border-r border-b border-transparent"
+                    style={{
+                      backgroundColor: `rgba(89, 195, 224, ${opacity})`,
+                    }}
+                  />
+                );
+              })}
+            </div>
+          ))}
+        </div>
+
+        {/* Big Text Container */}
+        <div className="relative flex items-center justify-center w-full py-2 md:py-3 px-1 md:px-2 z-10 overflow-hidden">
+          <span className="text-[13vw] md:text-[14vw] font-black text-white/90 dark:text-white/60 mix-blend-overlay tracking-tighter leading-none select-none text-center whitespace-nowrap">
+            {brandName.toUpperCase()}
+          </span>
         </div>
       </div>
     </footer>

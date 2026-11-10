@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Tabs } from "expo-router";
-import { View } from "react-native";
+import { Linking, Pressable, StyleSheet, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import OpalFloatingButton from "../../../components/OpalFloatingButton";
 import { useTrinityStore } from "../../../store/useTrinityStore";
@@ -70,6 +70,35 @@ export default function TrinityTabs() {
         <Tabs.Screen name="opal" options={{ href: null }} />
       </Tabs>
       <OpalFloatingButton href="/(app)/(tabs)/opal" />
+
+      {/* Telegram community button — subtle, bottom-left above tab bar */}
+      <Pressable
+        onPress={() => void Linking.openURL("https://t.me/trinityhealthet")}
+        style={[styles.telegramFab, { bottom: 68 + insets.bottom }]}
+        accessibilityRole="link"
+        accessibilityLabel="Join Trinity Telegram community"
+      >
+        <Ionicons name="paper-plane-outline" size={15} color="#fff" />
+      </Pressable>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  telegramFab: {
+    alignItems: "center",
+    backgroundColor: "#2AABEE",
+    borderRadius: 20,
+    elevation: 4,
+    height: 36,
+    justifyContent: "center",
+    left: 14,
+    opacity: 0.88,
+    position: "absolute",
+    shadowColor: "#1a7db5",
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.25,
+    shadowRadius: 6,
+    width: 36,
+  },
+});
