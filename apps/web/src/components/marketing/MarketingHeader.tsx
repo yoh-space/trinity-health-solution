@@ -13,6 +13,8 @@ export function MarketingHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
+  const isHome = pathname === "/";
+  const isAtHeroTop = isHome && !isScrolled;
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,19 +36,29 @@ export function MarketingHeader() {
 
   return (
     <header
-      className={`sticky top-0 z-50 transition-all duration-200 ${
+      className={`sticky top-0 z-50 transition-all duration-300 ${
+        isHome ? "-mb-[75px]" : ""
+      } ${
         isScrolled
-          ? "border-b border-[#183b2d]/10 bg-[#fbfaf6]/95 backdrop-blur-md shadow-xs"
-          : "border-b border-[#183b2d]/[0.06] bg-[#fbfaf6]/90 backdrop-blur-sm"
+          ? "border-b border-[#183b2d]/10 bg-[#f5f2e9]/95 backdrop-blur-xl shadow-sm"
+          : isAtHeroTop
+            ? "border-b border-white/25 bg-transparent"
+            : "border-b border-[#183b2d]/[0.06] bg-[#fbfaf6]/90 backdrop-blur-sm"
       }`}
     >
       <nav
         aria-label="Main navigation"
         className={`mx-auto flex max-w-7xl items-center justify-between px-5 transition-all duration-200 sm:px-8 lg:px-12 ${
-          isScrolled ? "h-[64px]" : "h-[74px]"
+          isHome ? "h-[74px]" : isScrolled ? "h-[64px]" : "h-[74px]"
         }`}
       >
-        <Wordmark />
+        <div
+          className={
+            isAtHeroTop ? "rounded-sm bg-[#fbfaf6]/95 px-2 py-1 shadow-sm" : ""
+          }
+        >
+          <Wordmark />
+        </div>
 
         {/* Desktop Nav */}
         <div className="hidden items-center gap-6 lg:flex xl:gap-8">
@@ -63,9 +75,13 @@ export function MarketingHeader() {
                 key={item.href}
                 href={item.href}
                 className={`text-sm font-semibold transition ${
-                  isActive
-                    ? "text-[#1c573e] underline decoration-[#1c573e] decoration-2 underline-offset-8"
-                    : "text-[#495c50] hover:text-[#1c573e]"
+                  isAtHeroTop
+                    ? isActive
+                      ? "text-white underline decoration-white decoration-2 underline-offset-8"
+                      : "text-white/90 hover:text-white"
+                    : isActive
+                      ? "text-[#1c573e] underline decoration-[#1c573e] decoration-2 underline-offset-8"
+                      : "text-[#495c50] hover:text-[#1c573e]"
                 }`}
               >
                 {language === "am" ? item.labelAm : item.labelEn}
@@ -79,21 +95,42 @@ export function MarketingHeader() {
           {/* Language Switcher Button */}
           <button
             onClick={toggleLanguage}
-            className="flex items-center gap-1.5 rounded-full border border-[#d2dbd0] bg-white/80 px-2.5 py-1.5 text-xs font-semibold text-[#254734] shadow-xs transition hover:border-[#1c573e] hover:bg-white active:scale-95"
+            className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1.5 text-xs font-semibold shadow-xs transition active:scale-95 ${
+              isAtHeroTop
+                ? "border-white/35 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20"
+                : "border-[#d2dbd0] bg-white/80 text-[#254734] hover:border-[#1c573e] hover:bg-white"
+            }`}
             title="Switch Language / ቋንቋ ይቀይሩ"
           >
-            <Globe size={13} className="text-[#1c573e]" />
+            <Globe
+              size={13}
+              className={isAtHeroTop ? "text-white" : "text-[#1c573e]"}
+            />
             <span
               className={
-                language === "am" ? "font-bold text-[#1c573e]" : "text-[#718075]"
+                language === "am"
+                  ? isAtHeroTop
+                    ? "font-bold text-white"
+                    : "font-bold text-[#1c573e]"
+                  : isAtHeroTop
+                    ? "text-white/70"
+                    : "text-[#718075]"
               }
             >
               አማ
             </span>
-            <span className="text-[#a4aca1]">/</span>
+            <span className={isAtHeroTop ? "text-white/55" : "text-[#a4aca1]"}>
+              /
+            </span>
             <span
               className={
-                language === "en" ? "font-bold text-[#1c573e]" : "text-[#718075]"
+                language === "en"
+                  ? isAtHeroTop
+                    ? "font-bold text-white"
+                    : "font-bold text-[#1c573e]"
+                  : isAtHeroTop
+                    ? "text-white/70"
+                    : "text-[#718075]"
               }
             >
               EN
@@ -115,7 +152,11 @@ export function MarketingHeader() {
           {/* Mobile Menu Hamburger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="grid size-10 place-items-center rounded-xl border border-[#d2ddd0] bg-white text-[#244c39] lg:hidden"
+            className={`grid size-10 place-items-center rounded-xl border lg:hidden ${
+              isAtHeroTop
+                ? "border-white/40 bg-white/10 text-white"
+                : "border-[#d2ddd0] bg-white text-[#244c39]"
+            }`}
             aria-label="Toggle navigation menu"
           >
             {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}

@@ -20,3 +20,7 @@
 - [ ] Connect client requests, profiles, appointments, notes, and saved content to Convex tables with ownership and staff-role authorization.
 - [ ] Replace prototype request actions and demo records with persisted mutations and audit logs.
 - [ ] Add automated end-to-end coverage for client request creation, staff assignment, admin publishing, and unauthorized access.
+- [x] Refresh the homepage hero background and design using the uploaded Kuri mother hero-section reference style; preserve English/Amharic copy, existing links, and responsive layout.
+- [x] While scrolling down, give the homepage header navigation a blurred but nearly solid background; keep it sticky and preserve the current solid-header treatment on internal pages.
+- [x] Remove the “Pillar 1: Healthcare Access for Women & Girls” span/tag from the hero.
+- [x] Remove AI-generated-look hero decorations such as the sparkle/Sparkles icon and repeated floating badge/tag elements; retain only necessary text wrappers and present trust details without a cluster of tags.
