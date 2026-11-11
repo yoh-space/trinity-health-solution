@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Smartphone } from "lucide-react";
 import { useMarketingLanguage } from "./MarketingLanguageContext";
@@ -12,14 +11,24 @@ export function MarketingHero() {
     <section className="relative isolate overflow-hidden bg-[#3d4c3d] text-white">
       <div
         aria-hidden="true"
-        className="absolute inset-0 bg-[linear-gradient(108deg,#29382f_0%,#394a3b_45%,#59664f_76%,#798168_100%)]"
+        className="absolute inset-0 bg-cover bg-[center_32%] lg:hidden"
+        style={{ backgroundImage: "url('/images/mother-child-hero-mobile.webp')" }}
       />
       <div
         aria-hidden="true"
-        className="absolute inset-y-0 right-0 hidden w-[58%] bg-[linear-gradient(90deg,rgba(57,74,59,0)_0%,rgba(121,129,104,0.1)_100%)] lg:block"
+        className="absolute inset-y-0 right-0 hidden w-[68%] bg-cover bg-[center_18%] lg:block"
+        style={{ backgroundImage: "url('/images/mother-child-hero-desktop.webp')" }}
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 hidden bg-[linear-gradient(90deg,#29382f_0%,rgba(41,56,47,0.98)_30%,rgba(41,56,47,0.76)_53%,rgba(41,56,47,0.28)_78%,rgba(41,56,47,0.14)_100%)] lg:block"
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 bg-[linear-gradient(180deg,rgba(30,39,32,0.68)_0%,rgba(30,39,32,0.58)_42%,rgba(41,56,47,0.94)_100%)] lg:hidden"
       />
 
-      <div className="relative mx-auto grid min-h-[760px] w-full max-w-7xl grid-cols-1 items-center gap-0 px-5 pb-8 pt-24 sm:px-8 sm:pb-12 sm:pt-28 lg:min-h-[640px] lg:grid-cols-[1.05fr_0.95fr] lg:gap-5 lg:px-12 lg:py-0 xl:min-h-[700px]">
+      <div className="relative mx-auto grid min-h-[760px] w-full max-w-7xl grid-cols-1 items-center gap-0 px-5 pb-8 pt-24 sm:px-8 sm:pb-12 sm:pt-28 lg:min-h-[640px] lg:px-12 lg:py-0 xl:min-h-[700px]">
         <div className="relative z-10 max-w-[610px] lg:py-16">
           <div aria-hidden="true" className="mb-6 h-px w-14 bg-[#d8bd7c]" />
           <h1 className="font-serif text-[2.8rem] leading-[1.04] tracking-[-0.035em] text-[#fffdf8] sm:text-6xl lg:text-[4.45rem]">
@@ -77,21 +86,6 @@ export function MarketingHero() {
               "ነፃ እና ክፍት ተደራሽነት · አማርኛ እና እንግሊዝኛ · በማህበረሰብ ጤና ላይ የተመሰረተ"
             )}
           </p>
-        </div>
-
-        <div className="relative mx-auto mt-5 flex h-[390px] w-full max-w-[430px] items-end justify-center sm:h-[470px] lg:mt-0 lg:h-[640px] lg:max-w-none xl:h-[700px]">
-          <Image
-            src="/images/maternal-care-hero.png"
-            alt={t(
-              "A mother holding her baby, representing maternal and child health",
-              "እናት ህፃኗን ይዛ የምትንከባከብ፣ የእናቶችና የህፃናት ጤናን የሚወክል"
-            )}
-            width={896}
-            height={1200}
-            priority
-            sizes="(max-width: 1023px) 90vw, 46vw"
-            className="h-full w-auto max-w-full object-contain object-bottom drop-shadow-[0_22px_40px_rgba(0,0,0,0.24)]"
-          />
         </div>
       </div>
     </section>

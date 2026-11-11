@@ -24,3 +24,5 @@
 - [x] While scrolling down, give the homepage header navigation a blurred but nearly solid background; keep it sticky and preserve the current solid-header treatment on internal pages.
 - [x] Remove the “Pillar 1: Healthcare Access for Women & Girls” span/tag from the hero.
 - [x] Remove AI-generated-look hero decorations such as the sparkle/Sparkles icon and repeated floating badge/tag elements; retain only necessary text wrappers and present trust details without a cluster of tags.
+- [x] For mobile, use the newly supplied mother-and-child photograph as the hero background with a readable contrast overlay; hide the desktop portrait on mobile and preserve the desktop hero treatment.
+- [x] For desktop, use the newly supplied mother-and-child photo as the hero background on the right with a left-side contrast fade; remove the former portrait cutout and keep the separate mobile background.
