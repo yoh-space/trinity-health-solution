@@ -24,7 +24,7 @@ The public routes consume published Convex education content when available and 
 
 ### Scope and implementation
 
-Refresh the homepage hero to follow the user's supplied Kuri mother-and-child reference. Reuse `apps/web/public/images/maternal-care-hero.png`, a transparent portrait cutout, as the large focal image over a full-bleed botanical/olive background with a restrained contrast wash. Place the bilingual value proposition and existing calls to action on the left with an editorial serif headline, preserving responsive behavior and existing destinations. No new image asset or dependency is needed.
+Refresh the homepage hero to follow the user's supplied Kuri mother-and-child reference. On desktop, reuse `apps/web/public/images/maternal-care-hero.png`, a transparent portrait cutout, as the large focal image over a full-bleed botanical/olive background. For mobile, use the user's supplied mother-and-child photo as a full-bleed background, apply a contrast wash, and hide the desktop portrait to avoid a duplicate image. Store the supplied photo as an optimized WebP in `apps/web/public/images/mother-child-hero-mobile.webp`. Place the bilingual value proposition and existing calls to action over the image and preserve existing destinations.
 
 Remove the `Pillar 1: Healthcare Access for Women & Girls` focus label, the floating hero badge cards, the Community Health Grounded sparkle callout, decorative rings/orbs, and repeated chip-like hero labels. Keep only text wrappers needed for headline emphasis and action labels; present useful trust information as a restrained line rather than a collection of badge tags.
 
@@ -32,7 +32,7 @@ On the homepage, the marketing header overlays the hero at initial scroll positi
 
 ### Design
 
-Use an editorial maternal-health direction: deep botanical/olive field, warm restrained undertones, white/cream copy, a large serif-led headline, spacious left-aligned text, and the existing mother-and-child portrait as the visual anchor. Avoid decorative circles, floating mini-cards, sparkles, and pill/tag clusters. Interactions remain understated and preserve existing links and language switching.
+Use an editorial maternal-health direction: deep botanical/olive field, warm restrained undertones, white/cream copy, a large serif-led headline, spacious left-aligned text, and maternal imagery as the visual anchor. Use the supplied photo as the mobile background with enough contrast for copy legibility while retaining the existing portrait-on-gradient composition for desktop. Avoid decorative circles, floating mini-cards, sparkles, and pill/tag clusters. Interactions remain understated and preserve existing links and language switching.
 
 ### Project structure
 
@@ -40,3 +40,8 @@ Use an editorial maternal-health direction: deep botanical/olive field, warm res
 - `apps/web/src/components/marketing/MarketingHeader.tsx`: homepage top/scroll states while preserving internal-route styling.
 - `apps/web/src/app/page.tsx`: homepage-only header/hero overlap layout.
 - `apps/web/src/app/globals.css`: unchanged unless a small shared style is required by the implemented responsive composition.
+
+
+### Responsive hero imagery follow-up (2026-11-11)
+
+The desktop homepage hero uses the latest supplied mother-and-child photograph as a cover background on the right portion of the section, with a botanical left-to-right gradient to preserve text contrast. The former desktop portrait cutout is removed. Mobile retains the earlier supplied photo as its own full-section background with a stronger contrast wash. Both uploaded photos are stored as optimized WebP assets in `apps/web/public/images/`.
