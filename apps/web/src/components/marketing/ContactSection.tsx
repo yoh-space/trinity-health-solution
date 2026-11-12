@@ -202,8 +202,8 @@ export function ContactSection() {
               </span>
               <h3 className="mt-2 text-2xl font-bold text-[#163826]">
                 {t(
-                  "Trinity Health Solution — Addis Ababa, Ethiopia",
-                  "ትሪኒቲ ሄልዝ ሶሉሽን — አዲስ አበባ፣ ኢትዮጵያ"
+                  "Trinity Health Solution — Bahir Dar, Ethiopia",
+                  "ትሪኒቲ ሄልዝ ሶሉሽን — ባህር ዳር፣ ኢትዮጵያ"
                 )}
               </h3>
             </div>
@@ -218,7 +218,7 @@ export function ContactSection() {
             <div className="space-y-3 pt-2 text-xs sm:text-sm text-[#465e4f]">
               <div className="flex items-center gap-3">
                 <MapPin size={16} className="text-[#1c573e] shrink-0" />
-                <span>Addis Ababa, Ethiopia (አዲስ አበባ፣ ኢትዮጵያ)</span>
+                <span>Bahir Dar, Ethiopia — Papyrus Building, 9th Floor (ባህር ዳር፣ ኢትዮጵያ — ፓፒረስ ህንፃ፣ 9ኛ ፎቅ)</span>
               </div>
               <div className="flex items-center gap-3">
                 <Mail size={16} className="text-[#1c573e] shrink-0" />

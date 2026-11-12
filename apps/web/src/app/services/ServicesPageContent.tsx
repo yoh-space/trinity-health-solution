@@ -198,7 +198,7 @@ function ServicesInner() {
       descAm:
         "በአካል ወደ አጋር ጤና ጣቢያዎችና ክሊኒኮች በመሄድ የሚደረግ የአልትራሳውንድ፣ የላብራቶሪ እና የአካል ምርመራ።",
       icon: MapPin,
-      badge: "Addis Ababa & Regions",
+      badge: "Bahir Dar & Regions",
     },
     {
       titleEn: "Community Health Extension",
@@ -400,8 +400,8 @@ function ServicesInner() {
               </h2>
               <p className="mt-2.5 text-xs text-[#506657] sm:text-sm">
                 {t(
-                  "Whether you are in Addis Ababa, in a regional town, or overseas supporting family, Trinity provides seamless touchpoints.",
-                  "በአዲስ አበባ፣ በክልል ከተሞች ወይም በውጭ ሀገር ሆነው የቤተሰብዎን ጤና ለመከታተል፣ ትሪኒቲ ምቹ መንገዶችን ያቀርባል።"
+                  "Whether you are in Bahir Dar, in a regional town, or overseas supporting family, Trinity provides seamless touchpoints.",
+                  "በባህር ዳር፣ በክልል ከተሞች ወይም በውጭ ሀገር ሆነው የቤተሰብዎን ጤና ለመከታተል፣ ትሪኒቲ ምቹ መንገዶችን ያቀርባል።"
                 )}
               </p>
             </div>

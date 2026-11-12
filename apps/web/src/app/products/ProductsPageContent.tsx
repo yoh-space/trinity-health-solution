@@ -308,8 +308,8 @@ function ProductsInner() {
                 </a>
                 <span className="text-xs text-[#627768]">
                   {t(
-                    "Home Delivery in Addis Ababa • Regional Courier Available",
-                    "በአዲስ አበባ የቤት ለቤት አቅርቦት • በክልሎች በፖስታ ይደርሳል"
+                    "Home Delivery in Bahir Dar • Regional Courier Available",
+                    "በባህር ዳር የቤት ለቤት አቅርቦት • በክልሎች በፖስታ ይደርሳል"
                   )}
                 </span>
               </div>
@@ -508,7 +508,7 @@ function ProductsInner() {
                   </h3>
                   <p className="mt-3 text-xs sm:text-sm leading-relaxed text-[#516456]">
                     {t(
-                      "Living abroad and want to support an expecting sister, daughter, or relative in Ethiopia? Sponsor a full 3-month postpartum recovery and infant nutrition care kit delivered directly to their doorstep in Addis Ababa or regional towns.",
+                      "Living abroad and want to support an expecting sister, daughter, or relative in Ethiopia? Sponsor a full 3-month postpartum recovery and infant nutrition care kit delivered directly to their doorstep in Bahir Dar or regional towns.",
                       "በውጭ ሀገር ሆነው በኢትዮጵያ ላሉ ወላጅ እህት፣ ልጅ ወይም ቤተሰብ የተመጣጠነ ምግብና እንክብካቤ ማድረስ ይፈልጋሉ? የተሟላ የ3 ወር የአራስ እና የህፃናት እንክብካቤ ፓኬጅ በስማቸው በቤት ለቤት አድራሻ እናደርሳለን።"
                     )}
                   </p>

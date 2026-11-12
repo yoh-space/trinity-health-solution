@@ -55,3 +55,8 @@ Replace decorative sparkle glyphs across the web and native apps with establishe
 ## Admin navigation and public badge cleanup (2026-11-12)
 
 Constrain the admin sidebar between its fixed branding header and account footer and make the navigation group area independently vertically scrollable with `min-h-0`, `flex-1`, and `overflow-y-auto`; apply the same sizing to the mobile drawer. On customer-facing marketing pages, remove credential-style eyebrow/badge labels such as the certified services and verified products labels, plus similarly styled verification/curation claims. Preserve substantive service and product descriptions, education-source provenance, and operational client-account verification copy.
+
+
+## Website office-location correction (2026-11-12)
+
+Use one public office address throughout the website: Bahir Dar, Ethiopia — Papyrus Building, 9th Floor (with an Amharic equivalent in the bilingual contact section). Replace city-specific Addis Ababa references in the contact details, services coverage, delivery copy, and diaspora sponsorship copy with Bahir Dar while preserving existing regional coverage. No separate map service or location integration was found in the website source.
