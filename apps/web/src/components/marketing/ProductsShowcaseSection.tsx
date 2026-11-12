@@ -9,7 +9,6 @@ import {
   ShieldCheck,
   CheckCircle2,
   PhoneCall,
-  Sparkles,
 } from "lucide-react";
 import { useMarketingLanguage } from "./MarketingLanguageContext";
 

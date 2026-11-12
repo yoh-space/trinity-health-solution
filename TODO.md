@@ -26,3 +26,6 @@
 - [x] Remove AI-generated-look hero decorations such as the sparkle/Sparkles icon and repeated floating badge/tag elements; retain only necessary text wrappers and present trust details without a cluster of tags.
 - [x] For mobile, use the newly supplied mother-and-child photograph as the hero background with a readable contrast overlay; hide the desktop portrait on mobile and preserve the desktop hero treatment.
 - [x] For desktop, use the newly supplied mother-and-child photo as the hero background on the right with a left-side contrast fade; remove the former portrait cutout and keep the separate mobile background.
+
+- [x] Replace all rendered sparkle/Sparkles icons across web and native app interfaces with professional, context-relevant icons: conversation icons for Opal/help, food icons for meal tools, book icons for learning, and verification/health icons for curated products.
+- [x] Replace the admin service catalog's selectable Sparkles glyph with a conversation icon and keep existing saved service records rendering with that new icon.

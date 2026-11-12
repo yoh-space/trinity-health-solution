@@ -336,7 +336,7 @@ export default function FoodIdeasScreen() {
                   : "Create an AI meal idea"}
             </Text>
             <Ionicons
-              name={isGenerating ? "hourglass-outline" : "sparkles-outline"}
+              name={isGenerating ? "hourglass-outline" : "restaurant-outline"}
               size={18}
               color="#FFFFFF"
             />
