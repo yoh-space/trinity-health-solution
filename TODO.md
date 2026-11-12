@@ -29,3 +29,5 @@
 
 - [x] Replace all rendered sparkle/Sparkles icons across web and native app interfaces with professional, context-relevant icons: conversation icons for Opal/help, food icons for meal tools, book icons for learning, and verification/health icons for curated products.
 - [x] Replace the admin service catalog's selectable Sparkles glyph with a conversation icon and keep existing saved service records rendering with that new icon.
+- [x] Make the admin sidebar navigation vertically scrollable between its fixed brand header and profile/footer on desktop and in the mobile drawer, with the sidebar constrained to the viewport height.
+- [x] Remove certification-, verification-, validation-, or curation-style badge/eyebrow labels from public customer pages, including “Certified Maternal & Infant Health Services” and similar service, product, learning, assistant, and release badges; use neutral wording for equivalent marketing qualifiers while preserving substantive service descriptions and operational/editorial provenance.

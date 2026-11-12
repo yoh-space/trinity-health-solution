@@ -6,7 +6,6 @@ import { anyApi } from "convex/server";
 import {
   ShoppingBag,
   ArrowRight,
-  ShieldCheck,
   CheckCircle2,
   PhoneCall,
 } from "lucide-react";
@@ -25,17 +24,13 @@ export function ProductsShowcaseSection() {
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-12 border-b border-[#dde8db]">
           <div className="max-w-2xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#cbd8c6] bg-white px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#1c573e]">
-              <ShoppingBag size={13} className="text-[#1c573e]" />
-              <span>{t("Verified Maternal & Infant Care Products", "የተረጋገጡ የእናቶችና ህፃናት ምርቶች")}</span>
-            </div>
-            <h2 className="mt-4 text-3xl font-extrabold tracking-tight text-[#163826] sm:text-4xl">
+            <h2 className="text-3xl font-extrabold tracking-tight text-[#163826] sm:text-4xl">
               {t("Community Health Essentials & Nutrition Solutions", "ለእናቶችና ህፃናት ጤና አስፈላጊ የተመጣጠኑ ምርቶች")}
             </h2>
             <p className="mt-3 text-sm text-[#5a7261] leading-relaxed">
               {t(
-                "Handpicked, nutritionist-approved lactation blends, mineral-rich maternal porridges, safe water tablets, and visual learning tools for Ethiopian mothers.",
-                "በባለሙያዎች የተመረጡ የተፈጥሮ የጡት ወተት ማሳደጊያዎች፣ አልሚ የእናቶች እህሎች፣ የውሃ ማጣሪያዎች እና ምስላዊ መማሪያዎች።"
+                "Lactation blends, mineral-rich maternal porridges, safe water tablets, and visual learning tools for Ethiopian mothers.",
+                "የተፈጥሮ የጡት ወተት ማሳደጊያዎች፣ አልሚ የእናቶች እህሎች፣ የውሃ ማጣሪያዎች እና ምስላዊ መማሪያዎች።"
               )}
             </p>
           </div>

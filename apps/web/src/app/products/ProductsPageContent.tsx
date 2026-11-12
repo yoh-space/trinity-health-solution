@@ -12,7 +12,6 @@ import {
   ShoppingBag,
   PhoneCall,
   MessageSquare,
-  ShieldCheck,
   CheckCircle2,
   Gift,
   Building2,
@@ -158,7 +157,7 @@ const PRODUCTS: Product[] = [
       "Dishwasher and boiling-water sterilizer safe",
     ],
     highlightsAm: [
-      "100% ለምግብ የተረጋገጠ ሲሊኮን፣ ከቢፒኤ እና መርዛማ ኬሚካሎች የጸዳ",
+      "100% ለምግብ ተስማሚ ሲሊኮን፣ ከቢፒኤ እና መርዛማ ኬሚካሎች የጸዳ",
       "የምግብ ሙቀትን የሚያሳይ ማንኪያ የህፃናትን አፍ እንዳይቃጠል ይጠብቃል",
       "ከጠረጴዛ ጋር የሚጣበቅ መሰረት ምግቡ እንዳይደፋ ይከላከላል",
       "በፈላ ውሃ በቀላሉ የሚጸዳ",
@@ -276,14 +275,7 @@ function ProductsInner() {
         <section className="relative border-b border-[#183b2d]/10 bg-linear-to-b from-[#f2f7ef] to-[#fbfaf6] py-16 sm:py-24">
           <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
             <div className="max-w-3xl">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#cbe1d3] bg-[#eef7f1] px-3.5 py-1 text-xs font-bold text-[#1c573e]">
-                <ShieldCheck size={14} />
-                {t(
-                  "Curated Maternal & Child Health Solutions",
-                  "የተመረጡ የእናቶችና ህፃናት ጤና እና የተመጣጠነ ምግብ ምርቶች"
-                )}
-              </span>
-              <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-[#16382b] sm:text-5xl sm:leading-tight">
+              <h1 className="text-3xl font-extrabold tracking-tight text-[#16382b] sm:text-5xl sm:leading-tight">
                 {t(
                   "Wholesome Essentials for Motherhood and Early Childhood",
                   "ለእናትነት እና ለህፃናት ጤናማ እድገት የተዘጋጁ ተፈጥሯዊ ምርቶች"
@@ -291,7 +283,7 @@ function ProductsInner() {
               </h1>
               <p className="mt-4 text-base leading-relaxed text-[#4a5f51] sm:text-lg">
                 {t(
-                  "Designed by maternal health experts for Ethiopian families. From certified herbal lactation support to complementary infant feeding packs, safe water defense, and educational toolkits.",
+                  "Designed by maternal health experts for Ethiopian families. From herbal lactation support to complementary infant feeding packs, safe water defense, and educational toolkits.",
                   "በእናቶች ጤና ባለሙያዎች ለኢትዮጵያውያን ቤተሰቦች የተዘጋጀ። የተፈጥሮ የጡት ወተት ማሳደጊያዎችን፣ የህፃናት ተጨማሪ ምግቦችን፣ የንጹህ ውሃ ማጣሪያዎችን እና የትምህርት መገልገያዎችን በአንድ ላይ ያግኙ።"
                 )}
               </p>
@@ -562,15 +554,11 @@ function ProductsInner() {
                   </h3>
                   <p className="mt-3 text-xs sm:text-sm leading-relaxed text-[#516456]">
                     {t(
-                      "We partner with health centers, regional health bureaus, NGOs, and humanitarian agencies to supply certified safe water kits, visual nutrition flipcharts, and infant complementary porridge mixes at subsidized institutional volumes.",
+                      "We partner with health centers, regional health bureaus, NGOs, and humanitarian agencies to supply safe water kits, visual nutrition flipcharts, and infant complementary porridge mixes at subsidized institutional volumes.",
                       "ከጤና ጣቢያዎች፣ ከክልል ጤና ቢሮዎች እና ከረድኤት ድርጅቶች ጋር በመተባበር የውሃ ማጣሪያ ኪቶችን፣ ምስላዊ የትምህርት ካርዶችን እና የህፃናት ምግቦችን በጅምላ እናቀርባለን።"
                     )}
                   </p>
                   <ul className="mt-4 space-y-2 text-xs text-[#43594b]">
-                    <li className="flex items-center gap-2">
-                      <CheckCircle2 size={14} className="text-[#1c573e]" />
-                      <span>{t("Verified MoH & WHO guideline formulation compliance", "የጤና ጥበቃና የዓለም ጤና ድርጅት መስፈርቶችን ያሟላ")}</span>
-                    </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle2 size={14} className="text-[#1c573e]" />
                       <span>{t("Customized labeling in Amharic, Afan Oromo, Tigrigna, Somali", "በተለያዩ የሀገር ውስጥ ቋንቋዎች የተዘጋጀ")}</span>

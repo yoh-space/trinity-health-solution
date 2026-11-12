@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, MessageSquare, BookOpen, Send, ShieldCheck, HelpCircle } from "lucide-react";
+import { ArrowRight, MessageSquare, BookOpen, Send, HelpCircle } from "lucide-react";
 import { opalSampleQuestions } from "./marketingContent";
 import { useMarketingLanguage } from "./MarketingLanguageContext";
 
@@ -22,19 +22,14 @@ export function OpalLiveTeaser() {
         <div className="grid items-center gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:gap-16">
           {/* Left Column: Context & Explanations */}
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#cbd8c6] bg-white px-3.5 py-1.5 text-xs font-semibold uppercase tracking-wider text-[#2d563d] shadow-2xs">
-              <ShieldCheck size={14} className="text-[#1c573e]" />
-              {t("Evidence-Grounded Health Reference", "በህክምና ባለሙያዎች የተረጋገጠ የጤና መመሪያ")}
-            </div>
-
-            <h2 className="mt-4 text-3xl font-medium leading-[1.08] tracking-tight text-[#193b2d] sm:text-5xl">
+            <h2 className="text-3xl font-medium leading-[1.08] tracking-tight text-[#193b2d] sm:text-5xl">
               {t("Ask Opal anything.", "ኦፓልን ማንኛውንም የጤና ጥያቄ ይጠይቁ።")}
             </h2>
 
             <p className="mt-4 text-base leading-7 text-[#5e7063]">
               {t(
-                "Opal is Trinity's conversational health assistant. Built on Gemini and strictly grounded in reviewed lessons, Opal gives calm, verified answers to common family health questions in both Amharic and English.",
-                "ኦፓል (Opal) የትሪኒቲ የጤና ረዳት ነው። በህክምና ባለሙያዎች በተረጋገጡ ትምህርቶች ላይ ተመስርቶ ለቤተሰብ ጤና፣ አመጋገብና ንፅህና ጥያቄዎች ግልጽና አስተማማኝ ምላሾችን በአማርኛ እና በእንግሊዝኛ ይሰጣል።"
+                "Opal is Trinity's conversational health assistant. Built on Gemini and informed by health lessons, Opal gives clear, helpful answers to common family health questions in both Amharic and English.",
+                "ኦፓል (Opal) የትሪኒቲ የጤና ረዳት ነው። በጤና ትምህርቶች ላይ ተመስርቶ ለቤተሰብ ጤና፣ አመጋገብና ንፅህና ጥያቄዎች ግልጽና አጋዥ ምላሾችን በአማርኛ እና በእንግሊዝኛ ይሰጣል።"
               )}
             </p>
 

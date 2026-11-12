@@ -4,7 +4,7 @@ import { ServicesPageContent } from "./ServicesPageContent";
 export const metadata: Metadata = {
   title: "Clinical & Community Services | Trinity Health Solution (አገልግሎቶች)",
   description:
-    "Comprehensive maternal and infant healthcare services: antenatal care, certified lactation guidance, infant feeding plans, household WASH defense, and personalized telemedicine consultations for Ethiopian families.",
+    "Comprehensive maternal and infant healthcare services: antenatal care, lactation guidance, infant feeding plans, household WASH defense, and personalized telemedicine consultations for Ethiopian families.",
   alternates: {
     canonical: "/services",
   },

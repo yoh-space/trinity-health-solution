@@ -210,8 +210,8 @@ export function ContactSection() {
 
             <p className="text-xs leading-relaxed text-[#596d60] sm:text-sm">
               {t(
-                "Dedicated to expanding evidence-based maternal, child, and public health care learning across Ethiopian communities. Serving families, care centers, and humanitarian teams nationwide.",
-                "የተረጋገጡ የህክምና መመሪያዎችንና የጤና ትምህርቶችን ለመላው ኢትዮጵያውያን ተደራሽ የማድረግ ተልዕኮ። በመላ ሀገሪቱ ለሚገኙ እናቶች፣ ህፃናት እና የጤና ሰራተኞች አገልግሎት እንሰጣለን።"
+                "Dedicated to expanding maternal, child, and public health education across Ethiopian communities. Serving families, care centers, and humanitarian teams nationwide.",
+                "የእናቶች፣ ህፃናትና የህዝብ ጤና ትምህርትን ለመላው ኢትዮጵያውያን ተደራሽ የማድረግ ተልዕኮ። በመላ ሀገሪቱ ለሚገኙ እናቶች፣ ህፃናት እና የጤና ሰራተኞች አገልግሎት እንሰጣለን።"
               )}
             </p>
 

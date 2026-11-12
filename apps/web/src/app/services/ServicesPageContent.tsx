@@ -8,7 +8,6 @@ import {
   Stethoscope,
   CheckCircle2,
   PhoneCall,
-  ShieldCheck,
   ArrowRight,
   Droplets,
   Calendar,
@@ -89,7 +88,7 @@ function ServicesInner() {
       categoryEn: "Lactation Specialty & Infant Feeding in Emergencies",
       categoryAm: "የጡት ማጥባት ባለሙያ እና የአስቸኳይ ጊዜ ህፃናት አመጋገብ",
       taglineEn:
-        "Certified lactation support covering latching mechanics, low supply, safe relactation, and emergency infant feeding where water and privacy are limited.",
+        "Lactation support covering latching mechanics, low supply, safe relactation, and emergency infant feeding where water and privacy are limited.",
       taglineAm:
         "የጡት ማጥባት አያያዝ፣ የወተት እጥረት፣ እንዲሁም ንጹህ ውሃ በሌለበት አስቸኳይ ጊዜ ህፃናትን ደህንነቱ በተጠበቀ መንገድ የመመገብ ድጋፍ።",
       icon: Heart,
@@ -195,7 +194,7 @@ function ServicesInner() {
       titleEn: "Partner Clinic Network",
       titleAm: "የአጋር ክሊኒኮች አውታረ መረብ",
       descEn:
-        "In-person physical examination, ultrasound checkups, and lab screenings through verified partner health facilities.",
+        "In-person physical examination, ultrasound checkups, and lab screenings through partner health facilities.",
       descAm:
         "በአካል ወደ አጋር ጤና ጣቢያዎችና ክሊኒኮች በመሄድ የሚደረግ የአልትራሳውንድ፣ የላብራቶሪ እና የአካል ምርመራ።",
       icon: MapPin,
@@ -246,14 +245,7 @@ function ServicesInner() {
         <section className="relative border-b border-[#183b2d]/10 bg-linear-to-b from-[#f2f7ef] to-[#fbfaf6] py-16 sm:py-24">
           <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
             <div className="max-w-3xl">
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-[#cbe1d3] bg-[#eef7f1] px-3.5 py-1 text-xs font-bold text-[#1c573e]">
-                <ShieldCheck size={14} />
-                {t(
-                  "Certified Maternal & Infant Health Services",
-                  "የተረጋገጡ የእናቶችና ህፃናት ጤና አገልግሎቶች"
-                )}
-              </span>
-              <h1 className="mt-4 text-3xl font-extrabold tracking-tight text-[#16382b] sm:text-5xl sm:leading-tight">
+              <h1 className="text-3xl font-extrabold tracking-tight text-[#16382b] sm:text-5xl sm:leading-tight">
                 {t(
                   "Compassionate, Evidence-Grounded Healthcare for Mothers and Babies",
                   "ለውድ እናቶችና ህፃናት የተሟላ፣ ሳይንሳዊ እና ተግባራዊ የጤና አገልግሎት"

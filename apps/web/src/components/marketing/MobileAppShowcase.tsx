@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Download, Smartphone, QrCode, WifiOff, ShieldCheck, CheckCircle, ExternalLink } from "lucide-react";
+import { Download, Smartphone, QrCode, WifiOff, ShieldCheck, ExternalLink } from "lucide-react";
 import { useMarketingLanguage } from "./MarketingLanguageContext";
 import { ReleaseQrCode } from "./ReleaseQrCode";
 
@@ -116,10 +116,6 @@ export function MobileAppShowcase() {
               <ReleaseQrCode className="size-full transition group-hover:opacity-95" />
             </a>
 
-            <div className="flex items-center justify-center gap-2 text-[11px] font-medium text-[#c0d4c6]">
-              <CheckCircle size={14} className="text-[#f4e6c3]" />
-              <span>{t("Verified SHA-256 release builds via GitHub Actions", "በ GitHub Actions የተረጋገጠ የፕሮጀክት ስሪት")}</span>
-            </div>
           </div>
         </div>
       </div>

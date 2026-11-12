@@ -150,8 +150,8 @@ export const approachSteps: ApproachStep[] = [
   },
   {
     number: "03",
-    titleEn: "Verified with care",
-    titleAm: "በጥንቃቄ የተገመገመና የታመነ",
+    titleEn: "Prepared with care",
+    titleAm: "በጥንቃቄ የተዘጋጀ",
     descriptionEn:
       "Prepared in collaboration with health educators and aligned with public health nutrition guidance.",
     descriptionAm:
@@ -175,11 +175,11 @@ export const commitments: Commitment[] = [
     icon: Smartphone,
   },
   {
-    titleEn: "Carefully Curated Guidance",
-    titleAm: "የተረጋገጠ የጤና መረጃ",
+    titleEn: "Health Learning Materials",
+    titleAm: "የጤና ትምህርታዊ ይዘት",
     descriptionEn: "Educational notes developed with health educators and referenced standards.",
-    descriptionAm: "በጤና መመሪያዎች የተረጋገጠ አስተማማኝ ትምህርታዊ ይዘት።",
-    icon: ShieldCheck,
+    descriptionAm: "የጤና መመሪያዎችን ያካተተ ትምህርታዊ ይዘት።",
+    icon: BookOpen,
   },
   {
     titleEn: "Women & Community Centered",
@@ -350,17 +350,17 @@ export const audiencePathways: AudiencePathway[] = [
     titleEn: "For Community & Public Health Partners",
     titleAm: "ለአጋር ድርጅቶችና የህዝብ ጤና አስተማሪዎች",
     descriptionEn:
-      "Scale high-impact maternal, newborn, and child health interventions through verified digital dissemination.",
+      "Scale high-impact maternal, newborn, and child health interventions through bilingual digital distribution.",
     descriptionAm:
-      "የእናቶች፣ አራስ እና ህፃናት ጤና እና የአመጋገብ ፕሮግራሞችን በዘመናዊና አስተማማኝ የዲጂታል ቴክኖሎጂ ተደራሽ ያድርጉ።",
+      "የእናቶች፣ አራስ እና ህፃናት ጤና እና የአመጋገብ ፕሮግራሞችን በዘመናዊ ዲጂታል ቴክኖሎጂ ተደራሽ ያድርጉ።",
     pointsEn: [
-      "Evidence-backed health communications",
+      "Health communication resources",
       "Content publishing & curriculum management",
       "Privacy-first population health reach",
     ],
     pointsAm: [
-      "በሳይንሳዊ መረጃ ላይ የተመሰረተ የጤና ትምህርት",
-      "የትምህርት ይዘቶችን የማረጋገጥና የማሳተም ስርዓት",
+      "የጤና ትምህርትና መረጃ ማስተላለፊያ",
+      "የትምህርት ይዘቶችን የማሳተምና የማስተዳደር ስርዓት",
       "የማህበረሰብ ሚስጥርን የጠበቀ ዘመናዊ መድረክ",
     ],
     ctaLabelEn: "Publisher Portal",

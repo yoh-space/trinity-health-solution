@@ -50,3 +50,8 @@ The desktop homepage hero uses the latest supplied mother-and-child photograph a
 ## Project-wide icon refinement (2026-11-12)
 
 Replace decorative sparkle glyphs across the web and native apps with established, feature-specific interface icons while preserving routes, copy, and behavior. Use conversation icons for Opal/help actions, food-related icons for meal and pantry features, book icons for lessons, and a verification/health icon for the curated-products label. In the service admin catalog, make a conversation icon the selectable choice for the Opal assistant. Keep a compatibility alias for previously saved service rows whose icon value is still `Sparkles`, but render that value with the new conversation icon; do not render a sparkle glyph anywhere in the UI.
+
+
+## Admin navigation and public badge cleanup (2026-11-12)
+
+Constrain the admin sidebar between its fixed branding header and account footer and make the navigation group area independently vertically scrollable with `min-h-0`, `flex-1`, and `overflow-y-auto`; apply the same sizing to the mobile drawer. On customer-facing marketing pages, remove credential-style eyebrow/badge labels such as the certified services and verified products labels, plus similarly styled verification/curation claims. Preserve substantive service and product descriptions, education-source provenance, and operational client-account verification copy.
