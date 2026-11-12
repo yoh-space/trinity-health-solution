@@ -47,7 +47,7 @@ const STATIC_SERVICES = [
   },
   {
     id: "opal",
-    icon: "sparkles-outline",
+    icon: "chatbubble-ellipses-outline",
     badgeEn: "24/7 AI Companion",
     badgeAm: "AI ረዳት",
     titleEn: "Ask Opal AI Guide",
@@ -153,7 +153,7 @@ export default function TrinityHomeScreen() {
                 <View style={styles.heroTopRow}>
                   <View style={styles.heroBadge}>
                     <Ionicons
-                      name="sparkles"
+                      name="book-outline"
                       size={13}
                       color="#E8F3BB"
                     />

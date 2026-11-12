@@ -4,7 +4,7 @@ import Link from "next/link";
 import {
   Heart,
   Baby,
-  Sparkles,
+  MessageCircle,
   Stethoscope,
   CheckCircle2,
   PhoneCall,
@@ -37,8 +37,9 @@ function getServiceIcon(iconName?: string) {
       return Droplets;
     case "Baby":
       return Baby;
+    case "MessageCircle":
     case "Sparkles":
-      return Sparkles;
+      return MessageCircle;
     default:
       return Stethoscope;
   }
@@ -278,7 +279,7 @@ function ServicesInner() {
                   href="/ask-opal"
                   className="inline-flex items-center gap-2 rounded-full border border-[#cbd8cb] bg-white px-5 py-3 text-sm font-bold text-[#1c573e] shadow-xs transition hover:bg-[#f6faf6] active:scale-95"
                 >
-                  <Sparkles size={16} className="text-[#1c573e]" />
+                  <MessageCircle size={16} className="text-[#1c573e]" />
                   <span>{t("Ask Opal AI Assistant", "ኦፓልን AI ይጠይቁ")}</span>
                 </Link>
                 <a

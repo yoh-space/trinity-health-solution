@@ -6,7 +6,6 @@ import {
   Heart,
   Droplets,
   Baby,
-  Sparkles,
   Plus,
   Trash2,
   CheckCircle2,

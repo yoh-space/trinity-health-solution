@@ -8,7 +8,7 @@ import {
   Heart,
   Droplets,
   Baby,
-  Sparkles,
+  MessageCircle,
   Plus,
   Edit2,
   Trash2,
@@ -199,8 +199,9 @@ export function ServicesStudio() {
         return <Droplets size={18} />;
       case "Baby":
         return <Baby size={18} />;
+      case "MessageCircle":
       case "Sparkles":
-        return <Sparkles size={18} />;
+        return <MessageCircle size={18} />;
       default:
         return <Stethoscope size={18} />;
     }

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useQuery } from "convex/react";
 import { anyApi } from "convex/server";
 import {
-  Sparkles,
   Heart,
   Baby,
   Droplets,
@@ -278,7 +277,7 @@ function ProductsInner() {
           <div className="mx-auto max-w-7xl px-5 sm:px-8 lg:px-12">
             <div className="max-w-3xl">
               <span className="inline-flex items-center gap-1.5 rounded-full border border-[#cbe1d3] bg-[#eef7f1] px-3.5 py-1 text-xs font-bold text-[#1c573e]">
-                <Sparkles size={14} />
+                <ShieldCheck size={14} />
                 {t(
                   "Curated Maternal & Child Health Solutions",
                   "የተመረጡ የእናቶችና ህፃናት ጤና እና የተመጣጠነ ምግብ ምርቶች"
@@ -616,7 +615,7 @@ function ProductsInner() {
                 href="/ask-opal"
                 className="inline-flex items-center gap-2 rounded-full bg-[#f2e7c9] px-6 py-2.5 text-xs font-bold text-[#173b2c] shadow-xs hover:bg-[#ede0be]"
               >
-                <Sparkles size={14} />
+                <MessageSquare size={14} />
                 <span>{t("Ask Opal AI Assistant", "ኦፓልን AI ይጠይቁ")}</span>
               </Link>
               <a

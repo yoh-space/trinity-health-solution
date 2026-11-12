@@ -10,7 +10,6 @@ import {
   Check,
   Lightbulb,
   LoaderCircle,
-  Sparkles,
   Utensils,
 } from "lucide-react";
 import {
@@ -184,7 +183,7 @@ export function PantryExplorerSection() {
         <div className="mx-auto mt-10 max-w-4xl rounded-[2rem] border border-[#dce3d8] bg-[#f2f7f0] p-6 shadow-[0_16px_40px_rgba(28,60,40,0.06)] sm:p-8">
           <div className="flex items-start gap-3">
             <span className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-[#1c573e] text-white">
-              <Sparkles size={20} />
+              <Utensils size={20} />
             </span>
             <div>
               <h3 className="text-xl font-bold tracking-tight text-[#1b3a2a]">

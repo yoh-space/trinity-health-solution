@@ -7,7 +7,7 @@ import {
   ArrowRight,
   Heart,
   Baby,
-  Sparkles,
+  MessageCircle,
   Stethoscope,
   CheckCircle2,
   PhoneCall,
@@ -24,8 +24,9 @@ function getServiceIcon(iconName?: string) {
       return Droplets;
     case "Baby":
       return Baby;
+    case "MessageCircle":
     case "Sparkles":
-      return Sparkles;
+      return MessageCircle;
     default:
       return Stethoscope;
   }
@@ -119,7 +120,7 @@ export function ServicesSection() {
       ctaLabelEn: "Ask Opal Now",
       ctaLabelAm: "ኦፓልን አሁን ይጠይቁ",
       ctaHref: "/ask-opal",
-      icon: Sparkles,
+      icon: MessageCircle,
       tint: "bg-[#edf3f8] text-[#2c5878]",
       border: "border-[#d8e4ef]",
     },

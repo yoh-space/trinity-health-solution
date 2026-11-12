@@ -92,8 +92,8 @@ export default function LearningScreen() {
           <View pointerEvents="none" style={styles.heroOrb} />
           <View style={styles.heroContent}>
             <View style={styles.heroKickerRow}>
-              <View style={styles.heroSparkle}>
-                <Ionicons name="sparkles" size={15} color="#E4F2BF" />
+              <View style={styles.heroIcon}>
+                <Ionicons name="book-outline" size={15} color="#E4F2BF" />
               </View>
               <Text style={styles.heroKicker}>
                 {am ? "ዛሬ ትንሽ ይማሩ" : "LEARN A LITTLE TODAY"}
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
   },
   heroContent: { justifyContent: "center", minHeight: 238, padding: 21 },
   heroKickerRow: { alignItems: "center", flexDirection: "row", gap: 8 },
-  heroSparkle: {
+  heroIcon: {
     alignItems: "center",
     backgroundColor: "#FFFFFF28",
     borderRadius: 12,

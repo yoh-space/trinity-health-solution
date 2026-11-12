@@ -12,7 +12,6 @@ import {
   Calendar,
   Settings,
   ShieldCheck,
-  Sparkles,
   ArrowRight,
 } from "lucide-react";
 import { useMarketingLanguage } from "@/components/marketing/MarketingLanguageContext";

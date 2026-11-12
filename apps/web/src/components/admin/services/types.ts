@@ -78,7 +78,7 @@ export function formFromService(item: ServiceItem): ServiceForm {
     deliverablesAm: item.deliverablesAm.length > 0 ? [...item.deliverablesAm] : [""],
     guidelineEn: item.guidelineEn,
     guidelineAm: item.guidelineAm,
-    icon: item.icon,
+    icon: item.icon === "Sparkles" ? "MessageCircle" : item.icon,
     accent: item.accent,
     primaryCtaLabelEn: item.primaryCtaLabelEn,
     primaryCtaLabelAm: item.primaryCtaLabelAm,
@@ -91,7 +91,7 @@ export const ICON_OPTIONS = [
   { id: "Heart", label: "Heart (Maternal & Lactation)" },
   { id: "Droplets", label: "Droplets (WASH & Water Safety)" },
   { id: "Baby", label: "Baby (Infant & Newborn)" },
-  { id: "Sparkles", label: "Sparkles (AI & Innovation)" },
+  { id: "MessageCircle", label: "Message Circle (AI Assistant)" },
 ];
 
 export const ACCENT_OPTIONS = [

@@ -45,3 +45,8 @@ Use an editorial maternal-health direction: deep botanical/olive field, warm res
 ### Responsive hero imagery follow-up (2026-11-11)
 
 The desktop homepage hero uses the latest supplied mother-and-child photograph as a cover background on the right portion of the section, with a botanical left-to-right gradient to preserve text contrast. The former desktop portrait cutout is removed. Mobile retains the earlier supplied photo as its own full-section background with a stronger contrast wash. Both uploaded photos are stored as optimized WebP assets in `apps/web/public/images/`.
+
+
+## Project-wide icon refinement (2026-11-12)
+
+Replace decorative sparkle glyphs across the web and native apps with established, feature-specific interface icons while preserving routes, copy, and behavior. Use conversation icons for Opal/help actions, food-related icons for meal and pantry features, book icons for lessons, and a verification/health icon for the curated-products label. In the service admin catalog, make a conversation icon the selectable choice for the Opal assistant. Keep a compatibility alias for previously saved service rows whose icon value is still `Sparkles`, but render that value with the new conversation icon; do not render a sparkle glyph anywhere in the UI.
