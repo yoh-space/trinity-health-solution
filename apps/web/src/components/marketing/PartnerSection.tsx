@@ -46,16 +46,16 @@ export function PartnerSection() {
       titleEn: "Maternity Clinics & Health Centers",
       titleAm: "የእናቶች ክሊኒኮችና የጤና ጣቢያዎች",
       descriptionEn:
-        "Empower your patients with verified post-discharge lactation and infant feeding guides. Reduce preventable complications through continuous education.",
+        "Empower your patients with post-discharge lactation and infant feeding guides. Reduce preventable complications through continuous education.",
       descriptionAm:
         "ከወሊድ በኋላ የሚሰጡ የጡት ማጥባትና የህፃናት አመጋገብ መመሪያዎችን ለተገልጋዮችዎ ያቅርቡ። ቀጣይነት ባለው ትምህርት ችግሮችን አስቀድመው ይከላከሉ።",
       benefitsEn: [
-        "Curated post-delivery maternal guidance cards",
+        "Post-delivery maternal guidance cards",
         "Streamlined patient triage & follow-up queues",
         "Decreased emergency re-admissions",
       ],
       benefitsAm: [
-        "ለአራስ እናቶች የተዘጋጁ ደረጃቸውን የጠበቁ የማስተማሪያ ካርዶች",
+        "ለአራስ እናቶች የማስተማሪያ ካርዶች",
         "የተገልጋዮች ክትትልና የምክክር ቅደም ተከተል ስርዓት",
         "ተደጋጋሚ የወሊድ ተያያዥ ድንገተኛ ችግሮችን መቀነስ",
       ],
@@ -66,9 +66,9 @@ export function PartnerSection() {
       titleEn: "NGOs, UNICEF & Public Health Agencies",
       titleAm: "የልማት ድርጅቶችና የህዝብ ጤና ተቋማት",
       descriptionEn:
-        "Scale maternal and infant feeding in emergency protocols across conflict or drought-affected regions with verified Amharic & English digital dissemination.",
+        "Scale maternal and infant feeding in emergency protocols across conflict or drought-affected regions with Amharic and English digital materials.",
       descriptionAm:
-        "በአስቸጋሪ ሁኔታዎች ውስጥ ያሉ እናቶችና ህፃናት የተመጣጠነ ምግብ እንዲያገኙ በኢትዮጵያ ብሄራዊ መመሪያዎች የተረጋገጡ ዲጂታል ፕሮግራሞችን በስፋት ተደራሽ ያድርጉ።",
+        "በአስቸጋሪ ሁኔታዎች ውስጥ ያሉ እናቶችና ህፃናት የተመጣጠነ ምግብ እንዲያገኙ በአማርኛና በእንግሊዝኛ ዲጂታል ፕሮግራሞችን በስፋት ተደራሽ ያድርጉ።",
       benefitsEn: [
         "Offline-capable mobile app for field health workers",
         "Alignment with Ethiopian National Health Guidelines",

@@ -22,7 +22,7 @@ export function AudiencePathways() {
         </h2>
         <p className="mt-4 text-sm leading-6 text-[#627367] sm:text-base">
           {t(
-            "Whether you are looking for guidance for your family, organizing community outreach, or publishing verified public health curricula, Trinity provides tailored tools.",
+            "Whether you are looking for guidance for your family, organizing community outreach, or publishing public health curricula, Trinity provides tailored tools.",
             "ለቤተሰብዎ የጤና እውቀት ቢፈልጉ፣ የማህበረሰብ ጤና ስራዎችን ቢያስተባብሩ ወይም የጤና መመሪያዎችን ቢያትቱ፣ ትሪኒቲ ተስማሚ መሳሪያዎችን ያቀርባል።"
           )}
         </p>

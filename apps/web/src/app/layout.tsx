@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     template: "%s | Trinity Health Solution",
   },
   description:
-    "Community-first, evidence-grounded maternal and infant health education for Ethiopian families. Access approved infant nutrition guidance, clean water safety, antenatal care, and Ask Opal AI guidance in English and Amharic (አማርኛ)።",
+    "Community-first maternal and infant health education for Ethiopian families. Access infant nutrition guidance, clean water safety, antenatal care, and Ask Opal AI guidance in English and Amharic (አማርኛ)።",
   applicationName: "Trinity Health Solution",
   authors: [{ name: "Trinity Health Solution", url: siteUrl }],
   generator: "Next.js",
@@ -75,7 +75,7 @@ export const metadata: Metadata = {
     title:
       "Trinity Health Solution | Maternal & Infant Health Care Access (ትሪኒቲ ሄልዝ ሶሉሽን)",
     description:
-      "Empowering Ethiopian mothers, children, and families with practical, culturally rooted health learning, verified infant nutrition guidance, and 24/7 Opal AI assistance in English and Amharic (አማርኛ)።",
+      "Empowering Ethiopian mothers, children, and families with practical, culturally rooted health learning, infant nutrition guidance, and 24/7 Opal AI assistance in English and Amharic (አማርኛ)።",
     images: [
       {
         url: "/images/maternal-care-hero.png",

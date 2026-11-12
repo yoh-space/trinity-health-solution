@@ -139,10 +139,10 @@ export function AdminSidebar({
   ];
 
   const sidebarContent = (
-    <div className="flex h-full flex-col justify-between border-r border-[#dbe4db] bg-white text-[#183a25]">
+    <div className="flex h-full min-h-0 flex-col overflow-hidden border-r border-[#dbe4db] bg-white text-[#183a25]">
       {/* Top Header & Branding */}
-      <div>
-        <div className="flex h-16 items-center justify-between border-b border-[#e5ede4] px-5">
+      <div className="flex min-h-0 flex-1 flex-col">
+        <div className="flex h-16 shrink-0 items-center justify-between border-b border-[#e5ede4] px-5">
           <Link
             href="/"
             className="flex items-center gap-2.5 transition hover:opacity-90"
@@ -169,7 +169,7 @@ export function AdminSidebar({
         </div>
 
         {/* Workspace Indicator Pill */}
-        <div className="p-4 pb-2">
+        <div className="shrink-0 p-4 pb-2">
           <div className="flex items-center justify-between rounded-xl border border-[#d6e2d6] bg-[#f4f7f2] px-3.5 py-2.5">
                 <p className="text-[11px] font-bold text-[#1a3828]">
                   Administrator Desk
@@ -178,7 +178,7 @@ export function AdminSidebar({
         </div>
 
         {/* Navigation Groups */}
-        <nav className="mt-2 flex flex-col gap-5 px-3">
+        <nav className="mt-2 flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain px-3 pb-3">
           {navItems.map((group, groupIndex) => (
             <div key={groupIndex}>
               <p className="px-3 text-[10px] font-bold uppercase tracking-wider text-[#829687]">
@@ -243,7 +243,7 @@ export function AdminSidebar({
       </div>
 
       {/* Bottom Profile & Session Panel */}
-      <div className="border-t border-[#e5ede4] p-4">
+      <div className="shrink-0 border-t border-[#e5ede4] p-4">
         <div className="flex items-center justify-between rounded-xl border border-[#dfe7df] bg-[#f8faf7] p-2.5">
           <div className="flex items-center gap-2.5 overflow-hidden">
             <div className="grid size-8 shrink-0 place-items-center rounded-full bg-[#1c573e] text-white font-bold text-xs">
@@ -285,7 +285,7 @@ export function AdminSidebar({
             className="fixed inset-0 bg-black/40 backdrop-blur-xs transition-opacity"
             onClick={onCloseMobile}
           />
-          <div className="relative w-64 max-w-full shadow-2xl">
+          <div className="relative h-full min-h-0 w-64 max-w-full shadow-2xl">
             {sidebarContent}
           </div>
         </div>

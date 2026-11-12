@@ -22,10 +22,7 @@ export function LearningTopicsSection() {
     >
       <div className="flex flex-col justify-between gap-6 sm:flex-row sm:items-end">
         <div>
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#8a7550]">
-            {t("Culturally Validated Curriculum", "የተረጋገጡ የትምህርት ርዕሶች")}
-          </p>
-          <h2 className="mt-3 max-w-xl text-3xl font-medium leading-[1.08] tracking-[-0.05em] text-[#193b2d] sm:text-5xl">
+          <h2 className="max-w-xl text-3xl font-medium leading-[1.08] tracking-[-0.05em] text-[#193b2d] sm:text-5xl">
             {t(
               "Good health starts with understanding.",
               "ጥሩ ጤና የሚጀምረው በማወቅና በመረዳት ነው።"
